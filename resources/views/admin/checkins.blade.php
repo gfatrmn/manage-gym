@@ -132,25 +132,43 @@
         </div>
 
         <div class="action-grid">
+            {{-- Member Check-in dengan Search --}}
             <div class="panel-card d-flex flex-column justify-content-between">
                 <div>
                     <h5 class="fw-bold mb-3"><i class="fas fa-qrcode me-2 text-danger"></i>Member Check-in</h5>
-                    <p class="small text-white-50">Scan barcode atau pilih nama member dari list di bawah.</p>
+                    <p class="small text-white-50">Ketik nama atau kode member untuk mencari.</p>
                 </div>
                 <form action="{{ route('admin.checkins.store') }}" method="POST">
                     @csrf
-                    <div class="input-group">
-                        <select name="gym_member_id" class="form-select bg-white bg-opacity-10 border-0 text-white p-3"
-                            style="border-radius: 12px 0 0 12px;" required>
-                            <option value="" class="text-dark">Pilih Member...</option>
-                            @foreach ($memberOptions as $member)
-                                <option value="{{ $member->id }}" class="text-dark">{{ $member->full_name }}
-                                    ({{ $member->checkin_code }})
-                                </option>
-                            @endforeach
-                        </select>
-                        <button type="submit" class="btn btn-danger px-4" style="border-radius: 0 12px 12px 0;">Check
-                            In</button>
+
+                    <select name="gym_member_id" id="memberSelectHidden" style="display:none;" required>
+                        <option value="">-- Pilih Member --</option>
+                        @foreach ($memberOptions as $member)
+                            <option value="{{ $member->id }}" data-name="{{ $member->full_name }}"
+                                data-code="{{ $member->checkin_code }}">
+                                {{ $member->full_name }} ({{ $member->checkin_code }})
+                            </option>
+                        @endforeach
+                    </select>
+
+                    {{-- Wrapper dengan position relative agar dropdown menempel di sini --}}
+                    <div style="position: relative;">
+                        <div class="input-group">
+                            <input type="text" id="memberSearchInput"
+                                class="form-control bg-white bg-opacity-10 border-0 text-white p-3"
+                                style="border-radius: 12px 0 0 12px;" placeholder="Cari nama atau kode member..."
+                                autocomplete="off">
+
+                            <button type="submit" class="btn btn-danger px-4" style="border-radius: 0 12px 12px 0;">Check
+                                In</button>
+                        </div>
+
+                        {{-- Dropdown HARUS di dalam div position:relative ini --}}
+                        <div id="memberDropdown"
+                            style="display:none; position:fixed; z-index:999999;
+            background:#1e1e2e; border:1px solid rgba(255,255,255,0.12);
+            border-radius:10px; max-height:220px; overflow-y:auto;">
+                        </div>
                     </div>
                 </form>
             </div>
@@ -319,5 +337,80 @@
         }
         setInterval(updateClock, 1000);
         updateClock();
+    </script>
+
+    <script>
+        (function() {
+            const searchInput = document.getElementById('memberSearchInput');
+            const selectHidden = document.getElementById('memberSelectHidden');
+            const dropdown = document.getElementById('memberDropdown');
+
+            // Angkat ke body agar mengambang di atas segalanya
+            document.body.appendChild(dropdown);
+
+            const allMembers = Array.from(selectHidden.options)
+                .filter(o => o.value)
+                .map(o => ({
+                    value: o.value,
+                    name: o.dataset.name,
+                    code: o.dataset.code
+                }));
+
+            function positionDropdown() {
+                const rect = searchInput.getBoundingClientRect();
+                const dropHeight = dropdown.offsetHeight;
+                dropdown.style.top = (rect.top - dropHeight - 4) + 'px';
+                dropdown.style.left = rect.left + 'px';
+                dropdown.style.width = rect.width + 'px';
+            }
+
+            function renderDropdown(query) {
+                const q = query.toLowerCase().trim();
+                const filtered = q ?
+                    allMembers.filter(m =>
+                        m.name.toLowerCase().includes(q) ||
+                        m.code.toLowerCase().includes(q)) :
+                    allMembers;
+
+                dropdown.innerHTML = '';
+
+                if (!filtered.length) {
+                    dropdown.innerHTML =
+                        '<div style="padding:12px 16px;color:rgba(255,255,255,.4);font-size:13px;">Tidak ada member ditemukan</div>';
+                } else {
+                    filtered.forEach(m => {
+                        const div = document.createElement('div');
+                        div.style.cssText =
+                            'padding:10px 16px;color:#fff;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.05);font-size:14px;';
+                        div.innerHTML = `${m.name} <span style="font-size:11px;opacity:.5;">${m.code}</span>`;
+                        div.addEventListener('mousedown', e => {
+                            e.preventDefault();
+                            searchInput.value = `${m.name} (${m.code})`;
+                            selectHidden.value = m.value;
+                            dropdown.style.display = 'none';
+                        });
+                        div.addEventListener('mouseover', () => div.style.background = 'rgba(220,53,69,.15)');
+                        div.addEventListener('mouseout', () => div.style.background = '');
+                        dropdown.appendChild(div);
+                    });
+                }
+
+                dropdown.style.display = 'block';
+                positionDropdown();
+            }
+
+            searchInput.addEventListener('input', () => {
+                selectHidden.value = '';
+                renderDropdown(searchInput.value);
+            });
+            searchInput.addEventListener('focus', () => renderDropdown(searchInput.value));
+            searchInput.addEventListener('blur', () => setTimeout(() => dropdown.style.display = 'none', 150));
+            window.addEventListener('scroll', () => {
+                if (dropdown.style.display !== 'none') positionDropdown();
+            }, true);
+            window.addEventListener('resize', () => {
+                if (dropdown.style.display !== 'none') positionDropdown();
+            });
+        })();
     </script>
 @endsection

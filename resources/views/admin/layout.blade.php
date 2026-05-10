@@ -1230,7 +1230,6 @@
                 ['key' => 'members', 'label' => 'Member', 'route' => route('admin.members')],
                 ['key' => 'checkin', 'label' => 'Check In', 'route' => route('admin.checkins')],
                 ['key' => 'products', 'label' => 'Produk', 'route' => route('admin.products')],
-                ['key' => 'announcements', 'label' => 'Pengumuman', 'route' => route('admin.announcements')],
                 ['key' => 'reports', 'label' => 'Laporan', 'route' => route('admin.reports')],
             ];
             $cashierNavigation = [

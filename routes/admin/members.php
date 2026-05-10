@@ -29,7 +29,7 @@ $memberValidationRules = function (?GymMember $member = null): array {
     ];
 };
 
-// ── Index ─────────────────────────────────────────────────────────────────────
+// ── Index (Updated with Pagination) ──────────────────────────────────────────
 Route::get('/members', function (Request $request) {
     if ($redirect = RouteHelpers::ensureAdmin()) return $redirect;
 
@@ -37,10 +37,11 @@ Route::get('/members', function (Request $request) {
     $memberSection = $request->string('section', 'active')->lower()->value();
     $memberSearch  = trim($request->string('q')->value());
 
-    $membersQuery = GymMember::query()->latest();
+    // ── Base query untuk search ──────────────────────────────────────
+    $baseQuery = GymMember::query()->latest();
 
     if ($memberSearch !== '') {
-        $membersQuery->where(function ($q) use ($memberSearch) {
+        $baseQuery->where(function ($q) use ($memberSearch) {
             $q->where('full_name', 'like', '%' . $memberSearch . '%')
                 ->orWhere('email', 'like', '%' . $memberSearch . '%')
                 ->orWhere('phone', 'like', '%' . $memberSearch . '%')
@@ -48,17 +49,38 @@ Route::get('/members', function (Request $request) {
         });
     }
 
-    $members = $membersQuery->get();
+    // ── Counter (selalu dari seluruh data, tidak ikut section) ───────
+    // Pakai query DB langsung agar tidak terpengaruh pagination/filter section
+    $totalActiveCount   = GymMember::where('expires_at', '>=', $today)->count();
+    $totalExpiredCount  = GymMember::where('expires_at', '<', $today)->count();
+    $totalMembersCount  = GymMember::count();
 
-    $activeMembers  = $members->filter(fn(GymMember $m) => $m->expires_at && $m->expires_at->gte($today))->values();
-    $expiredMembers = $members->filter(fn(GymMember $m) => $m->expires_at && $m->expires_at->lt($today))->values();
+    // Expiring soon (7 hari ke depan) — dari seluruh data
+    $expiringSoonCount  = GymMember::whereBetween('expires_at', [$today, $today->copy()->addDays(7)])->count();
+
+    // ── Data untuk tabel (paginated, ikut search & section) ──────────
+    if ($memberSection === 'expired') {
+        $activeMembers  = (clone $baseQuery)->where('expires_at', '>=', $today)->paginate(8)->withQueryString();
+        $expiredMembers = (clone $baseQuery)->where('expires_at', '<', $today)->paginate(8)->withQueryString();
+        $currentItems   = $expiredMembers;
+    } else {
+        $activeMembers  = (clone $baseQuery)->where('expires_at', '>=', $today)->paginate(8)->withQueryString();
+        $expiredMembers = (clone $baseQuery)->where('expires_at', '<', $today)->paginate(8)->withQueryString();
+        $currentItems   = $activeMembers;
+    }
 
     return view('admin.members', array_merge(RouteHelpers::pageMeta('members'), [
-        'members'         => $members,
-        'memberSection'   => $memberSection,
-        'memberSearch'    => $memberSearch,
-        'activeMembers'   => $activeMembers,
-        'expiredMembers'  => $expiredMembers,
+        'memberSection'      => $memberSection,
+        'memberSearch'       => $memberSearch,
+        'activeMembers'      => $activeMembers,
+        'expiredMembers'     => $expiredMembers,
+        'currentItems'       => $currentItems,
+
+        // Counter cards — selalu total keseluruhan
+        'totalActiveCount'   => $totalActiveCount,
+        'totalExpiredCount'  => $totalExpiredCount,
+        'totalMembersCount'  => $totalMembersCount,
+        'expiringSoonCount'  => $expiringSoonCount,
     ]));
 })->name('members');
 
@@ -76,7 +98,6 @@ Route::post('/members', function (Request $request) {
     ]);
 
     $joinedAt = Carbon::parse($validated['joined_at']);
-    // Default pendaftaran pertama dapat 1 bulan
     $expiresAt = $joinedAt->copy()->addMonth();
 
     $memberData = [
@@ -104,7 +125,6 @@ Route::put('/members/{member}', function (Request $request, GymMember $member) u
 
     $validated = $request->validate($memberValidationRules($member));
 
-    // Data dasar profil (menjaga agar data lama tidak hilang)
     $data = [
         'full_name'      => $validated['full_name'],
         'email'          => $validated['email'] ?? $member->email,
@@ -113,11 +133,8 @@ Route::put('/members/{member}', function (Request $request, GymMember $member) u
         'joined_at'      => $validated['joined_at'] ?? $member->joined_at,
     ];
 
-    // Logika Perpanjangan Masa Aktif
     if ($request->filled('duration')) {
         $months = (int) $request->duration;
-
-        // Stacking Logic: jika belum expired tambah dari tanggal expired, jika sudah lewat tambah dari now
         $baseDate = ($member->expires_at && $member->expires_at->isFuture())
             ? $member->expires_at
             : now();
@@ -125,20 +142,19 @@ Route::put('/members/{member}', function (Request $request, GymMember $member) u
         $data['expires_at'] = $baseDate->addMonths($months);
         $data['status']     = 'active';
 
-        // Sesuaikan dengan kolom Model CashierTransaction kamu
         $hargaPerBulan = 90000;
 
         \App\Models\CashierTransaction::create([
             'invoice'            => 'INV-' . date('Ymd') . strtoupper(Str::random(6)),
             'gym_member_id'      => $member->id,
             'customer_name'      => $data['full_name'],
-            'transaction_group'  => 'membership',     // Kategori besar
-            'transaction_type'   => 'renewal',        // Jenis transaksi
+            'transaction_group'  => 'membership',
+            'transaction_type'   => 'renewal',
             'amount'             => $months * $hargaPerBulan,
-            'quantity'           => $months,          // Jumlah bulan
+            'quantity'           => $months,
             'payment_method'     => $data['payment_method'],
             'payment_status'     => 'verified',
-            'receipt_status'     => 'printed',        // Atau sesuaikan defaultmu
+            'receipt_status'     => 'printed',
             'transaction_at'     => now(),
             'notes'              => "Perpanjangan member oleh Admin: $months Bulan",
         ]);

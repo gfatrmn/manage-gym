@@ -47,12 +47,12 @@
             white-space: nowrap;
         }
 
-        .section-divider::after {
+        /* .section-divider::after {
             content: "";
             height: 1px;
             width: 100%;
             background: linear-gradient(90deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.1) 100%);
-        }
+        } */
 
         .stats-grid {
             display: grid;
