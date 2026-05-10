@@ -7,6 +7,7 @@
 
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=outfit:400,500,600,700,800|space-grotesk:500,700" rel="stylesheet" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
         <script>
             (() => {
@@ -253,41 +254,54 @@
             .sidebar-toggle {
                 position: fixed;
                 top: 50%;
-                left: 1rem;
-                transform: translateY(-50%);
+                left: 1rem; /* Posisi horizontal tetap di kiri */
+                transform: translateY(-50%); /* Trik untuk perataan vertikal sempurna */
                 z-index: 2060;
-                width: auto;
-                height: auto;
-                display: inline-flex;
+
+                /* Gunakan Flexbox untuk memposisikan ikon di tengah tombol */
+                display: flex;
                 align-items: center;
                 justify-content: center;
-                padding: 0;
-                border: 0;
-                background: transparent;
+
+                /* Ganti padding dengan ukuran tetap (width/height) untuk konsistensi */
+                width: 50px;
+                height: 50px;
+
+                border: 1px solid var(--border-strong);
+                background: var(--red);
                 color: var(--text-main);
-                box-shadow: none;
-                transition: left .28s ease, transform .2s ease;
+                border-radius: 50%;
+                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+                backdrop-filter: blur(10px);
+                transition: all .28s cubic-bezier(0.4, 0, 0.2, 1);
             }
 
             body.sidebar-open .sidebar-toggle {
-                left: min(360px, calc(100vw - 2rem));
-                transform: translate(0.5rem, -50%);
+                left: min(360px, calc(100vw - 3.5rem)); /* Menempel di dekat sidebar */
+                transform: translateY(-50%) rotate(180deg); /* Ikon berputar */
+                background: var(--red); /* Beri warna aksen saat terbuka */
+                color: white;
+                border-color: transparent;
             }
 
             .sidebar-toggle:hover {
-                color: var(--text-main);
-                transform: translateY(calc(-50% - 2px));
+                background: var(--red);
+                color: white;
+                transform: translateY(-50%) scale(1.05); /* Pastikan tetap di tengah saat hover */
             }
 
-            body.sidebar-open .sidebar-toggle:hover {
+            /* body.sidebar-open .sidebar-toggle:hover {
                 transform: translate(0.5rem, calc(-50% - 2px));
-            }
+            } */
 
             .sidebar-toggle-icon {
-                font-size: 2rem;
-                font-weight: 800;
+                font-size: 1.8rem; /* Ukuran icon */
+                font-weight: bold;
                 line-height: 1;
-                text-shadow: 0 8px 18px rgba(0, 0, 0, 0.2);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transform: translateY(-3px); /* Koreksi posisi icon agar benar-benar di tengah */
             }
 
             .sidebar-stack {
@@ -939,8 +953,13 @@
             }
 
             @media (max-width: 991.98px) {
-                .topbar-utility {
-                    padding-left: 3.4rem;
+                .sidebar-toggle {
+                    width: 42px;
+                    height: 52px;
+                    left: 0.25rem;
+                }
+                body.sidebar-open .sidebar-toggle {
+                    left: min(340px, calc(100vw - 3.2rem));
                 }
             }
 
@@ -1234,7 +1253,13 @@
         @endphp
         <div class="container-fluid py-3 py-lg-4">
             <button type="button" class="btn sidebar-toggle" id="sidebarToggle" aria-label="Buka navigasi" aria-expanded="false" aria-controls="adminSidebar">
-                <span class="sidebar-toggle-icon" id="sidebarToggleIcon">›</span>
+                <div class="sidebar-toggle-icon" id="sidebarToggleIcon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                </div>
             </button>
             <div class="sidebar-overlay" id="sidebarOverlay"></div>
             <div class="row g-3 g-lg-4">
@@ -1252,10 +1277,9 @@
                                     </div>
                                 </div>
 
-                                <div class="small text-uppercase text-white-50 fw-bold mb-3" style="letter-spacing:.12em;">Navigation</div>
+                                <div class="small text-uppercase text-white-50 fw-bold mb-1" style="letter-spacing:.12em;">Navigation</div>
                                 @foreach ($navigationGroups as $group)
                                     <div class="sidebar-nav-group">
-                                        <div class="sidebar-nav-label">{{ $group['label'] }}</div>
                                         <nav class="sidebar-nav-list">
                                             @foreach ($group['items'] as $item)
                                                 @php
@@ -1298,12 +1322,6 @@
                                 </div>
                             @endif
 
-                            <div class="dark-panel rounded-4 p-3">
-                                <div class="section-label text-white-50">Status Hari Ini</div>
-                                <div class="h4 fw-bold mt-3 mb-1">{{ $sidebarStatusTitle ?? 'Operasional Stabil' }}</div>
-                                <div class="small muted-copy">{{ $sidebarStatusNote ?? 'Pemantauan admin berjalan normal.' }}</div>
-                            </div>
-
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
                                 <button type="submit" class="btn btn-outline-light w-100 rounded-pill">Logout</button>
@@ -1314,11 +1332,6 @@
                 </aside>
 
                 <main class="col-12">
-                    @if (session('status'))
-                        <div class="alert alert-success border-0 shadow-sm rounded-4 mb-3">
-                            {{ session('status') }}
-                        </div>
-                    @endif
                     @if ($errors->any())
                         <div class="alert alert-danger border-0 shadow-sm rounded-4 mb-3">
                             <div class="fw-semibold mb-1">Data belum tersimpan.</div>
@@ -1353,11 +1366,10 @@
 
                 const syncSidebarState = () => {
                     const isOpen = body.classList.contains('sidebar-open');
-
                     toggleButton?.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-                    toggleButton?.setAttribute('aria-label', isOpen ? 'Sembunyikan navigasi' : 'Buka navigasi');
 
                     if (toggleIcon) {
+                        // Tetap gunakan ini agar simbol berubah saat diklik
                         toggleIcon.textContent = isOpen ? '‹' : '›';
                     }
                 };

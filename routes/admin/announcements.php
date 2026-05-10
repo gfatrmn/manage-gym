@@ -22,13 +22,14 @@ Route::get('/announcements', function () {
     $today            = Carbon::today();
     $sevenDaysFromNow = $today->copy()->addDays(7);
 
+    // Ambil pengumuman terbaru
     $announcements = Announcement::query()
         ->latest('publish_at')
         ->latest()
         ->get();
 
+    // PERBAIKAN: Hapus filter 'member_status' karena semua di tabel gym_members adalah member tetap
     $expiringMembers = GymMember::query()
-        ->where('member_status', 'member')
         ->whereNotNull('expires_at')
         ->whereDate('expires_at', '>=', $today)
         ->whereDate('expires_at', '<=', $sevenDaysFromNow)
@@ -37,8 +38,8 @@ Route::get('/announcements', function () {
         ->get();
 
     return view('admin.announcements', array_merge(RouteHelpers::pageMeta('announcements'), [
-        'announcements'  => $announcements,
-        'expiringMembers'=> $expiringMembers,
+        'announcements'   => $announcements,
+        'expiringMembers' => $expiringMembers,
     ]));
 })->name('announcements');
 
@@ -72,7 +73,7 @@ Route::post('/announcements/schedule', function (Request $request) {
     $validated = $request->validate([
         'title'      => ['required', 'string', 'max:255'],
         'body'       => ['required', 'string'],
-        'publish_at' => ['required', 'date'],
+        'publish_at' => ['required', 'date', 'after:now'],
     ]);
 
     Announcement::create([
@@ -97,7 +98,10 @@ Route::post('/announcements/archive', function (Request $request) {
 
     Announcement::query()
         ->whereKey($validated['announcement_id'])
-        ->update(['status' => 'archived', 'archived_at' => now()]);
+        ->update([
+            'status' => 'archived',
+            'archived_at' => now()
+        ]);
 
     return back()->with('status', 'Pengumuman berhasil dipindahkan ke arsip.');
 })->name('announcements.archive');
@@ -113,8 +117,8 @@ Route::post('/announcements/reminders', function (Request $request) {
     ]);
 
     $member = GymMember::query()->findOrFail($validated['gym_member_id']);
-    abort_unless($member->member_status === 'member', 404);
 
+    // PERBAIKAN: Hapus pengecekan member_status
     $member->update(['last_membership_reminder_at' => now()]);
 
     return back()->with('status', "Pengingat perpanjangan untuk {$member->full_name} berhasil dikirim.");

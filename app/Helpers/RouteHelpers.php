@@ -104,7 +104,7 @@ class RouteHelpers
 
     public static function memberLifecycleStatus(?GymMember $member): array
     {
-        $today          = Carbon::today();
+        $today           = Carbon::today();
         $sevenDaysFromNow = $today->copy()->addDays(7);
         $expiresAt      = $member?->expires_at;
 
@@ -151,8 +151,8 @@ class RouteHelpers
         } elseif (! empty($resolvedCheckinCode)) {
             $member = GymMember::query()->where('checkin_code', $resolvedCheckinCode)->first();
         } elseif ($actor === 'qr_member' && ! empty($resolvedPhone)) {
+            // PERBAIKAN: Hapus filter member_status
             $member = GymMember::query()
-                ->where('member_status', 'member')
                 ->whereNotNull('phone')
                 ->get()
                 ->first(fn (GymMember $candidate) => preg_replace('/\D+/', '', (string) $candidate->phone) === $resolvedPhone);
@@ -162,7 +162,8 @@ class RouteHelpers
             ? 'checkin_code'
             : (! empty($validated['gym_member_id']) ? 'gym_member_id' : 'submitted_phone');
 
-        if (! $member || ($member->member_status !== 'member' && ! in_array($actor, ['cashier', 'admin'], true))) {
+        // PERBAIKAN: Hapus pengecekan member_status
+        if (! $member) {
             return redirect()->route($redirectRoute, $redirectParams)
                 ->withErrors([$errorKey => 'Member untuk check-in tidak ditemukan.'])
                 ->withInput();
@@ -342,14 +343,9 @@ class RouteHelpers
             'sidebarStatusTitle'  => 'Shift Kasir Aktif',
             'sidebarStatusNote'   => 'Pantau pembayaran, transaksi, dan bukti pembayaran harian.',
             'cashierShift'        => ['start' => '08:00', 'end' => '16:00', 'label' => '08:00 - 16:00'],
+            // PERBAIKAN: Hapus filter member_status, cukup tampilkan member yang aktif
             'cashierCheckinMembers' => GymMember::query()
-                ->where(function ($q) use ($today) {
-                    $q->where('member_status', 'non_member')
-                        ->orWhere(function ($q) use ($today) {
-                            $q->where('member_status', 'member')
-                                ->whereDate('expires_at', '>=', $today);
-                        });
-                })
+                ->whereDate('expires_at', '>=', $today)
                 ->orderBy('full_name')
                 ->get(),
             'cashierTodayCheckins'   => $todayCheckins,

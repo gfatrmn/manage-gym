@@ -2,25 +2,31 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    /**
+     * Run the migrations.
+     */
     public function up(): void
     {
-        Schema::create('gym_checkins', function (Blueprint $table) {
+        Schema::create('membership_plans', function (Blueprint $table) {
             $table->id();
             $table->foreignId('gym_member_id')->constrained('gym_members')->onDelete('cascade');
-            $table->datetime('checked_in_at');
-            $table->string('checkin_method', 20)->default('admin');
+            $table->string('plan_name'); // e.g. Bulanan, Tahunan
+            $table->integer('amount');
+            $table->date('start_date');
+            $table->date('end_date');
             $table->timestamps();
         });
     }
 
+    /**
+     * Reverse the migrations.
+     */
     public function down(): void
     {
-        Schema::dropIfExists('gym_checkins');
+        Schema::dropIfExists('membership_plans');
     }
 };

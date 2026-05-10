@@ -2,11 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class GymMember extends Model
 {
@@ -16,66 +13,32 @@ class GymMember extends Model
         'full_name',
         'email',
         'phone',
-        'profile_photo_path',
-        'profile_photo_pending_path',
-        'profile_photo_pending_status',
-        'checkin_code',
-        'member_status',
-        'membership_plan',
-        'package_status',
-        'guest_visit_type',
-        'payment_method',
-        'payment_amount',
-        'can_check_in',
-        'visit_date',
         'joined_at',
         'expires_at',
-        'last_membership_reminder_at',
-        'notes',
+        'status',
+        'checkin_code',
+        'profile_photo_path',
     ];
 
-    protected function casts(): array
+    protected $casts = [
+        'joined_at' => 'date',
+        'expires_at' => 'date',
+    ];
+
+    // Accessor Inisial Nama
+    public function getProfileInitialsAttribute()
     {
-        return [
-            'can_check_in' => 'boolean',
-            'payment_amount' => 'integer',
-            'visit_date' => 'date',
-            'joined_at' => 'date',
-            'expires_at' => 'date',
-            'last_membership_reminder_at' => 'datetime',
-        ];
-    }
-
-    public function checkins(): HasMany
-    {
-        return $this->hasMany(GymCheckin::class);
-    }
-
-    public function getProfilePhotoUrlAttribute(): ?string
-    {
-        if (! $this->profile_photo_path) {
-            return null;
-        }
-
-        return Storage::disk('public')->url($this->profile_photo_path);
-    }
-
-    public function getProfilePhotoPendingUrlAttribute(): ?string
-    {
-        if (! $this->profile_photo_pending_path) {
-            return null;
-        }
-
-        return Storage::disk('public')->url($this->profile_photo_pending_path);
-    }
-
-    public function getProfileInitialsAttribute(): string
-    {
-        return Str::of($this->full_name)
-            ->trim()
-            ->explode(' ')
+        return collect(explode(' ', $this->full_name))
+            ->map(fn($n) => mb_substr($n, 0, 1))
             ->take(2)
-            ->map(fn (string $part) => Str::substr($part, 0, 1))
-            ->implode('');
+            ->join('');
+    }
+
+    // Accessor URL Foto
+    public function getProfilePhotoUrlAttribute()
+    {
+        return $this->profile_photo_path
+            ? asset('storage/' . $this->profile_photo_path)
+            : null;
     }
 }

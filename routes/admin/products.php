@@ -24,18 +24,7 @@ Route::get('/products', function () {
         ->get();
 
     return view('admin.products', array_merge(RouteHelpers::pageMeta('products'), [
-        'products' => $products,
-        'sidebarExtraSummary' => [
-            'label' => 'Inventaris Produk',
-            'title' => $products->count() . ' Produk Tersimpan',
-            'note'  => 'Kelola daftar suplemen dan vitamin yang bisa digunakan untuk kebutuhan operasional kasir.',
-        ],
-        'sidebarExtraItemsTitle' => 'Ringkasan Produk',
-        'sidebarExtraItems' => [
-            ['title' => $products->where('category', 'suplemen')->count() . ' Suplemen',    'note' => 'Produk kategori suplemen yang tersedia di master produk.'],
-            ['title' => $products->where('category', 'vitamin')->count() . ' Vitamin',      'note' => 'Produk kategori vitamin yang tersedia di master produk.'],
-            ['title' => $products->where('is_active', true)->count() . ' Produk Aktif',    'note' => 'Produk aktif siap dipakai untuk transaksi atau pengelolaan stok.'],
-        ],
+        'products' => $products
     ]));
 })->name('products');
 
