@@ -18,6 +18,7 @@ class GymMember extends Model
         'status',
         'checkin_code',
         'profile_photo_path',
+        'payment_method'
     ];
 
     protected $casts = [

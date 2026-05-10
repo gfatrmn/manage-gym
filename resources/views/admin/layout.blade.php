@@ -1228,7 +1228,7 @@
             $adminNavigation = [
                 ['key' => 'dashboard', 'label' => 'Dashboard', 'route' => route('admin.dashboard')],
                 ['key' => 'members', 'label' => 'Member', 'route' => route('admin.members')],
-                ['key' => 'non-members', 'label' => 'Non Member', 'route' => route('admin.non-members')],
+                ['key' => 'checkin', 'label' => 'Check In', 'route' => route('admin.checkins')],
                 ['key' => 'products', 'label' => 'Produk', 'route' => route('admin.products')],
                 ['key' => 'announcements', 'label' => 'Pengumuman', 'route' => route('admin.announcements')],
                 ['key' => 'reports', 'label' => 'Laporan', 'route' => route('admin.reports')],

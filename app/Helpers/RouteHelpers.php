@@ -195,7 +195,6 @@ class RouteHelpers
             'submitted_phone'     => $validated['submitted_phone'] ?? null,
             'verified_at'         => $isQrMemberCheckin ? null : now(),
             'verified_by'         => $isQrMemberCheckin ? null : (string) (session('auth.name') ?? session('auth.login') ?? $actor),
-            'notes'               => $validated['notes'] ?? null,
         ]);
 
         if ($isQrMemberCheckin) {

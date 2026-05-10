@@ -1,410 +1,323 @@
 ﻿@extends('admin.layout')
 
 @section('content')
+    @php
+        $paymentMethods = ['Cash', 'Transfer Bank', 'QRIS', 'Debit Card'];
+    @endphp
+
     <style>
-        .barcode-camera-card {
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 1rem;
+        .dashboard-page {
+            padding: 1rem 2rem;
+        }
+
+        .dashboard-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #fff;
+            margin: 0;
+        }
+
+        /* Stats Card */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .summary-card {
+            background: rgba(255, 255, 255, .03);
+            border: 1px solid rgba(255, 255, 255, .06);
+            border-radius: 1.2rem;
+            padding: 1.2rem;
+        }
+
+        .summary-label {
+            font-size: .7rem;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.5);
+            letter-spacing: 1px;
+        }
+
+        .summary-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #fff;
+            margin-top: 5px;
+        }
+
+        /* Action Cards */
+        .action-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .panel-card {
+            background: rgba(255, 255, 255, .025);
+            border: 1px solid rgba(255, 255, 255, .05);
+            border-radius: 1.2rem;
+            padding: 1.5rem;
+        }
+
+        .member-table thead th {
+            font-size: .7rem;
+            text-transform: uppercase;
+            color: #9ca3af;
             padding: 1rem;
-            background: rgba(255, 255, 255, 0.03);
+            border-bottom: 1px solid rgba(255, 255, 255, .06);
         }
 
-        .barcode-camera-preview {
-            position: relative;
-            width: 100%;
-            border-radius: 1rem;
-            background: #0f172a;
-            aspect-ratio: 16 / 10;
-            overflow: hidden;
+        .member-table tbody td {
+            color: #ffffff !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+            padding: 1rem;
         }
 
-        .barcode-camera-video,
-        .barcode-camera-fallback,
-        .barcode-camera-fallback video,
-        .barcode-camera-fallback canvas {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+        /* Nav Tab Custom */
+        .nav-pills .nav-link {
+            color: #dc3545;
+            border-radius: 50px;
+            padding: 8px 25px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: 0.3s;
+        }
+
+        .nav-pills .nav-link.active {
+            background: #dc3545 !important;
+            color: #fff;
+        }
+
+        .btn-checkin {
+            height: 60px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1.1rem;
         }
     </style>
 
-    <div class="topbar-card p-4 mb-4">
-        <div class="section-label">Check-in</div>
-        <h1 class="display-6 fw-bold mt-2 mb-2">Check-in member hari ini</h1>
-        <p class="muted-copy mb-0">Halaman ini menampilkan daftar member yang sudah check-in hari ini, urut dari yang paling baru. Check-in di halaman ini dibantu langsung oleh admin.</p>
-    </div>
-
-    <div class="row g-4 mb-4">
-        <div class="col-12 col-lg-4">
-            <div class="panel-card p-4 h-100">
-                <div class="section-label">Hari Ini</div>
-                <div class="display-6 fw-bold mt-2">{{ $todayCheckinsCount }}</div>
-                <p class="muted-copy mb-0">Total member yang check-in pada {{ now()->format('d M Y') }}.</p>
+    <div class="dashboard-page">
+        <div class="d-flex justify-content-between align-items-end mb-4">
+            <div>
+                <div class="text-uppercase small fw-bold opacity-50 mb-1" style="letter-spacing: 2px;">Front Desk</div>
+                <h1 class="dashboard-title">Check-in Hub</h1>
+            </div>
+            <div class="text-end">
+                <div class="text-white-50 small">{{ now()->format('l, d F Y') }}</div>
+                <div class="fw-bold fs-4 text-white" id="liveClock">00:00:00</div>
             </div>
         </div>
-        <div class="col-12 col-lg-8">
-            <div class="panel-card p-4 h-100">
-                <div class="section-label">Check-in Terbaru</div>
-                @if ($latestCheckin)
-                    <h2 class="h4 fw-bold mt-2 mb-1">{{ $latestCheckin->member?->full_name }}</h2>
-                    <p class="muted-copy mb-0">
-                        {{ $latestCheckin->checked_in_at->format('d M Y, H:i') }}
-                        -
-                        {{ $latestCheckin->checkin_method === 'cashier' ? 'Dibantu kasir' : 'Dibantu admin' }}
-                    </p>
-                @else
-                    <h2 class="h4 fw-bold mt-2 mb-1">Belum ada log check-in</h2>
-                    <p class="muted-copy mb-0">Belum ada member yang check-in pada {{ now()->format('d M Y') }}.</p>
-                @endif
+
+        @if (session('status'))
+            <div class="alert alert-success border-0 bg-success text-white rounded-3 mb-4 py-2 small shadow-sm">
+                <i class="fas fa-check-circle me-2"></i> {{ session('status') }}
+            </div>
+        @endif
+
+        <div class="summary-grid">
+            {{-- Card Member --}}
+            <div class="summary-card" style="background: rgba(25, 135, 84, 0.1); border: 1px solid rgba(25, 135, 84, 0.2);">
+                <div class="summary-label" style="color: #198754; opacity: 1; font-weight: 700;">Member Check-in Today</div>
+                <div class="summary-value" style="color: #198754;">{{ $todayCheckinsCount }}</div>
+            </div>
+
+            {{-- Card Guest --}}
+            <div class="summary-card"
+                style="background: rgba(13, 110, 253, 0.1); border: 1px solid rgba(13, 110, 253, 0.2);">
+                <div class="summary-label" style="color: #0d6efd; opacity: 1; font-weight: 700;">Daily Guest Today</div>
+                <div class="summary-value" style="color: #0d6efd;">{{ $todayGuestsCount }}</div>
             </div>
         </div>
-    </div>
 
-    <div class="panel-card p-4 mb-4">
-        <div class="section-label">Bantu Check-in Admin</div>
-        <h2 class="h4 fw-bold mt-2 mb-2">Form check-in member</h2>
-        <p class="muted-copy mb-3">Admin bisa scan barcode member atau tetap pilih manual. Sistem akan langsung mencatat check-in dengan jam saat ini.</p>
-        <form method="POST" action="{{ route('admin.checkins.store') }}">
-            @csrf
-            <input type="hidden" name="source" value="admin">
-            <div class="row g-3">
-                <div class="col-12 col-xl-6">
-                    <label class="form-label">Scan Barcode Member</label>
-                    <input
-                        type="text"
-                        name="checkin_code"
-                        class="form-control @error('checkin_code') is-invalid @enderror"
-                        value="{{ old('checkin_code') }}"
-                        placeholder="Scan atau ketik barcode member"
-                        autocomplete="off"
-                        data-barcode-input>
-                    @error('checkin_code')
-                        <div class="invalid-feedback d-block">{{ $message }}</div>
-                    @enderror
-                    <div class="small muted-copy mt-2">Scanner barcode biasanya langsung mengetik kode dan menekan Enter setelah scan.</div>
+        <div class="action-grid">
+            <div class="panel-card d-flex flex-column justify-content-between">
+                <div>
+                    <h5 class="fw-bold mb-3"><i class="fas fa-qrcode me-2 text-danger"></i>Member Check-in</h5>
+                    <p class="small text-white-50">Scan barcode atau pilih nama member dari list di bawah.</p>
                 </div>
-                <div class="col-12">
-                    <div class="barcode-camera-card">
-                        <div class="d-flex justify-content-between align-items-center gap-2 flex-wrap mb-3">
-                            <div>
-                                <div class="fw-semibold">Scan dari Kamera</div>
-                                <div class="small muted-copy">Buka kamera, arahkan ke barcode member, lalu sistem akan otomatis check-in.</div>
-                            </div>
-                            <div class="d-flex gap-2">
-                                <button type="button" class="btn btn-outline-light rounded-pill" data-camera-start>Buka Kamera Scan</button>
-                                <button type="button" class="btn btn-outline-secondary rounded-pill d-none" data-camera-stop>Tutup Kamera</button>
-                            </div>
-                        </div>
-                        <div class="barcode-camera-preview d-none" data-camera-preview-shell>
-                            <video class="barcode-camera-video d-none" autoplay muted playsinline data-camera-preview></video>
-                            <div class="barcode-camera-fallback d-none" data-camera-fallback></div>
-                        </div>
-                        <div class="small muted-copy mt-3" data-camera-status>Kamera belum aktif.</div>
+                <form action="{{ route('admin.checkins.store') }}" method="POST">
+                    @csrf
+                    <div class="input-group">
+                        <select name="gym_member_id" class="form-select bg-white bg-opacity-10 border-0 text-white p-3"
+                            style="border-radius: 12px 0 0 12px;" required>
+                            <option value="" class="text-dark">Pilih Member...</option>
+                            @foreach ($memberOptions as $member)
+                                <option value="{{ $member->id }}" class="text-dark">{{ $member->full_name }}
+                                    ({{ $member->checkin_code }})
+                                </option>
+                            @endforeach
+                        </select>
+                        <button type="submit" class="btn btn-danger px-4" style="border-radius: 0 12px 12px 0;">Check
+                            In</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="panel-card d-flex flex-column justify-content-between">
+                <div>
+                    <h5 class="fw-bold mb-3"><i class="fas fa-user-plus me-2 text-info"></i>Daily Guest (Tamu Harian)</h5>
+                    <p class="small text-white-50">Input tamu yang membayar kunjungan harian.</p>
+                </div>
+                <button class="btn btn-info w-100 btn-checkin text-white shadow-sm" data-bs-toggle="modal"
+                    data-bs-target="#addGuestModal">
+                    <i class="fas fa-ticket-alt me-2"></i> Input Tamu Harian
+                </button>
+            </div>
+        </div>
+
+        <div class="panel-card">
+            <ul class="nav nav-pills mb-4 bg-white bg-opacity-5 p-2 rounded-pill d-inline-flex" id="pills-tab"
+                role="tablist">
+                <li class="nav-item">
+                    <button class="nav-link active" id="pills-member-tab" data-bs-toggle="pill"
+                        data-bs-target="#pills-member" type="button">Member Logs</button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" id="pills-guest-tab" data-bs-toggle="pill" data-bs-target="#pills-guest"
+                        type="button">Guest Logs</button>
+                </li>
+            </ul>
+
+            <div class="tab-content" id="pills-tabContent">
+                {{-- TAB MEMBER --}}
+                <div class="tab-pane fade show active" id="pills-member">
+                    <div class="table-responsive">
+                        <table class="table align-middle member-table">
+                            <thead>
+                                <tr>
+                                    <th>Nama Member</th>
+                                    <th>Masa Aktif</th>
+                                    <th>Status</th>
+                                    <th>Waktu Check-in</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($checkinRecords as $record)
+                                    <tr>
+                                        <td>
+                                            <div class="fw-bold">{{ $record->member->full_name }}</div>
+                                            <div class="small opacity-50">{{ $record->member->checkin_code }}</div>
+                                        </td>
+                                        <td class="small">Hingga: {{ $record->member->expires_at?->format('d M Y') }}</td>
+                                        <td><span
+                                                class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-3 py-1 rounded-pill">Verified</span>
+                                        </td>
+                                        <td class="fw-bold">
+                                            {{-- Format: 10 May 2026, 10:55 --}}
+                                            {{ $record->checked_in_at->format('d M Y, H:i') }}
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="4" class="text-center py-5 opacity-50">Belum ada member check-in
+                                            hari ini.</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-                <div class="col-12 col-xl-8">
-                    <label class="form-label">Member Aktif Manual</label>
-                    <select name="gym_member_id" class="form-select @error('gym_member_id') is-invalid @enderror">
-                        <option value="">Pilih member</option>
-                        @foreach ($memberOptions as $member)
-                            <option value="{{ $member->id }}" @selected((string) old('gym_member_id') === (string) $member->id)>
-                                {{ $member->full_name }}
-                            </option>
-                        @endforeach
-                    </select>
-                    @error('gym_member_id')
-                        <div class="invalid-feedback d-block">{{ $message }}</div>
-                    @enderror
-                </div>
-                <div class="col-12 col-xl-4 d-flex align-items-end">
-                    <button type="submit" class="btn btn-dark rounded-pill w-100">Simpan Check-in Admin</button>
-                </div>
-                <div class="col-12">
-                    <div class="small muted-copy">Isi salah satu: scan barcode atau pilih member manual. Saat disimpan, sistem langsung mencatat check-in dengan jam sekarang.</div>
-                </div>
-                <div class="col-12">
-                    <label class="form-label">Catatan</label>
-                    <textarea name="notes" class="form-control" rows="3" placeholder="Opsional.">{{ old('notes') }}</textarea>
+
+                {{-- TAB GUEST --}}
+                <div class="tab-pane fade" id="pills-guest">
+                    <div class="table-responsive">
+                        <table class="table align-middle member-table">
+                            <thead>
+                                <tr>
+                                    <th>Nama Tamu</th>
+                                    <th>Metode Bayar</th>
+                                    <th>Harga</th>
+                                    <th>Waktu Kunjungan</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($dailyGuests as $guest)
+                                    <tr>
+                                        <td>{{ $guest->full_name }}</td>
+                                        <td>
+                                            <span class="badge bg-white bg-opacity-10 text-white fw-normal">
+                                                {{ $guest->payment_method }}
+                                            </span>
+                                        </td>
+                                        <td class="fw-bold text-info">
+                                            Rp {{ number_format($guest->payment_amount, 0, ',', '.') }}
+                                        </td>
+                                        <td class="fw-bold">
+                                            {{-- Format: 10 May 2026, 10:55 --}}
+                                            @if ($guest->visit_at)
+                                                {{ \Carbon\Carbon::parse($guest->visit_at)->format('d M Y, H:i') }}
+                                            @else
+                                                {{ $guest->created_at->format('d M Y, H:i') }}
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="4" class="text-center py-5 opacity-50">Belum ada tamu harian hari
+                                            ini.</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
-        </form>
+        </div>
+    </div>
+
+    <div class="modal fade" id="addGuestModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-dark text-white border-0 shadow-lg" style="border-radius: 1.5rem;">
+                <div class="modal-header border-bottom border-white border-opacity-10 p-4">
+                    <h5 class="modal-title fw-bold">Input Tamu Harian</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <form action="{{ route('admin.checkins.guest.store') }}" method="POST">
+                    @csrf
+                    <div class="modal-body p-4">
+                        <div class="mb-3">
+                            <label class="form-label small text-uppercase fw-bold opacity-50">Nama Tamu</label>
+                            <input type="text" name="name"
+                                class="form-control bg-white bg-opacity-10 border-0 text-white p-3"
+                                style="border-radius: 0.8rem;" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small text-uppercase fw-bold opacity-50">Harga (Rp)</label>
+                            <input type="number" name="price"
+                                class="form-control bg-white bg-opacity-10 border-0 text-white p-3"
+                                style="border-radius: 0.8rem;" value="25000" required>
+                        </div>
+                        <div class="mb-0">
+                            <label class="form-label small text-uppercase fw-bold opacity-50">Metode Pembayaran</label>
+                            <select name="payment_method"
+                                class="form-select bg-white bg-opacity-10 border-0 text-white p-3"
+                                style="border-radius: 0.8rem;" required>
+                                @foreach ($paymentMethods as $pm)
+                                    <option value="{{ $pm }}" class="text-dark">{{ $pm }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0 p-4 pt-0">
+                        <button type="submit" class="btn btn-info w-100 rounded-pill fw-bold py-3 text-white">Konfirmasi
+                            & Simpan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const barcodeInput = document.querySelector('[data-barcode-input]');
-            const cameraStartButton = document.querySelector('[data-camera-start]');
-            const cameraStopButton = document.querySelector('[data-camera-stop]');
-            const cameraPreviewShell = document.querySelector('[data-camera-preview-shell]');
-            const cameraPreview = document.querySelector('[data-camera-preview]');
-            const cameraFallback = document.querySelector('[data-camera-fallback]');
-            const cameraStatus = document.querySelector('[data-camera-status]');
-            const form = barcodeInput?.closest('form');
-            let mediaStream = null;
-            let detector = null;
-            let scanFrameId = null;
-            let isDetecting = false;
-            let isSubmitting = false;
-            let quaggaActive = false;
-
-            const loadScript = (src) => new Promise((resolve, reject) => {
-                const existingScript = document.querySelector(`script[src="${src}"]`);
-
-                if (existingScript) {
-                    existingScript.addEventListener('load', resolve, { once: true });
-                    existingScript.addEventListener('error', reject, { once: true });
-
-                    if (existingScript.dataset.loaded === 'true') {
-                        resolve();
-                    }
-
-                    return;
-                }
-
-                const script = document.createElement('script');
-                script.src = src;
-                script.async = true;
-                script.onload = () => {
-                    script.dataset.loaded = 'true';
-                    resolve();
-                };
-                script.onerror = reject;
-                document.head.appendChild(script);
+        function updateClock() {
+            const now = new Date();
+            const clock = document.getElementById('liveClock');
+            clock.innerText = now.toLocaleTimeString('id-ID', {
+                hour12: false
             });
-
-            const setStatus = (message) => {
-                if (cameraStatus) {
-                    cameraStatus.textContent = message;
-                }
-            };
-
-            const stopCamera = () => {
-                if (scanFrameId) {
-                    cancelAnimationFrame(scanFrameId);
-                    scanFrameId = null;
-                }
-
-                if (mediaStream) {
-                    mediaStream.getTracks().forEach((track) => track.stop());
-                    mediaStream = null;
-                }
-
-                if (quaggaActive && window.Quagga) {
-                    window.Quagga.offDetected(submitByQuaggaBarcode);
-                    window.Quagga.stop();
-                    quaggaActive = false;
-                }
-
-                if (cameraPreviewShell) {
-                    cameraPreviewShell.classList.add('d-none');
-                }
-
-                if (cameraPreview) {
-                    cameraPreview.pause();
-                    cameraPreview.srcObject = null;
-                    cameraPreview.classList.add('d-none');
-                }
-
-                if (cameraFallback) {
-                    cameraFallback.classList.add('d-none');
-                    cameraFallback.innerHTML = '';
-                }
-
-                cameraStartButton?.classList.remove('d-none');
-                cameraStopButton?.classList.add('d-none');
-                detector = null;
-                isDetecting = false;
-            };
-
-            const submitByBarcode = (rawValue) => {
-                if (!barcodeInput || !form || isSubmitting) {
-                    return;
-                }
-
-                isSubmitting = true;
-                barcodeInput.value = String(rawValue || '').toUpperCase().trim();
-                setStatus(`Barcode terbaca: ${barcodeInput.value}. Mengirim check-in...`);
-                stopCamera();
-                form.submit();
-            };
-
-            const submitByQuaggaBarcode = (result) => {
-                const rawValue = result?.codeResult?.code;
-
-                if (rawValue) {
-                    submitByBarcode(rawValue);
-                }
-            };
-
-            const scanLoop = async () => {
-                if (!cameraPreview || !detector || isSubmitting) {
-                    return;
-                }
-
-                if (cameraPreview.readyState >= 2 && !isDetecting) {
-                    isDetecting = true;
-
-                    try {
-                        const barcodes = await detector.detect(cameraPreview);
-                        const firstBarcode = barcodes.find((barcode) => barcode.rawValue);
-
-                        if (firstBarcode?.rawValue) {
-                            submitByBarcode(firstBarcode.rawValue);
-                            return;
-                        }
-                    } catch (error) {
-                        setStatus('Kamera aktif, tetapi barcode belum terbaca. Coba dekatkan barcode ke kamera.');
-                    } finally {
-                        isDetecting = false;
-                    }
-                }
-
-                scanFrameId = requestAnimationFrame(scanLoop);
-            };
-
-            const startQuaggaFallback = async () => {
-                setStatus('Browser ini tidak mendukung scanner bawaan. Menyiapkan fallback scanner...');
-
-                try {
-                    await loadScript('https://cdn.jsdelivr.net/npm/@ericblade/quagga2@1.8.2/dist/quagga.min.js');
-                } catch (error) {
-                    setStatus('Fallback scanner gagal dimuat. Pastikan koneksi internet aktif lalu coba lagi.');
-                    return;
-                }
-
-                if (!window.Quagga || !cameraFallback || !cameraPreviewShell) {
-                    setStatus('Fallback scanner tidak tersedia di browser ini.');
-                    return;
-                }
-
-                cameraPreviewShell.classList.remove('d-none');
-                cameraPreview.classList.add('d-none');
-                cameraFallback.classList.remove('d-none');
-                cameraFallback.innerHTML = '';
-
-                window.Quagga.init({
-                    inputStream: {
-                        type: 'LiveStream',
-                        target: cameraFallback,
-                        constraints: {
-                            facingMode: 'environment',
-                        },
-                    },
-                    decoder: {
-                        readers: ['code_39_reader'],
-                    },
-                    locate: true,
-                }, function (error) {
-                    if (error) {
-                        setStatus('Kamera fallback tidak bisa dibuka. Pastikan izin kamera diberikan di browser.');
-                        return;
-                    }
-
-                    quaggaActive = true;
-                    cameraStartButton?.classList.add('d-none');
-                    cameraStopButton?.classList.remove('d-none');
-                    window.Quagga.offDetected(submitByQuaggaBarcode);
-                    window.Quagga.onDetected(submitByQuaggaBarcode);
-                    window.Quagga.start();
-                    setStatus('Kamera aktif dengan mode fallback. Arahkan barcode member ke kamera.');
-                });
-            };
-
-            barcodeInput?.addEventListener('input', function () {
-                this.value = this.value.toUpperCase().trimStart();
-            });
-
-            cameraStartButton?.addEventListener('click', async function () {
-                if (!('BarcodeDetector' in window)) {
-                    await startQuaggaFallback();
-                    return;
-                }
-
-                try {
-                    const supportedFormats = await window.BarcodeDetector.getSupportedFormats();
-
-                    if (!supportedFormats.includes('code_39')) {
-                        await startQuaggaFallback();
-                        return;
-                    }
-
-                    detector = new window.BarcodeDetector({ formats: ['code_39'] });
-                    mediaStream = await navigator.mediaDevices.getUserMedia({
-                        video: {
-                            facingMode: { ideal: 'environment' },
-                        },
-                        audio: false,
-                    });
-
-                    cameraPreviewShell.classList.remove('d-none');
-                    cameraFallback?.classList.add('d-none');
-                    cameraPreview.srcObject = mediaStream;
-                    cameraPreview.classList.remove('d-none');
-                    await cameraPreview.play();
-                    cameraStartButton.classList.add('d-none');
-                    cameraStopButton?.classList.remove('d-none');
-                    setStatus('Kamera aktif. Arahkan barcode member ke kamera.');
-                    scanLoop();
-                } catch (error) {
-                    stopCamera();
-                    await startQuaggaFallback();
-                }
-            });
-
-            cameraStopButton?.addEventListener('click', function () {
-                stopCamera();
-                setStatus('Kamera dimatikan.');
-            });
-        });
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
     </script>
-
-    <div class="panel-card p-4">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h2 class="h4 fw-bold mb-0">Daftar member check-in hari ini</h2>
-            <div class="small muted-copy">{{ $checkinRecords->count() }} member check-in hari ini</div>
-        </div>
-
-        <div class="table-responsive">
-            <table class="table align-middle mb-0">
-                <thead>
-                    <tr>
-                        <th>Foto</th>
-                        <th>Nama Member</th>
-                        <th>Kode Check-in</th>
-                        <th>Jam Check-in</th>
-                        <th>Sumber</th>
-                        <th>Catatan</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse ($checkinRecords as $record)
-                        <tr>
-                            <td>
-                                @if ($record->member?->profile_photo_url)
-                                    <img src="{{ $record->member->profile_photo_url }}" alt="Foto {{ $record->member->full_name }}" class="table-avatar">
-                                @elseif ($record->member)
-                                    <span class="table-avatar-placeholder">{{ $record->member->profile_initials }}</span>
-                                @else
-                                    <span class="table-avatar-placeholder">-</span>
-                                @endif
-                            </td>
-                            <td class="fw-semibold">{{ $record->member?->full_name ?? '-' }}</td>
-                            <td>{{ $record->member?->checkin_code ?? '-' }}</td>
-                            <td>{{ $record->checked_in_at->format('H:i') }}</td>
-                            <td>
-                                <span class="badge {{ $record->checkin_method === 'cashier' ? 'text-bg-primary' : 'text-bg-secondary' }}">
-                                    {{ $record->checkin_method === 'cashier' ? 'Kasir' : 'Admin' }}
-                                </span>
-                            </td>
-                            <td class="small muted-copy">{{ $record->notes ?: '-' }}</td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="6" class="text-center py-4 text-secondary">Belum ada member yang check-in hari ini.</td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-    </div>
 @endsection

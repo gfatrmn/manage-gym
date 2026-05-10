@@ -3,61 +3,156 @@
 @section('content')
 
 @php
-    // Logika filter untuk member yang akan segera habis masa aktifnya (7 hari ke depan)
     $expiringSoonMembers = $members->filter(function ($member) {
-        return $member->expires_at &&
-            now()->diffInDays($member->expires_at, false) >= 0 &&
-            now()->diffInDays($member->expires_at, false) <= 7;
+        return $member->expires_at && now()->diffInDays($member->expires_at, false) >= 0 && now()->diffInDays($member->expires_at, false) <= 7;
     });
-
     $isExpiredSection = $memberSection === 'expired';
-
-    $currentSection = [
-        'items' => $isExpiredSection ? $expiredMembers : $activeMembers,
-        'badge' => $isExpiredSection ? 'text-bg-danger' : 'text-bg-success',
-        'statusLabel' => $isExpiredSection ? 'Expired' : 'Aktif',
-    ];
+    $currentSection = ['items' => $isExpiredSection ? $expiredMembers : $activeMembers];
+    $paymentMethods = ['Cash', 'Transfer Bank', 'QRIS', 'Debit Card'];
 @endphp
 
 <style>
     .dashboard-page { padding: 1rem 2rem; }
-    .dashboard-heading { position: relative; padding-bottom: 1.2rem; margin-bottom: 2rem; border-bottom: 1px solid rgba(255,255,255,.06); }
-    .dashboard-subtitle { font-size: .75rem; letter-spacing: .18em; text-transform: uppercase; color: rgba(255,255,255,.4); margin-bottom: .7rem; font-weight: 500; }
-    .dashboard-title { font-size: clamp(1.5rem, 3vw, 2.2rem); font-weight: 700; margin: 0; color: #fff; }
-
-    /* Stats Card Ramping */
+    .dashboard-title { font-size: 2.2rem; font-weight: 700; color: #fff; margin: 0; }
     .member-summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.7rem; }
-    .member-summary-card { background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.06); border-radius: 1rem; padding: 0.85rem 1.1rem; transition: .2s ease; }
-    .summary-label { font-size: .65rem; text-transform: uppercase; letter-spacing: .12em; color: #ffffff; margin-bottom: .3rem; }
-    .summary-value { font-size: 1.5rem; font-weight: 700; line-height: 1.2; color: #fff; }
-    .summary-danger { background: rgba(239,68,68,.08); border-color: rgba(239,68,68,.15); }
-
-    /* Tabel Custom & Warna Teks Putih */
+    .member-summary-card { background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.06); border-radius: 1rem; padding: 0.85rem 1.1rem; }
+    .summary-label { font-size: .65rem; text-transform: uppercase; color: #fff; opacity: 0.6; }
+    .summary-value { font-size: 1.5rem; font-weight: 700; color: #fff; }
     .panel-card { background: rgba(255,255,255,.025); border: 1px solid rgba(255,255,255,.05); border-radius: 1.2rem; padding: 1.5rem; }
-    .member-table thead th { font-size: .7rem; text-transform: uppercase; letter-spacing: .06em; color: #9ca3af; padding: 1rem; border-bottom: 1px solid rgba(255,255,255,.06); }
-
-    /* Memaksa semua teks di dalam tabel menjadi putih/terang */
-    .member-table tbody td { color: #ffffff !important; }
-    .text-white-custom { color: #ffffff !important; }
-    .text-muted-custom { color: rgba(255,255,255,0.6) !important; }
-
+    .member-table thead th { font-size: .7rem; text-transform: uppercase; color: #9ca3af; padding: 1rem; border-bottom: 1px solid rgba(255,255,255,.06); }
+    .member-table tbody td { color: #ffffff !important; border-bottom: 1px solid rgba(255,255,255,0.02); }
     .member-photo { width: 42px; height: 42px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(255,255,255,0.1); }
     .member-photo-placeholder { width: 42px; height: 42px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #ef4444, #991b1b); color: white; font-size: .8rem; font-weight: 700; }
-
-    /* Tombol Aksi Bulat */
     .btn-action { width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; border: none; transition: 0.2s; }
-    .btn-action i { font-size: 0.75rem; }
+    .btn-action-success { background: rgba(16, 185, 129, 0.2); color: #34d399; }
     .btn-action-info { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
     .btn-action-warning { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
     .btn-action-danger { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+    .ds-section-label {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: .16em;
+        color: rgba(255,255,255,0.45);
+        margin-bottom: .3rem;
+    }
 
-    @media (max-width: 992px) { .member-summary-grid { grid-template-columns: repeat(2, 1fr); } }
+    /* =============================================
+       SEARCH INPUT
+       ============================================= */
+    .member-search-wrap {
+        position: relative;
+        flex: 0 0 auto;
+    }
+    .member-search-icon {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: rgba(255, 255, 255, 0.35);
+        font-size: 13px;
+        pointer-events: none;
+    }
+    .member-search-input {
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 50px;
+        color: #fff;
+        font-size: 13px;
+        padding: 0.42rem 1rem 0.42rem 2.1rem;
+        width: 230px;
+        outline: none;
+        transition: border-color 0.2s, background 0.2s;
+    }
+    .member-search-input::placeholder { color: rgba(255, 255, 255, 0.3); }
+    .member-search-input:focus {
+        border-color: rgba(255, 255, 255, 0.25);
+        background: rgba(255, 255, 255, 0.09);
+    }
+    #memberNoResult { display: none; }
+
+    /* =============================================
+       RESPONSIVE — Tablet (max-width: 1024px)
+       ============================================= */
+    @media (max-width: 1024px) {
+        .dashboard-page { padding: 1rem 1.2rem; }
+        .dashboard-title { font-size: 1.8rem; }
+        .member-summary-grid { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+        .panel-card { padding: 1.2rem; }
+    }
+
+    /* =============================================
+       RESPONSIVE — Mobile (max-width: 640px)
+       ============================================= */
+    @media (max-width: 640px) {
+        .dashboard-page { padding: 0.75rem 0.85rem 1.5rem; }
+        .dashboard-title { font-size: 1.5rem; }
+        .ds-section-label { font-size: 10px; }
+
+        .d-flex.justify-content-between.align-items-end.mb-4 {
+            flex-direction: column;
+            align-items: flex-start !important;
+            gap: 0.85rem;
+        }
+        .d-flex.justify-content-between.align-items-end.mb-4 .btn {
+            width: 100%;
+            text-align: center;
+        }
+
+        .member-summary-grid {
+            grid-template-columns: 1fr;
+            gap: 0.6rem;
+            margin-bottom: 1.2rem;
+        }
+        .member-summary-card { padding: 0.75rem 1rem; }
+        .summary-value { font-size: 1.3rem; }
+
+        .panel-card { padding: 1rem 0.85rem; border-radius: 1rem; }
+
+        /* Tab + search: stack vertically on mobile */
+        .panel-tabs-row {
+            flex-direction: column !important;
+            align-items: stretch !important;
+            gap: 0.65rem !important;
+        }
+        .panel-tabs-row .btn { font-size: 12px; padding: 0.4rem 1rem; }
+        .member-search-wrap { width: 100%; }
+        .member-search-input { width: 100%; box-sizing: border-box; }
+
+        /* Table: hide less-important columns */
+        .member-table thead th:nth-child(3),
+        .member-table tbody td:nth-child(3),
+        .member-table thead th:nth-child(4),
+        .member-table tbody td:nth-child(4),
+        .member-table thead th:nth-child(5),
+        .member-table tbody td:nth-child(5) {
+            display: none;
+        }
+
+        .member-table thead th { font-size: .65rem; padding: 0.75rem 0.6rem; }
+        .member-table tbody td { font-size: 12px; padding: 0.75rem 0.6rem; }
+        .member-photo,
+        .member-photo-placeholder { width: 34px; height: 34px; font-size: .7rem; }
+        .btn-action { width: 30px; height: 30px; font-size: 12px; }
+        .member-table thead th:first-child,
+        .member-table tbody td:first-child { width: 46px; }
+    }
+
+    /* =============================================
+       RESPONSIVE — Very small (max-width: 380px)
+       ============================================= */
+    @media (max-width: 380px) {
+        .dashboard-title { font-size: 1.3rem; }
+        .member-summary-grid { gap: 0.5rem; }
+        .summary-value { font-size: 1.15rem; }
+        .btn-action { width: 28px; height: 28px; font-size: 11px; }
+        .d-flex.justify-content-end.gap-2 { gap: 4px !important; }
+    }
 </style>
 
 <div class="dashboard-page">
-    <div class="dashboard-heading d-flex justify-content-between align-items-end">
+    <div class="d-flex justify-content-between align-items-end mb-4">
         <div>
-            <div class="dashboard-subtitle">ARENA GYM · MEMBER MANAGEMENT</div>
+            <div class="ds-section-label">Arena Gym · Management Member</div>
             <h1 class="dashboard-title">Manajemen Member</h1>
         </div>
         <button class="btn btn-danger rounded-pill px-4 fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#addMemberModal">
@@ -74,64 +169,91 @@
     <div class="member-summary-grid">
         <div class="member-summary-card"><div class="summary-label">Aktif</div><div class="summary-value text-success">{{ $activeMembers->count() }}</div></div>
         <div class="member-summary-card"><div class="summary-label">Expired</div><div class="summary-value text-danger">{{ $expiredMembers->count() }}</div></div>
-        <div class="member-summary-card summary-danger"><div class="summary-label">7 Hari Lagi</div><div class="summary-value text-white">{{ $expiringSoonMembers->count() }}</div></div>
-        <div class="member-summary-card"><div class="summary-label">Total Data</div><div class="summary-value text-info">{{ $members->count() }}</div></div>
+        <div class="member-summary-card"><div class="summary-label">Segera Habis</div><div class="summary-value text-warning">{{ $expiringSoonMembers->count() }}</div></div>
+        <div class="member-summary-card"><div class="summary-label">Total Data</div><div class="summary-value text-white">{{ $members->count() }}</div></div>
     </div>
 
     <div class="panel-card">
-        <div class="d-flex flex-wrap gap-2 mb-4">
-            <a href="{{ route('admin.members', ['section' => 'active']) }}" class="btn btn-sm rounded-pill {{ $isExpiredSection ? 'btn-outline-secondary' : 'btn-light text-dark fw-bold' }}">Member Aktif</a>
-            <a href="{{ route('admin.members', ['section' => 'expired']) }}" class="btn btn-sm rounded-pill {{ $isExpiredSection ? 'btn-light text-dark fw-bold' : 'btn-outline-secondary' }}">Member Expired</a>
+        {{-- Tab buttons + Search --}}
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-4 panel-tabs-row">
+            <div class="d-flex flex-wrap gap-2">
+                <a href="{{ route('admin.members', ['section' => 'active']) }}" class="btn btn-sm rounded-pill {{ $isExpiredSection ? 'btn-outline-secondary' : 'btn-light text-dark fw-bold' }}">Member Aktif</a>
+                <a href="{{ route('admin.members', ['section' => 'expired']) }}" class="btn btn-sm rounded-pill {{ $isExpiredSection ? 'btn-light text-dark fw-bold' : 'btn-outline-secondary' }}">Member Expired</a>
+            </div>
+            <div class="member-search-wrap">
+                <i class="fas fa-search member-search-icon"></i>
+                <input type="text" id="memberSearchInput" class="member-search-input" placeholder="Cari nama atau no. HP...">
+            </div>
         </div>
 
-        <div class="member-table-wrap">
-            <table class="table align-middle mb-0 member-table">
+        <div class="table-responsive">
+            <table class="table align-middle member-table">
                 <thead>
                     <tr>
                         <th style="width: 70px">Foto</th>
                         <th>Member</th>
                         <th>Telepon</th>
-                        <th>Tgl Daftar</th> <th>Status</th>
+                        <th>Tgl Daftar</th>
+                        <th>Metode Bayar</th>
                         <th>Masa Aktif</th>
                         <th class="text-end">Aksi</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="memberTableBody">
                     @forelse ($currentSection['items'] as $member)
-                        <tr>
+                        @php
+                            $diff = $member->expires_at ? now()->diffInDays($member->expires_at, false) : null;
+                            $daysLeft = $diff !== null ? ceil($diff) : null;
+                        @endphp
+                        <tr class="member-row"
+                            data-name="{{ strtolower($member->full_name) }}"
+                            data-phone="{{ $member->phone }}">
                             <td>
-                                @if ($member->profile_photo_url)
-                                    <img src="{{ $member->profile_photo_url }}" class="member-photo">
+                                @if ($member->profile_photo_path)
+                                    <img src="{{ asset('storage/' . $member->profile_photo_path) }}" class="member-photo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                    <div class="member-photo-placeholder" style="display: none;">{{ strtoupper(substr($member->full_name, 0, 1)) }}</div>
                                 @else
-                                    <span class="member-photo-placeholder">{{ $member->profile_initials }}</span>
+                                    <div class="member-photo-placeholder">{{ strtoupper(substr($member->full_name, 0, 1)) }}</div>
                                 @endif
                             </td>
                             <td>
-                                <div class="fw-bold text-white">{{ $member->full_name }}</div>
-                                <div class="small text-muted-custom">{{ $member->email ?: '-' }}</div>
+                                <div class="fw-bold">{{ $member->full_name }}</div>
+                                <div class="small opacity-50">{{ $member->email ?: 'Tanpa Email' }}</div>
                             </td>
-                            <td class="small text-white">{{ $member->phone ?: '-' }}</td>
-                            <td class="small text-white">
-                                {{ $member->joined_at?->format('d M Y') ?: '-' }}
-                            </td>
-                            <td><span class="badge {{ $currentSection['badge'] }} rounded-pill" style="font-size: 10px;">{{ $currentSection['statusLabel'] }}</span></td>
+                            <td class="small">{{ $member->phone ?: '-' }}</td>
+                            <td class="small">{{ $member->joined_at?->format('d M Y') ?: '-' }}</td>
+                            <td><span class="badge bg-white bg-opacity-10 text-white fw-normal">{{ $member->payment_method ?: 'Cash' }}</span></td>
                             <td class="small">
-                                <div class="fw-bold {{ $isExpiredSection ? 'text-danger' : 'text-white' }}">Hingga: {{ $member->expires_at?->format('d M Y') }}</div>
+                                <div class="fw-bold {{ $isExpiredSection ? 'text-danger' : ($daysLeft <= 7 ? 'text-warning' : 'text-white') }}">
+                                    Hingga: {{ $member->expires_at?->format('d M Y') }}
+                                </div>
+                                @if(!$isExpiredSection && $daysLeft <= 7)
+                                <div class="fw-bold text-warning" style="font-size: 11px; margin-top: 2px;">
+                                    <i class="fas fa-clock me-1"></i>Sisa {{ $daysLeft }} Hari
+                                </div>
+                                @endif
                             </td>
                             <td class="text-end">
                                 <div class="d-flex justify-content-end gap-2">
-                                    <button class="btn-action btn-action-info" data-bs-toggle="modal" data-bs-target="#detailMemberModal{{ $member->id }}" title="Detail"><i class="fas fa-eye"></i></button>
-                                    <button class="btn-action btn-action-warning" data-bs-toggle="modal" data-bs-target="#editMemberModal{{ $member->id }}" title="Edit"><i class="fas fa-edit"></i></button>
-                                    <form action="{{ route('admin.members.destroy', $member) }}" method="POST" onsubmit="return confirm('Hapus member {{ $member->full_name }}?')" class="d-inline">
+                                    <button class="btn-action btn-action-success" data-bs-toggle="modal" data-bs-target="#renewMemberModal{{ $member->id }}"><i class="fas fa-sync-alt"></i></button>
+                                    <button class="btn-action btn-action-info" data-bs-toggle="modal" data-bs-target="#detailMemberModal{{ $member->id }}"><i class="fas fa-eye"></i></button>
+                                    <button class="btn-action btn-action-warning" data-bs-toggle="modal" data-bs-target="#editMemberModal{{ $member->id }}"><i class="fas fa-edit"></i></button>
+                                    <form action="{{ route('admin.members.destroy', $member) }}" method="POST" class="d-inline">
                                         @csrf @method('DELETE')
-                                        <button type="submit" class="btn-action btn-action-danger" title="Hapus"><i class="fas fa-trash"></i></button>
+                                        <button type="submit" class="btn-action btn-action-danger" onclick="return confirm('Hapus?')"><i class="fas fa-trash"></i></button>
                                     </form>
                                 </div>
                             </td>
                         </tr>
                     @empty
-                        <tr><td colspan="7" class="text-center py-5 text-secondary">Tidak ada data member dalam kategori ini.</td></tr>
+                        <tr><td colspan="7" class="text-center py-5 text-secondary">Data Kosong</td></tr>
                     @endforelse
+                    {{-- Row muncul saat hasil search kosong --}}
+                    <tr id="memberNoResult">
+                        <td colspan="7" class="text-center py-5 text-secondary">
+                            <i class="fas fa-search me-2 opacity-50"></i>Member tidak ditemukan
+                        </td>
+                    </tr>
                 </tbody>
             </table>
         </div>
@@ -141,39 +263,24 @@
 <div class="modal fade" id="addMemberModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content bg-dark text-white border-0 shadow-lg" style="border-radius: 1.5rem;">
-            <div class="modal-header border-bottom border-white border-opacity-10 p-4">
-                <h5 class="modal-title fw-bold">Tambah Member Baru</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
+            <div class="modal-header border-bottom border-white border-opacity-10 p-4"><h5 class="modal-title fw-bold">Tambah Member</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
             <form action="{{ route('admin.members.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="modal-body p-4">
-                    <div class="mb-3">
-                        <label class="form-label small text-uppercase fw-bold mb-2" style="color: rgba(255,255,255,0.6);">Nama Lengkap</label>
-                        <input type="text" name="full_name" class="form-control bg-white bg-opacity-10 border-0 text-white p-3" style="border-radius: 0.8rem;" placeholder="Nama Lengkap" required>
+                    <div class="mb-3"><label class="form-label small text-uppercase fw-bold opacity-50">Nama Lengkap</label><input type="text" name="full_name" class="form-control bg-white bg-opacity-10 border-0 text-white p-3" style="border-radius: 0.8rem;" required></div>
+                    <div class="mb-3"><label class="form-label small text-uppercase fw-bold opacity-50">Email</label><input type="email" name="email" class="form-control bg-white bg-opacity-10 border-0 text-white p-3" style="border-radius: 0.8rem;"></div>
+                    <div class="row">
+                        <div class="col-6 mb-3"><label class="form-label small text-uppercase fw-bold opacity-50">No. Telepon</label><input type="text" name="phone" class="form-control bg-white bg-opacity-10 border-0 text-white p-3" style="border-radius: 0.8rem;"></div>
+                        <div class="col-6 mb-3"><label class="form-label small text-uppercase fw-bold opacity-50">Metode Bayar</label>
+                            <select name="payment_method" class="form-select bg-white bg-opacity-10 border-0 text-white p-3" style="border-radius: 0.8rem;" required>
+                                @foreach($paymentMethods as $pm) <option value="{{ $pm }}" class="text-dark">{{ $pm }}</option> @endforeach
+                            </select>
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label small text-uppercase fw-bold mb-2" style="color: rgba(255,255,255,0.6);">Email</label>
-                        <input type="email" name="email" class="form-control bg-white bg-opacity-10 border-0 text-white p-3" style="border-radius: 0.8rem;" placeholder="Email">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label small text-uppercase fw-bold mb-2" style="color: rgba(255,255,255,0.6);">No. Telepon</label>
-                        <input type="text" name="phone" class="form-control bg-white bg-opacity-10 border-0 text-white p-3" style="border-radius: 0.8rem;" placeholder="08xxxx">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label small text-uppercase fw-bold mb-2" style="color: rgba(255,255,255,0.6);">Tanggal Bergabung</label>
-                        <input type="date" name="joined_at" class="form-control bg-white bg-opacity-10 border-0 text-white p-3" style="border-radius: 0.8rem;" value="{{ date('Y-m-d') }}" required>
-                    </div>
-                    <div class="mb-4">
-                        <label class="form-label small text-uppercase fw-bold mb-2" style="color: rgba(255,255,255,0.6);">Foto Profil</label>
-                        <input type="file" name="profile_photo" class="form-control bg-white bg-opacity-10 border-0 text-white p-2" style="border-radius: 0.8rem;">
-                    </div>
-                    <div class="alert alert-info py-2 small border-0 bg-info bg-opacity-10 text-info mb-0" style="border-radius: 0.8rem;"><i class="fas fa-info-circle me-2"></i> Masa aktif diset otomatis 1 bulan.</div>
+                    <div class="mb-3"><label class="form-label small text-uppercase fw-bold opacity-50">Tgl Daftar</label><input type="date" name="joined_at" class="form-control bg-white bg-opacity-10 border-0 text-white p-3" style="border-radius: 0.8rem;" value="{{ date('Y-m-d') }}" required></div>
+                    <div class="mb-0"><label class="form-label small text-uppercase fw-bold opacity-50">Foto Profil</label><input type="file" name="profile_photo" class="form-control bg-white bg-opacity-10 border-0 text-white p-2" style="border-radius: 0.8rem;"></div>
                 </div>
-                <div class="modal-footer border-top border-white border-opacity-10 p-4">
-                    <button type="button" class="btn btn-link text-white text-decoration-none" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-danger rounded-pill px-4 fw-bold">Simpan Member</button>
-                </div>
+                <div class="modal-footer border-0 p-4 pt-0"><button type="submit" class="btn btn-danger w-100 rounded-pill fw-bold py-3">Simpan Member</button></div>
             </form>
         </div>
     </div>
@@ -183,45 +290,21 @@
     <div class="modal fade" id="detailMemberModal{{ $member->id }}" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content bg-dark text-white border-0 shadow-lg" style="border-radius: 1.5rem;">
-                <div class="modal-header border-bottom border-white border-opacity-10 p-4">
-                    <h5 class="modal-title fw-bold">Profil Member</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
+                <div class="modal-header border-bottom border-white border-opacity-10 p-4"><h5 class="modal-title fw-bold">Detail Profil</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
                 <div class="modal-body p-4 text-center">
-                    @if ($member->profile_photo_url)
-                        <img src="{{ $member->profile_photo_url }}" class="rounded-circle mb-3 border border-3 border-danger shadow" style="width: 100px; height: 100px; object-fit: cover;">
+                    @if ($member->profile_photo_path)
+                        <img src="{{ asset('storage/' . $member->profile_photo_path) }}" class="rounded-circle mb-3 border border-3 border-danger" style="width: 100px; height: 100px; object-fit: cover;">
                     @else
-                        <div class="member-photo-placeholder mx-auto mb-3" style="width: 100px; height: 100px; font-size: 2rem;">
-                            {{ $member->profile_initials }}
-                        </div>
+                        <div class="member-photo-placeholder mx-auto mb-3" style="width: 100px; height: 100px; font-size: 2rem;">{{ strtoupper(substr($member->full_name, 0, 1)) }}</div>
                     @endif
-
-                    <h4 class="fw-bold mb-1 text-white">{{ $member->full_name }}</h4>
-                    <p style="color: rgba(255,255,255,0.7); font-size: 0.9rem;" class="mb-4">
-                        {{ $member->email ?: 'Email tidak tersedia' }}
-                    </p>
-
+                    <h4 class="fw-bold mb-0">{{ $member->full_name }}</h4>
+                    <p class="opacity-50 small mb-4">{{ $member->email ?: 'Email tidak tersedia' }}</p>
                     <div class="row g-3 text-start bg-white bg-opacity-10 p-4 rounded-4">
-                        <div class="col-6">
-                            <label class="small d-block text-uppercase fw-bold mb-1" style="color: rgba(255,255,255,0.5); letter-spacing: 0.05em;">Telepon</label>
-                            <span class="text-white fw-bold">{{ $member->phone ?: '-' }}</span>
-                        </div>
-                        <div class="col-6">
-                            <label class="small d-block text-uppercase fw-bold mb-1" style="color: rgba(255,255,255,0.5); letter-spacing: 0.05em;">Status</label>
-                            <span class="badge {{ $isExpiredSection ? 'bg-danger' : 'bg-success' }} px-3 py-2 rounded-pill">{{ $isExpiredSection ? 'Expired' : 'Aktif' }}</span>
-                        </div>
-                        <div class="col-6">
-                            <label class="small d-block text-uppercase fw-bold mb-1" style="color: rgba(255,255,255,0.5); letter-spacing: 0.05em;">Gabung</label>
-                            <span class="text-white fw-bold">{{ $member->joined_at?->format('d M Y') }}</span>
-                        </div>
-                        <div class="col-6">
-                            <label class="small d-block text-uppercase fw-bold mb-1" style="color: rgba(255,255,255,0.5); letter-spacing: 0.05em;">Hingga</label>
-                            <span class="text-danger fw-bold" style="font-size: 1.1rem;">{{ $member->expires_at?->format('d M Y') }}</span>
-                        </div>
+                        <div class="col-6"><label class="small d-block text-uppercase fw-bold opacity-50">Telepon</label><span class="fw-bold">{{ $member->phone ?: '-' }}</span></div>
+                        <div class="col-6"><label class="small d-block text-uppercase fw-bold opacity-50">Metode Bayar</label><span class="badge bg-danger px-3">{{ $member->payment_method ?: 'Cash' }}</span></div>
+                        <div class="col-6"><label class="small d-block text-uppercase fw-bold opacity-50">Tgl Daftar</label><span class="fw-bold">{{ $member->joined_at?->format('d M Y') }}</span></div>
+                        <div class="col-6"><label class="small d-block text-uppercase fw-bold opacity-50">Masa Aktif</label><span class="fw-bold text-danger">{{ $member->expires_at?->format('d M Y') }}</span></div>
                     </div>
-                </div>
-                <div class="modal-footer border-0 pb-4 justify-content-center">
-                    <button type="button" class="btn btn-outline-light rounded-pill px-5" data-bs-dismiss="modal">Tutup</button>
                 </div>
             </div>
         </div>
@@ -234,19 +317,131 @@
                 <form action="{{ route('admin.members.update', $member) }}" method="POST" enctype="multipart/form-data">
                     @csrf @method('PUT')
                     <div class="modal-body p-4">
-                        <div class="mb-3"><label class="form-label small text-uppercase fw-bold mb-2" style="color: rgba(255,255,255,0.6);">Nama Lengkap</label><input type="text" name="full_name" class="form-control bg-white bg-opacity-10 border-0 text-white p-3" style="border-radius: 0.8rem;" value="{{ $member->full_name }}" required></div>
-                        <div class="mb-3"><label class="form-label small text-uppercase fw-bold mb-2" style="color: rgba(255,255,255,0.6);">Email</label><input type="email" name="email" class="form-control bg-white bg-opacity-10 border-0 text-white p-3" style="border-radius: 0.8rem;" value="{{ $member->email }}"></div>
-                        <div class="mb-3"><label class="form-label small text-uppercase fw-bold mb-2" style="color: rgba(255,255,255,0.6);">No. Telepon</label><input type="text" name="phone" class="form-control bg-white bg-opacity-10 border-0 text-white p-3" style="border-radius: 0.8rem;" value="{{ $member->phone }}"></div>
-                        <div class="mb-3"><label class="form-label small text-uppercase fw-bold mb-2" style="color: rgba(255,255,255,0.6);">Foto Baru (Opsional)</label><input type="file" name="profile_photo" class="form-control bg-white bg-opacity-10 border-0 text-white p-2" style="border-radius: 0.8rem;"></div>
+                        <div class="mb-3"><label class="form-label small text-uppercase fw-bold opacity-50">Nama Lengkap</label><input type="text" name="full_name" class="form-control bg-white bg-opacity-10 border-0 text-white p-3" style="border-radius: 0.8rem;" value="{{ $member->full_name }}" required></div>
+                        <div class="mb-3"><label class="form-label small text-uppercase fw-bold opacity-50">Email</label><input type="email" name="email" class="form-control bg-white bg-opacity-10 border-0 text-white p-3" style="border-radius: 0.8rem;" value="{{ $member->email }}"></div>
+                        <div class="row">
+                            <div class="col-6 mb-3"><label class="form-label small text-uppercase fw-bold opacity-50">Telepon</label><input type="text" name="phone" class="form-control bg-white bg-opacity-10 border-0 text-white p-3" style="border-radius: 0.8rem;" value="{{ $member->phone }}"></div>
+                            <div class="col-6 mb-3"><label class="form-label small text-uppercase fw-bold opacity-50">Metode Bayar</label>
+                                <select name="payment_method" class="form-select bg-white bg-opacity-10 border-0 text-white p-3" style="border-radius: 0.8rem;">
+                                    @foreach($paymentMethods as $pm) <option value="{{ $pm }}" class="text-dark" {{ $member->payment_method == $pm ? 'selected' : '' }}>{{ $pm }}</option> @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-0"><label class="form-label small text-uppercase fw-bold opacity-50">Ganti Foto Profil</label><input type="file" name="profile_photo" class="form-control bg-white bg-opacity-10 border-0 text-white p-2" style="border-radius: 0.8rem;"></div>
                     </div>
-                    <div class="modal-footer border-top border-white border-opacity-10 p-4">
-                        <button type="button" class="btn btn-link text-white text-decoration-none" data-bs-dismiss="modal">Batal</button>
-                        <button type="submit" class="btn btn-warning rounded-pill px-4 fw-bold">Update Data</button>
-                    </div>
+                    <div class="modal-footer border-0 p-4 pt-0"><button type="submit" class="btn btn-warning w-100 rounded-pill fw-bold py-3 text-dark">Update Data</button></div>
                 </form>
             </div>
         </div>
     </div>
+
+    {{-- MODAL RENEW (PERPANJANG) --}}
+    @foreach ($currentSection['items'] as $member)
+        <div class="modal fade" id="renewMemberModal{{ $member->id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content bg-dark text-white border-0 shadow-lg" style="border-radius: 1.5rem;">
+                    <div class="modal-header border-bottom border-white border-opacity-10 p-4">
+                        <h5 class="modal-title fw-bold text-success">
+                            <i class="fas fa-history me-2"></i>Perpanjang Member
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <form action="{{ route('admin.members.update', $member) }}" method="POST">
+                        @csrf @method('PUT')
+                        <div class="modal-body p-4">
+
+                            <div class="p-3 mb-4" style="background: rgba(255,255,255,0.03); border-radius: 1rem; border: 1px solid rgba(255,255,255,0.08);">
+                                <div class="row g-3">
+                                    <div class="col-7">
+                                        <label class="d-block small text-uppercase fw-bold opacity-50 mb-1" style="font-size: 0.65rem; letter-spacing: 0.5px;">Nama Member</label>
+                                        <div class="fw-bold text-white fs-6">{{ $member->full_name }}</div>
+                                    </div>
+                                    <div class="col-5 text-end">
+                                        <label class="d-block small text-uppercase fw-bold opacity-50 mb-1" style="font-size: 0.65rem; letter-spacing: 0.5px;">Status Saat Ini</label>
+                                        <div>
+                                            @if($member->expires_at && $member->expires_at->isPast())
+                                                <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-3 py-1 rounded-pill" style="font-size: 0.7rem;">Expired</span>
+                                            @else
+                                                <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-3 py-1 rounded-pill" style="font-size: 0.7rem;">Aktif</span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    <div class="col-12 mt-3 pt-3 border-top border-white border-opacity-10">
+                                        <label class="d-block small text-uppercase fw-bold opacity-50 mb-1" style="font-size: 0.65rem; letter-spacing: 0.5px;">Masa Aktif Sebelumnya</label>
+                                        <div class="text-white-50 fw-semibold">{{ $member->expires_at?->format('d M Y') ?: '-' }}</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label small fw-bold text-uppercase opacity-50 mb-2">Pilih Durasi Perpanjangan</label>
+                                <select name="duration" class="form-select bg-white bg-opacity-10 border-0 text-white p-3 shadow-none" style="border-radius: 0.8rem;" onchange="updateRenewPreview(this, 'prevNew{{ $member->id }}', 'prevMonths{{ $member->id }}')">
+                                    <option value="1" selected class="text-dark">1 Bulan</option>
+                                </select>
+                            </div>
+
+                            <div class="p-3 rounded-4 bg-success bg-opacity-10 border border-success border-opacity-25 mt-4">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <div class="small text-success fw-bold opacity-75">Masa Aktif Baru (<span id="prevMonths{{ $member->id }}">1</span> Bln)</div>
+                                        <div id="prevNew{{ $member->id }}" class="fw-bold text-success fs-5 mt-1">
+                                            {{ now()->addMonth()->format('d M Y') }}
+                                        </div>
+                                    </div>
+                                    <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 45px; height: 45px; background: rgba(25, 135, 84, 0.2) !important;">
+                                        <i class="fas fa-calendar-plus"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="modal-footer border-0 p-4 pt-0">
+                            <input type="hidden" name="full_name" value="{{ $member->full_name }}">
+                            <input type="hidden" name="payment_method" value="{{ $member->payment_method }}">
+
+                            <button type="submit" class="btn btn-success w-100 rounded-pill fw-bold py-3 shadow-sm">
+                                Konfirmasi & Perbarui Member
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    @endforeach
 @endforeach
+
+<script>
+    function updateRenewPreview(select, datePreviewId, monthPreviewId) {
+        const months = parseInt(select.value);
+        const date = new Date();
+        date.setMonth(date.getMonth() + months);
+
+        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = monthNames[date.getMonth()];
+        const year = date.getFullYear();
+
+        document.getElementById(datePreviewId).innerText = `${day} ${month} ${year}`;
+        document.getElementById(monthPreviewId).innerText = months;
+    }
+
+    // ── Member Search ──────────────────────────────────────────
+    document.getElementById('memberSearchInput').addEventListener('input', function () {
+        const query    = this.value.toLowerCase().trim();
+        const rows     = document.querySelectorAll('#memberTableBody .member-row');
+        const noResult = document.getElementById('memberNoResult');
+        let visible    = 0;
+
+        rows.forEach(function (row) {
+            const name  = row.dataset.name  || '';
+            const phone = row.dataset.phone || '';
+            const match = name.includes(query) || phone.includes(query);
+            row.style.display = match ? '' : 'none';
+            if (match) visible++;
+        });
+
+        noResult.style.display = visible === 0 ? '' : 'none';
+    });
+</script>
 
 @endsection

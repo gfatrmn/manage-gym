@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('email')->unique()->nullable();
             $table->string('phone', 30)->nullable();
             $table->string('password')->nullable();
+            $table->string('profile_photo_path')->nullable();
             $table->string('checkin_code', 40)->unique()->nullable();
             $table->enum('status', ['active', 'inactive'])->default('active');
             $table->date('joined_at')->nullable();
