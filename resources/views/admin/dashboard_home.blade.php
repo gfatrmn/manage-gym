@@ -29,7 +29,12 @@
             margin-bottom: .3rem;
         }
 
-        .dashboard-title { font-size: 2.2rem; font-weight: 700; color: #fff; margin: 0; }
+        .dashboard-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #fff;
+            margin: 0;
+        }
 
         .section-divider {
             display: flex;
@@ -48,11 +53,11 @@
         }
 
         /* .section-divider::after {
-            content: "";
-            height: 1px;
-            width: 100%;
-            background: linear-gradient(90deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.1) 100%);
-        } */
+                                                    content: "";
+                                                    height: 1px;
+                                                    width: 100%;
+                                                    background: linear-gradient(90deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.1) 100%);
+                                                } */
 
         .stats-grid {
             display: grid;
@@ -124,21 +129,51 @@
         .tbl {
             width: 100%;
             border-collapse: collapse;
+            table-layout: fixed;
+            /* Menjamin kesejajaran kolom */
         }
 
         .tbl th {
             font-size: 10px;
-            text-transform: uppercase;
             color: rgba(255, 255, 255, 0.3);
             padding: 1.2rem 1.5rem 0.8rem;
+            text-transform: uppercase;
             text-align: left;
+            letter-spacing: 1px;
         }
 
         .tbl td {
             font-size: 13px;
-            padding: 1.1rem 1.5rem;
+            padding: 1.2rem 1.5rem;
             border-top: 1px solid rgba(255, 255, 255, 0.05);
-            color: rgba(255, 255, 255, 0.85);
+            color: rgba(255, 255, 255, 0.9);
+            vertical-align: middle;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Mengatur Lebar Kolom secara Spesifik */
+        .col-nama {
+            width: 25%;
+        }
+
+        .col-telp {
+            width: 25%;
+        }
+
+        .col-tgl {
+            width: 30%;
+        }
+
+        .col-aktif {
+            width: 25%;
+        }
+
+        /* Gaya khusus untuk teks Masa Aktif agar bold sesuai gambar */
+        .expires-val {
+            font-weight: 700;
+            color: #fff;
         }
 
         .type-pill {
@@ -159,9 +194,26 @@
             color: #3b9eff;
         }
 
+        .date-text {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .phone-text {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
         /* =============================================
-           RESPONSIVE — Tablet (max-width: 1024px)
-           ============================================= */
+                                                   RESPONSIVE — Tablet (max-width: 1024px)
+                                                   ============================================= */
         @media (max-width: 1024px) {
             .ds {
                 padding: 0.5rem 1.2rem 1rem;
@@ -183,8 +235,8 @@
         }
 
         /* =============================================
-           RESPONSIVE — Mobile (max-width: 640px)
-           ============================================= */
+                                                   RESPONSIVE — Mobile (max-width: 640px)
+                                                   ============================================= */
         @media (max-width: 640px) {
             .ds {
                 padding: 0.5rem 0.85rem 1.5rem;
@@ -269,8 +321,8 @@
         }
 
         /* =============================================
-           RESPONSIVE — Very small (max-width: 380px)
-           ============================================= */
+                                                   RESPONSIVE — Very small (max-width: 380px)
+                                                   ============================================= */
         @media (max-width: 380px) {
             .stats-grid {
                 grid-template-columns: 1fr;
@@ -343,28 +395,29 @@
             {{-- Tabel Member Baru --}}
             <div class="box">
                 <div class="box-head">
-                    <span class="box-title"><i class="fas fa-user-plus me-2 text-danger"></i>Member Baru</span>
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="fas fa-user-plus text-danger"></i>
+                        <span class="box-title">Registrasi Member Terbaru</span>
+                    </div>
                 </div>
                 <table class="tbl">
                     <thead>
                         <tr>
-                            <th>Nama</th>
-                            <th>Paket</th>
-                            <th>Waktu</th>
+                            <th class="col-nama">Nama Member</th>
+                            <th class="col-telp">Telepon</th>
+                            <th class="col-tgl">Tanggal Daftar</th>
+                            <th class="col-aktif">Masa Aktif</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse ($recentMembers as $member)
+                        @foreach ($recentMembers as $m)
                             <tr>
-                                <td class="fw-bold">{{ $member->full_name }}</td>
-                                <td style="opacity: 0.6;">{{ $member->membership_plan ?? 'Reguler' }}</td>
-                                <td style="opacity: 0.5;">{{ $member->created_at->format('H:i') }}</td>
+                                <td class="fw-bold">{{ $m->full_name }}</td>
+                                <td style="color: rgba(255,255,255,0.7)">{{ $m->phone }}</td>
+                                <td class="expires-val">{{ $m->created_at }}</td>
+                                <td class="expires-val">{{ $m->expires_at }}</td>
                             </tr>
-                        @empty
-                            <tr>
-                                <td colspan="3" class="text-center py-4">Belum ada member baru</td>
-                            </tr>
-                        @endforelse
+                        @endforeach
                     </tbody>
                 </table>
             </div>
@@ -372,7 +425,10 @@
             {{-- Tabel Check-in Terbaru (Gabungan Member & Guest) --}}
             <div class="box">
                 <div class="box-head">
-                    <span class="box-title"><i class="fas fa-history me-2 text-warning"></i>Check-in Terbaru</span>
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="fas fa-list-ul text-warning"></i>
+                        <span class="box-title">Log Aktivitas Terkini</span>
+                    </div>
                 </div>
                 <table class="tbl">
                     <thead>
@@ -383,22 +439,15 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse ($recentCheckins as $checkin)
+                        @foreach ($recentCheckins as $c)
                             <tr>
-                                <td class="fw-bold">{{ $checkin['nama'] }}</td>
-                                <td>
-                                    <span
-                                        class="type-pill {{ $checkin['tipe'] == 'Member' ? 'type-member' : 'type-guest' }}">
-                                        {{ $checkin['tipe'] }}
-                                    </span>
+                                <td class="fw-bold">{{ $c['nama'] }}</td>
+                                <td><span
+                                        style="font-size: 10px; padding: 3px 8px; border-radius: 4px; background: rgba(255,255,255,0.1);">{{ $c['tipe'] }}</span>
                                 </td>
-                                <td style="opacity: 0.5;">{{ $checkin['waktu'] }}</td>
+                                <td class="date-text">{{ $c['waktu'] }}</td>
                             </tr>
-                        @empty
-                            <tr>
-                                <td colspan="3" class="text-center py-4">Belum ada aktivitas</td>
-                            </tr>
-                        @endforelse
+                        @endforeach
                     </tbody>
                 </table>
             </div>

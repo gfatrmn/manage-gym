@@ -127,8 +127,8 @@
         }
 
         /* =============================================
-                                                   SEARCH INPUT
-                                                   ============================================= */
+                                                           SEARCH INPUT
+                                                           ============================================= */
         .member-search-wrap {
             position: relative;
             flex: 0 0 auto;
@@ -219,8 +219,8 @@
         }
 
         /* =============================================
-                                                   RESPONSIVE — Tablet (max-width: 1024px)
-                                                   ============================================= */
+                                                           RESPONSIVE — Tablet (max-width: 1024px)
+                                                           ============================================= */
         @media (max-width: 1024px) {
             .dashboard-page {
                 padding: 1rem 1.2rem;
@@ -241,8 +241,8 @@
         }
 
         /* =============================================
-                                                   RESPONSIVE — Mobile (max-width: 640px)
-                                                   ============================================= */
+                                                           RESPONSIVE — Mobile (max-width: 640px)
+                                                           ============================================= */
         @media (max-width: 640px) {
             .dashboard-page {
                 padding: 0.75rem 0.85rem 1.5rem;
@@ -347,8 +347,8 @@
         }
 
         /* =============================================
-                                                   RESPONSIVE — Very small (max-width: 380px)
-                                                   ============================================= */
+                                                           RESPONSIVE — Very small (max-width: 380px)
+                                                           ============================================= */
         @media (max-width: 380px) {
             .dashboard-title {
                 font-size: 1.3rem;
@@ -737,12 +737,13 @@
                                 </div>
 
                                 <div class="mb-4">
-                                    <label class="form-label small fw-bold text-uppercase opacity-50 mb-2">Pilih Durasi
+                                    <label class="form-label small fw-bold text-uppercase opacity-50 mb-2">Durasi
                                         Perpanjangan</label>
+                                    {{-- Kita buat select ini read-only atau hanya satu pilihan --}}
                                     <select name="duration"
                                         class="form-select bg-white bg-opacity-10 border-0 text-white p-3 shadow-none"
                                         style="border-radius: 0.8rem;"
-                                        onchange="updateRenewPreview(this, 'prevNew{{ $member->id }}', 'prevMonths{{ $member->id }}')">
+                                        onchange="updateRenewPreview(this, '{{ $member->id }}', '{{ $member->expires_at ? $member->expires_at->format('Y-m-d') : now()->format('Y-m-d') }}')">
                                         <option value="1" selected class="text-dark">1 Bulan</option>
                                     </select>
                                 </div>
@@ -751,10 +752,17 @@
                                     class="p-3 rounded-4 bg-success bg-opacity-10 border border-success border-opacity-25 mt-4">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div>
-                                            <div class="small text-success fw-bold opacity-75">Masa Aktif Baru (<span
+                                            <div class="small text-success fw-bold opacity-75">Masa Aktif Baru (+<span
                                                     id="prevMonths{{ $member->id }}">1</span> Bln)</div>
                                             <div id="prevNew{{ $member->id }}" class="fw-bold text-success fs-5 mt-1">
-                                                {{ now()->addMonth()->format('d M Y') }}
+                                                {{-- Inisialisasi tampilan awal: Masa Aktif Sekarang + 1 Bulan --}}
+                                                @php
+                                                    $baseDate =
+                                                        $member->expires_at && $member->expires_at->isFuture()
+                                                            ? $member->expires_at
+                                                            : now();
+                                                    echo $baseDate->addMonth()->format('d M Y');
+                                                @endphp
                                             </div>
                                         </div>
                                         <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center"
@@ -803,20 +811,28 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <script>
-        function updateRenewPreview(select, datePreviewId, monthPreviewId) {
-            const months = parseInt(select.value);
-            const date = new Date();
-            date.setMonth(date.getMonth() + months);
+        function updateRenewPreview(select, memberId, currentExpiry) {
+            const monthsToAdd = parseInt(select.value);
 
-            const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September",
-                "October", "November", "December"
-            ];
-            const day = String(date.getDate()).padStart(2, '0');
-            const month = monthNames[date.getMonth()];
-            const year = date.getFullYear();
+            // Gunakan tanggal expiry dari database, jika sudah lewat gunakan hari ini
+            let baseDate = new Date(currentExpiry);
+            let today = new Date();
 
-            document.getElementById(datePreviewId).innerText = `${day} ${month} ${year}`;
-            document.getElementById(monthPreviewId).innerText = months;
+            if (baseDate < today) {
+                baseDate = today;
+            }
+
+            // Tambah bulan
+            baseDate.setMonth(baseDate.getMonth() + monthsToAdd);
+
+            // Format tampilan (Contoh: 10 Aug 2026)
+            const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            const day = String(baseDate.getDate()).padStart(2, '0');
+            const month = monthNames[baseDate.getMonth()];
+            const year = baseDate.getFullYear();
+
+            document.getElementById('prevNew' + memberId).innerText = `${day} ${month} ${year}`;
+            document.getElementById('prevMonths' + memberId).innerText = monthsToAdd;
         }
 
         // ── Member Search ──────────────────────────────────────────

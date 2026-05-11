@@ -1,4 +1,4 @@
-﻿@extends('admin.layout')
+@extends('admin.layout')
 
 @section('content')
     @php
@@ -96,13 +96,28 @@
             font-weight: 700;
             font-size: 1.1rem;
         }
+
+        .dashboard-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #fff;
+            margin: 0;
+        }
+
+        .ds-section-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: .16em;
+            color: rgba(255, 255, 255, 0.45);
+            margin-bottom: .3rem;
+        }
     </style>
 
     <div class="dashboard-page">
         <div class="d-flex justify-content-between align-items-end mb-4">
             <div>
-                <div class="text-uppercase small fw-bold opacity-50 mb-1" style="letter-spacing: 2px;">Front Desk</div>
-                <h1 class="dashboard-title">Check-in Hub</h1>
+                <div class="ds-section-label">Arena Gym · Management Check-in</div>
+                <h1 class="dashboard-title">Check-in Member & Guest</h1>
             </div>
             <div class="text-end">
                 <div class="text-white-50 small">{{ now()->format('l, d F Y') }}</div>

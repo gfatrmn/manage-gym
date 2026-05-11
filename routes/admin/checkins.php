@@ -3,7 +3,7 @@
 use App\Helpers\RouteHelpers;
 use App\Models\GymCheckin;
 use App\Models\GymMember;
-use App\Models\DailyGuest; // Pastikan model DailyGuest di-import
+use App\Models\DailyGuest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Route;
@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 
-// ── Index ─────────────────────────────────────────────────────────────────────
+// ── Index (Updated: Menampilkan Semua Riwayat dengan Pagination) ──────────────
 Route::get('/checkins', function () {
     if ($redirect = RouteHelpers::ensureAdmin()) {
         return $redirect;
@@ -22,20 +22,21 @@ Route::get('/checkins', function () {
 
     $today = Carbon::today();
 
-    // 1. Ambil Check-in Member hari ini
-    $todayCheckins = GymCheckin::query()
+    // 1. Ambil SEMUA Riwayat Check-in Member (Paginasi 10 data)
+    $checkinRecords = GymCheckin::query()
         ->with('member')
-        ->whereDate('checked_in_at', $today)
         ->where('verification_status', 'verified')
         ->latest('checked_in_at')
-        ->get();
+        ->paginate(10, ['*'], 'member_page') // Menggunakan nama page khusus agar tidak bentrok
+        ->withQueryString();
 
-    // 2. Ambil Tamu Harian (Daily Guest) hari ini
+    // 2. Ambil SEMUA Riwayat Tamu Harian (Paginasi 10 data)
     $dailyGuests = DailyGuest::query()
-        ->whereDate('created_at', $today)
         ->latest()
-        ->get();
+        ->paginate(10, ['*'], 'guest_page')
+        ->withQueryString();
 
+    // Data pendukung untuk Dashboard Check-in
     $latestCheckin = GymCheckin::query()
         ->with('member')
         ->where('verification_status', 'verified')
@@ -43,15 +44,16 @@ Route::get('/checkins', function () {
         ->first();
 
     return view('admin.checkins', array_merge(RouteHelpers::pageMeta('checkins'), [
-        'checkinRecords'     => $todayCheckins,
-        'dailyGuests'        => $dailyGuests, // Tambahkan data tamu harian
+        'checkinRecords'     => $checkinRecords,
+        'dailyGuests'        => $dailyGuests,
         'memberOptions'      => GymMember::query()
-            ->where('status', 'active') // Sesuaikan dengan kolom status kamu
+            ->where('status', 'active')
             ->whereDate('expires_at', '>=', $today)
             ->orderBy('full_name')
             ->get(),
-        'todayCheckinsCount' => $todayCheckins->count(),
-        'todayGuestsCount'   => $dailyGuests->count(), // Hitung jumlah tamu harian
+        // Counter tetap menghitung data hari ini untuk informasi di widget atas
+        'todayCheckinsCount' => GymCheckin::whereDate('checked_in_at', $today)->where('verification_status', 'verified')->count(),
+        'todayGuestsCount'   => DailyGuest::whereDate('created_at', $today)->count(),
         'latestCheckin'      => $latestCheckin,
     ]));
 })->name('checkins');
@@ -69,7 +71,7 @@ Route::post('/checkins', function (Request $request) {
     );
 })->name('checkins.store');
 
-// ── Store Daily Guest (Pindahan dari Non-Member) ──────────────────────────────
+// ── Store Daily Guest ─────────────────────────────────────────────────────────
 Route::post('/checkins/guest', function (Request $request) {
     if ($redirect = \App\Helpers\RouteHelpers::ensureAdmin()) {
         return $redirect;
@@ -78,14 +80,14 @@ Route::post('/checkins/guest', function (Request $request) {
     $validated = $request->validate([
         'name'           => 'required|string|max:255',
         'phone'          => 'nullable|string|max:20',
-        'price'          => 'required|numeric', // Input dari form
+        'price'          => 'required|numeric',
         'payment_method' => 'required|string',
     ]);
 
-    \App\Models\DailyGuest::create([
+    DailyGuest::create([
         'full_name'      => $validated['name'],
         'phone'          => $validated['phone'] ?? null,
-        'payment_amount' => $validated['price'], // SESUAIKAN DENGAN DATABASE
+        'payment_amount' => $validated['price'],
         'payment_method' => $validated['payment_method'],
         'visit_at'       => now(),
     ]);

@@ -16,77 +16,74 @@ Route::get('/', function () {
     $startOfToday = now()->startOfDay();
     $endOfToday = now()->endOfDay();
 
-    // 1. Hitung Member Aktif
+    // 1. Statistik
     $activeMembersCount = GymMember::where('status', 'active')
         ->where('expires_at', '>=', now())
         ->count();
 
-    // 2. HITUNG PEMASUKAN HARI INI (Dua Sumber)
-    // Sumber A: Dari tabel Transaksi Kasir (Membership/Produk)
-    $incomeFromTransactions = CashierTransaction::whereBetween('transaction_at', [$startOfToday, $endOfToday])
+    $totalPemasukanHariIni = CashierTransaction::whereBetween('transaction_at', [$startOfToday, $endOfToday])
         ->where('payment_status', 'verified')
-        ->sum('amount');
-
-    // Sumber B: Dari tabel DailyGuest (Tamu Harian)
-    // Kita ambil kolom 'payment_amount' dari pendaftaran guest hari ini
-    $incomeFromGuests = DailyGuest::whereBetween('created_at', [$startOfToday, $endOfToday])
+        ->sum('amount') + DailyGuest::whereBetween('created_at', [$startOfToday, $endOfToday])
         ->sum('payment_amount');
 
-    $totalPemasukanHariIni = $incomeFromTransactions + $incomeFromGuests;
+    // 2. Member Baru - 3 Data Terbaru (Format Tanggal Sesuai Gambar)
+    $recentMembers = GymMember::latest()
+        ->take(3)
+        ->get()
+        ->map(function($member) {
+            return (object)[
+                'full_name'      => $member->full_name,
+                'phone'          => $member->phone ?? '-',
+                // FORMAT: 10 May 2026, 12:56
+                'created_at'     => $member->created_at->translatedFormat('d M Y'),
+                // FORMAT: 10 Jun 2026
+                'expires_at'     => $member->expires_at ? $member->expires_at->translatedFormat('d M Y') : '-',
+            ];
+        });
 
-    // 3. AMBIL LOG AKTIVITAS (Member + Guest)
+    // 3. Log Aktivitas - 3 Aktivitas Terbaru
     $memberLogs = GymCheckin::with('member')
-        ->whereBetween('checked_in_at', [$startOfToday, $endOfToday])
+        ->where('verification_status', 'verified')
+        ->latest('checked_in_at')
+        ->take(3)
         ->get()
         ->map(fn($item) => [
-            'nama'  => $item->member->full_name ?? 'N/A',
-            'tipe'  => 'Member',
-            'waktu' => $item->checked_in_at->format('H:i')
+            'nama'      => $item->member->full_name ?? 'N/A',
+            'tipe'      => 'Member',
+            'waktu_raw' => $item->checked_in_at,
+            'waktu'     => $item->checked_in_at->translatedFormat('d M Y')
         ]);
 
-    $guestLogs = DailyGuest::whereBetween('created_at', [$startOfToday, $endOfToday])
+    $guestLogs = DailyGuest::latest()
+        ->take(3)
         ->get()
         ->map(fn($item) => [
-            'nama'  => $item->full_name,
-            'tipe'  => 'Guest',
-            'waktu' => $item->created_at->format('H:i')
+            'nama'      => $item->full_name,
+            'tipe'      => 'Guest',
+            'waktu_raw' => $item->created_at,
+            'waktu'     => $item->created_at->translatedFormat('d M Y, H:i')
         ]);
 
-    $allLogs = $memberLogs->concat($guestLogs);
-    $totalCheckins = $allLogs->count();
-    $recentCheckins = $allLogs->sortByDesc('waktu')->take(3);
+    $recentCheckins = $memberLogs->concat($guestLogs)
+        ->sortByDesc('waktu_raw')
+        ->take(3)
+        ->values();
 
-    // 4. Membership Alert
+    // 4. Alert & Meta
     $expiringCount = GymMember::where('status', 'active')
         ->whereBetween('expires_at', [now(), now()->addDays(7)])
         ->count();
 
     return view('admin.dashboard_home', array_merge(RouteHelpers::pageMeta('dashboard'), [
         'stats' => [
-            [
-                'label' => 'Total Member Aktif',
-                'value' => number_format($activeMembersCount, 0, ',', '.'),
-                'note'  => 'Status aktif'
-            ],
-            [
-                'label' => 'Pemasukan Hari Ini',
-                'value' => 'Rp ' . number_format($totalPemasukanHariIni, 0, ',', '.'),
-                'note'  => 'Kasir: Rp'.number_format($incomeFromTransactions,0,',','.').' | Guest: Rp'.number_format($incomeFromGuests,0,',','.')
-            ],
+            ['label' => 'Total Member Aktif', 'value' => number_format($activeMembersCount, 0, ',', '.'), 'note' => 'Status aktif'],
+            ['label' => 'Pemasukan Hari Ini', 'value' => 'Rp ' . number_format($totalPemasukanHariIni, 0, ',', '.'), 'note' => 'Kasir & Guest']
         ],
         'heroSummary' => [
-            [
-                'label' => 'Check-in Hari Ini',
-                'value' => $totalCheckins,
-                'note'  => $memberLogs->count() . ' Member & ' . $guestLogs->count() . ' Guest'
-            ],
-            [
-                'label' => 'Membership Alert',
-                'value' => $expiringCount . ' Jatuh Tempo',
-                'note'  => 'Akan berakhir dalam 7 hari'
-            ]
+            ['label' => 'Aktivitas Hari Ini', 'value' => GymCheckin::whereBetween('checked_in_at', [$startOfToday, $endOfToday])->count() + DailyGuest::whereBetween('created_at', [$startOfToday, $endOfToday])->count(), 'note' => 'Kunjungan'],
+            ['label' => 'Membership Alert', 'value' => $expiringCount . ' Jatuh Tempo', 'note' => 'Dalam 7 hari']
         ],
-        'recentMembers'  => GymMember::latest()->take(3)->get(),
+        'recentMembers'  => $recentMembers,
         'recentCheckins' => $recentCheckins,
     ]));
 })->name('dashboard');
