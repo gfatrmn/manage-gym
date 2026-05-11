@@ -33,11 +33,18 @@
         }
 
         .summary-label {
-            font-size: .7rem;
-            font-weight: 500;
+            font-size: 1rem;
+            font-weight: 600;
             text-transform: uppercase;
             color: #fff;
             opacity: 1;
+        }
+
+        .summary-note {
+            font-size: .7rem;
+            font-weight: 400;
+            color: #ffffffc9;
+            opacity: 0.8;
         }
 
         .summary-value {
@@ -396,18 +403,22 @@
             <div class="member-summary-card">
                 <div class="summary-label">Aktif</div>
                 <div class="summary-value text-success">{{ $totalActiveCount }}</div>
+                <div class="summary-note">Member Aktif</div>
             </div>
             <div class="member-summary-card">
                 <div class="summary-label">Expired</div>
                 <div class="summary-value text-danger">{{ $totalExpiredCount }}</div>
+                <div class="summary-note">Member Expired</div>
             </div>
             <div class="member-summary-card">
                 <div class="summary-label">Segera Habis</div>
                 <div class="summary-value text-warning">{{ $expiringSoonCount }}</div>
+                <div class="summary-note">Member Segera Habis</div>
             </div>
             <div class="member-summary-card">
                 <div class="summary-label">Total Data</div>
                 <div class="summary-value text-white">{{ $totalMembersCount }}</div>
+                <div class="summary-note">Total Data Member</div>
             </div>
         </div>
 
