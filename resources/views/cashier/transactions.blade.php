@@ -33,14 +33,14 @@
         </div>
         <div class="row g-4">
             <div class="col-12 col-md-6">
-                <div class="card p-4 h-100">
+                <div class="hero-stat-card p-4 h-100">
                     <div class="small text-uppercase text-muted mb-2">Pembayaran Member</div>
                     <div class="fs-3 fw-bold">{{ number_format($memberPayments->count(), 0, ',', '.') }}</div>
                     <div class="small text-secondary">Transaksi member 24 jam terakhir</div>
                 </div>
             </div>
             <div class="col-12 col-md-6">
-                <div class="card p-4 h-100">
+                <div class="hero-stat-card p-4 h-100">
                     <div class="small text-uppercase text-muted mb-2">Daily Non Member</div>
                     <div class="fs-3 fw-bold">{{ number_format($dailyPayments->count(), 0, ',', '.') }}</div>
                     <div class="small text-secondary">Transaksi daily pass 24 jam terakhir</div>
@@ -72,7 +72,7 @@
 
         <div class="row g-4">
             <div class="col-12">
-                <div class="card p-4">
+                <div class="hero-stat-card p-4">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <div>
                             <h3 class="h5 mb-1">Member</h3>
@@ -115,7 +115,7 @@
             </div>
 
             <div class="col-12">
-                <div class="card p-4">
+                <div class="hero-stat-card p-4">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <div>
                             <h3 class="h5 mb-1">Non Member</h3>

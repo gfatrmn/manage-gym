@@ -97,66 +97,66 @@
 
             body.cashier-layout {
                 --body-gradient:
-                    radial-gradient(circle at top right, rgba(6, 182, 212, 0.22), transparent 24%),
-                    radial-gradient(circle at bottom left, rgba(16, 185, 129, 0.16), transparent 22%),
-                    linear-gradient(160deg, #04131c 0%, #08212c 52%, #0c1720 100%);
-                --surface: rgba(9, 27, 36, 0.96);
-                --surface-soft: rgba(14, 38, 49, 0.98);
-                --border: rgba(125, 211, 252, 0.18);
-                --border-strong: rgba(34, 211, 238, 0.34);
-                --panel-glow: rgba(34, 211, 238, 0.16);
-                --shadow: 0 26px 52px rgba(2, 23, 33, 0.38);
-                --sidebar-bg: linear-gradient(180deg, rgba(4, 24, 34, 0.99) 0%, rgba(6, 19, 27, 0.99) 100%);
-                --sidebar-extra-bg: linear-gradient(180deg, rgba(34, 211, 238, 0.1) 0%, rgba(16, 185, 129, 0.06) 100%);
-                --hero-pill-bg: rgba(34, 211, 238, 0.1);
-                --hero-pill-border: rgba(103, 232, 249, 0.24);
-                --hero-pill-color: #effcff;
-                --hero-stat-bg: linear-gradient(180deg, rgba(13, 42, 54, 0.98) 0%, rgba(10, 31, 41, 0.98) 100%);
-                --table-head-bg: rgba(34, 211, 238, 0.09);
-                --field-bg: rgba(4, 30, 40, 0.9);
-                --field-border: rgba(103, 232, 249, 0.18);
-                --field-placeholder: rgba(220, 252, 255, 0.42);
-                --field-focus-bg: rgba(10, 44, 57, 0.96);
-                --field-disabled-bg: rgba(7, 30, 39, 0.82);
-                --field-disabled-color: rgba(219, 243, 247, 0.66);
-                --modal-bg: linear-gradient(180deg, rgba(8, 30, 39, 0.99) 0%, rgba(7, 21, 29, 0.99) 100%);
-                --modal-border: rgba(103, 232, 249, 0.14);
-                --toggle-bg: rgba(34, 211, 238, 0.08);
-                --toggle-border: rgba(103, 232, 249, 0.18);
+                    radial-gradient(circle at top right, rgba(255, 59, 59, 0.22), transparent 28%),
+                    radial-gradient(circle at bottom left, rgba(166, 15, 31, 0.28), transparent 24%),
+                    linear-gradient(160deg, #050505 0%, #0c0c0c 48%, #15080a 100%);
+                --surface: rgba(20, 20, 20, 0.92);
+                --surface-soft: rgba(34, 34, 34, 0.94);
+                --border: rgba(255, 255, 255, 0.08);
+                --border-strong: rgba(255, 68, 68, 0.3);
+                --panel-glow: rgba(255, 59, 59, 0.14);
+                --shadow: 0 26px 52px rgba(0, 0, 0, 0.45);
+                --sidebar-bg: linear-gradient(180deg, rgba(25, 25, 25, 0.96) 0%, rgba(10, 10, 10, 0.96) 100%);
+                --sidebar-extra-bg: linear-gradient(180deg, rgba(255, 59, 59, 0.1) 0%, rgba(166, 15, 31, 0.06) 100%);
+                --hero-pill-bg: rgba(255, 59, 59, 0.1);
+                --hero-pill-border: rgba(255, 138, 138, 0.24);
+                --hero-pill-color: #fff0f0;
+                --hero-stat-bg: linear-gradient(180deg, rgba(42, 42, 42, 0.94) 0%, rgba(28, 28, 28, 0.96) 100%);
+                --table-head-bg: rgba(255, 59, 59, 0.09);
+                --field-bg: rgba(20, 20, 20, 0.9);
+                --field-border: rgba(255, 138, 138, 0.18);
+                --field-placeholder: rgba(255, 235, 235, 0.42);
+                --field-focus-bg: rgba(30, 10, 10, 0.96);
+                --field-disabled-bg: rgba(20, 10, 10, 0.82);
+                --field-disabled-color: rgba(247, 219, 219, 0.66);
+                --modal-bg: linear-gradient(180deg, rgba(22, 22, 22, 0.98) 0%, rgba(12, 12, 12, 0.98) 100%);
+                --modal-border: rgba(255, 138, 138, 0.14);
+                --toggle-bg: rgba(255, 59, 59, 0.08);
+                --toggle-border: rgba(255, 138, 138, 0.18);
             }
 
             html[data-theme="light"] body.cashier-layout {
                 --body-gradient:
-                    radial-gradient(circle at top right, rgba(6, 182, 212, 0.12), transparent 24%),
-                    radial-gradient(circle at bottom left, rgba(16, 185, 129, 0.1), transparent 22%),
-                    linear-gradient(160deg, #fbfeff 0%, #f0fbff 48%, #e8f8ff 100%);
-                --surface: rgba(255, 255, 255, 0.98);
-                --surface-soft: rgba(241, 251, 255, 0.99);
-                --border: rgba(8, 145, 178, 0.16);
-                --border-strong: rgba(6, 182, 212, 0.24);
-                --text-main: #0f2430;
-                --text-muted: #45606d;
-                --panel-glow: rgba(6, 182, 212, 0.1);
-                --shadow: 0 24px 44px rgba(8, 47, 73, 0.1);
-                --sidebar-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.995) 0%, rgba(236, 249, 255, 0.995) 100%);
-                --sidebar-link-color: rgba(15,36,48,0.84);
-                --sidebar-nav-label-color: rgba(15,36,48,0.54);
-                --sidebar-extra-bg: linear-gradient(180deg, rgba(236, 254, 255, 0.97) 0%, rgba(236, 253, 245, 0.99) 100%);
-                --hero-pill-bg: rgba(6, 182, 212, 0.08);
-                --hero-pill-border: rgba(8, 145, 178, 0.18);
-                --hero-pill-color: #0f5f78;
-                --hero-stat-bg: linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(235,248,252,1) 100%);
-                --table-head-bg: rgba(8,145,178,0.08);
-                --field-bg: rgba(255,255,255,0.98);
-                --field-border: rgba(8,145,178,0.16);
-                --field-placeholder: rgba(15,36,48,0.4);
-                --field-focus-bg: rgba(243, 253, 255, 1);
-                --field-disabled-bg: rgba(8,145,178,0.05);
-                --field-disabled-color: rgba(15,36,48,0.62);
-                --modal-bg: linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(238,249,253,1) 100%);
-                --modal-border: rgba(8,145,178,0.1);
-                --toggle-bg: rgba(8,145,178,0.06);
-                --toggle-border: rgba(8,145,178,0.14);
+                    radial-gradient(circle at top right, rgba(255, 111, 111, 0.16), transparent 26%),
+                    radial-gradient(circle at bottom left, rgba(214, 40, 57, 0.1), transparent 24%),
+                    linear-gradient(160deg, #fffdfc 0%, #f8f5f2 48%, #f2ece8 100%);
+                --surface: rgba(255, 255, 255, 0.92);
+                --surface-soft: rgba(255, 255, 255, 0.97);
+                --border: rgba(15, 23, 42, 0.1);
+                --border-strong: rgba(214, 40, 57, 0.22);
+                --text-main: #18181b;
+                --text-muted: #5b6270;
+                --panel-glow: rgba(214, 40, 57, 0.12);
+                --shadow: 0 24px 48px rgba(15, 23, 42, 0.08);
+                --sidebar-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(247, 242, 239, 0.98) 100%);
+                --sidebar-link-color: rgba(24,24,27,0.78);
+                --sidebar-nav-label-color: rgba(24,24,27,0.48);
+                --sidebar-extra-bg: linear-gradient(180deg, rgba(255,240,240,0.97) 0%, rgba(255,230,230,0.99) 100%);
+                --hero-pill-bg: rgba(214, 40, 57, 0.08);
+                --hero-pill-border: rgba(214, 40, 57, 0.18);
+                --hero-pill-color: #7f1d1d;
+                --hero-stat-bg: linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(252,235,235,1) 100%);
+                --table-head-bg: rgba(214,40,57,0.08);
+                --field-bg: rgba(255,255,255,0.85);
+                --field-border: rgba(214,40,57,0.16);
+                --field-placeholder: rgba(24,24,27,0.38);
+                --field-focus-bg: rgba(255, 243, 243, 1);
+                --field-disabled-bg: rgba(214,40,57,0.05);
+                --field-disabled-color: rgba(24,24,27,0.6);
+                --modal-bg: linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(253,238,238,1) 100%);
+                --modal-border: rgba(214,40,57,0.1);
+                --toggle-bg: rgba(214,40,57,0.06);
+                --toggle-border: rgba(214,40,57,0.14);
             }
 
             body {
@@ -331,7 +331,7 @@
             }
 
             body.cashier-layout .sidebar::before {
-                background: radial-gradient(circle at top left, rgba(34, 211, 238, 0.18), transparent 60%);
+                background: radial-gradient(circle at top left, rgba(255, 59, 59, 0.22), transparent 60%);
             }
 
             .brand-mark {
@@ -356,8 +356,8 @@
             body.cashier-layout .brand-mark,
             body.cashier-layout .metric-icon,
             body.cashier-layout .table-avatar-placeholder {
-                background: linear-gradient(135deg, #06b6d4 0%, #0f766e 100%);
-                box-shadow: 0 16px 28px rgba(14, 116, 144, 0.28);
+                background: linear-gradient(135deg, #ff2323 0%, #1d0909 100%);
+                box-shadow: 0 16px 28px rgba(255, 59, 59, 0.28);
             }
 
             .sidebar-link {
@@ -385,8 +385,8 @@
 
             body.cashier-layout .sidebar-link:hover,
             body.cashier-layout .sidebar-link.active {
-                background: linear-gradient(90deg, rgba(34, 211, 238, 0.18), rgba(255,255,255,0.04));
-                border-color: rgba(34, 211, 238, 0.22);
+                background: linear-gradient(90deg, rgba(255, 59, 59, 0.16), rgba(255,255,255,0.03));
+                border-color: rgba(255, 59, 59, 0.2);
                 box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
             }
 
@@ -424,8 +424,8 @@
             }
 
             body.cashier-layout .sidebar-dot {
-                background: linear-gradient(135deg, #67e8f9 0%, #06b6d4 100%);
-                box-shadow: 0 0 0 4px rgba(34, 211, 238, 0.14);
+                background: linear-gradient(135deg, #ff8a8a 0%, #ff3b3b 100%);
+                box-shadow: 0 0 0 4px rgba(255, 59, 59, 0.14);
             }
 
             .topbar-card,
@@ -507,14 +507,14 @@
             }
 
             body.cashier-layout .hero-pill:hover {
-                border-color: rgba(34, 211, 238, 0.3);
-                background: linear-gradient(135deg, rgba(34, 211, 238, 0.18) 0%, rgba(16, 185, 129, 0.12) 100%);
+                border-color: rgba(255, 59, 59, 0.3);
+                background: linear-gradient(135deg, rgba(255, 59, 59, 0.18) 0%, rgba(166, 15, 31, 0.12) 100%);
             }
 
             body.cashier-layout .hero-pill.active {
-                border-color: rgba(34, 211, 238, 0.34);
-                background: linear-gradient(135deg, rgba(34, 211, 238, 0.28) 0%, rgba(16, 185, 129, 0.18) 100%);
-                box-shadow: 0 14px 24px rgba(8, 145, 178, 0.22);
+                border-color: rgba(255, 59, 59, 0.34);
+                background: linear-gradient(135deg, rgba(255, 59, 59, 0.28) 0%, rgba(166, 15, 31, 0.18) 100%);
+                box-shadow: 0 14px 24px rgba(166, 15, 31, 0.22);
             }
 
             .hero-stat-card {
@@ -568,8 +568,8 @@
             body.cashier-layout .icon-orange,
             body.cashier-layout .icon-navy,
             body.cashier-layout .icon-green {
-                background: linear-gradient(135deg, #06b6d4 0%, #0f766e 100%);
-                box-shadow: 0 18px 26px rgba(8, 145, 178, 0.26);
+                background: linear-gradient(135deg, #ff5a5a 0%, #8f0013 100%);
+                box-shadow: 0 18px 26px rgba(166, 15, 31, 0.35);
             }
 
             .list-card {
@@ -641,8 +641,8 @@
 
             body.cashier-layout .badge-soft-teal,
             body.cashier-layout .badge-soft-green {
-                background: rgba(34, 211, 238, 0.14);
-                color: #cffafe;
+                background: rgba(255, 59, 59, 0.14);
+                color: #ffb3b3;
             }
 
             .badge-soft-green {
@@ -761,9 +761,9 @@
 
             body.cashier-layout .btn-dark,
             body.cashier-layout .btn-outline-light:hover {
-                background: linear-gradient(135deg, #06b6d4 0%, #0f766e 100%);
-                border-color: #0891b2;
-                box-shadow: 0 18px 28px rgba(8, 145, 178, 0.28);
+                background: linear-gradient(135deg, #ff4c4c 0%, #b10018 100%);
+                border-color: #d62839;
+                box-shadow: 0 18px 28px rgba(177, 0, 24, 0.35);
             }
 
             body.cashier-layout main {
@@ -777,7 +777,7 @@
             body.cashier-layout .list-card,
             body.cashier-layout .hero-stat-card {
                 box-shadow:
-                    0 20px 42px rgba(2, 23, 33, 0.22),
+                    0 20px 42px rgba(0, 0, 0, 0.3),
                     inset 0 1px 0 rgba(255,255,255,0.03);
             }
 
@@ -790,14 +790,14 @@
             body.cashier-layout .metric-card,
             body.cashier-layout .list-card {
                 background:
-                    linear-gradient(180deg, rgba(14, 38, 49, 0.98) 0%, rgba(9, 27, 36, 0.98) 100%);
+                    linear-gradient(180deg, rgba(20, 20, 20, 0.98) 0%, rgba(12, 12, 12, 0.98) 100%);
             }
 
             html[data-theme="light"] body.cashier-layout .panel-card,
             html[data-theme="light"] body.cashier-layout .metric-card,
             html[data-theme="light"] body.cashier-layout .list-card {
                 background:
-                    linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(241,251,255,1) 100%);
+                    linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(252,235,235,1) 100%);
             }
 
             body.cashier-layout .table-responsive {
@@ -808,28 +808,28 @@
             }
 
             body.cashier-layout .table tbody tr:hover {
-                background: rgba(34, 211, 238, 0.06);
+                background: rgba(255, 59, 59, 0.06);
             }
 
             html[data-theme="light"] body.cashier-layout .table tbody tr:hover {
-                background: rgba(8, 145, 178, 0.05);
+                background: rgba(214, 40, 57, 0.05);
             }
 
             body.cashier-layout .table thead th {
-                color: #cffafe;
+                color: #ffb3b3;
                 font-size: .74rem;
             }
 
             html[data-theme="light"] body.cashier-layout .table thead th {
-                color: #0f5f78;
+                color: #7f1d1d;
             }
 
             body.cashier-layout .form-label {
-                color: #f0fdff;
+                color: #fff0f0;
             }
 
             html[data-theme="light"] body.cashier-layout .form-label {
-                color: #0f2430;
+                color: #18181b;
             }
 
             body.cashier-layout .form-control,
@@ -841,43 +841,43 @@
             body.cashier-layout .form-control:focus,
             body.cashier-layout .form-select:focus,
             body.cashier-layout textarea.form-control:focus {
-                border-color: rgba(34, 211, 238, 0.5);
-                box-shadow: 0 0 0 .22rem rgba(34, 211, 238, 0.14);
+                border-color: rgba(255, 59, 59, 0.5);
+                box-shadow: 0 0 0 .22rem rgba(255, 59, 59, 0.14);
             }
 
             body.cashier-layout .btn-outline-secondary {
-                border-color: rgba(103, 232, 249, 0.24);
-                color: #e6fbff;
+                border-color: rgba(255, 138, 138, 0.24);
+                color: #ffe4e4;
                 background: rgba(255,255,255,0.03);
             }
 
             body.cashier-layout .btn-outline-secondary:hover {
-                border-color: rgba(34, 211, 238, 0.3);
-                background: rgba(34, 211, 238, 0.12);
+                border-color: rgba(255, 59, 59, 0.3);
+                background: rgba(255, 59, 59, 0.12);
                 color: #ffffff;
             }
 
             html[data-theme="light"] body.cashier-layout .btn-outline-secondary {
-                border-color: rgba(8, 145, 178, 0.18);
-                color: #0f5f78;
-                background: rgba(8, 145, 178, 0.04);
+                border-color: rgba(214, 40, 57, 0.18);
+                color: #991b1b;
+                background: rgba(214, 40, 57, 0.04);
             }
 
             html[data-theme="light"] body.cashier-layout .btn-outline-secondary:hover {
-                background: rgba(8, 145, 178, 0.1);
-                color: #083344;
+                background: rgba(214, 40, 57, 0.1);
+                color: #7f1d1d;
             }
 
             body.cashier-layout .btn-outline-light {
-                border-color: rgba(103, 232, 249, 0.22);
-                color: #e6fbff;
+                border-color: rgba(255, 138, 138, 0.22);
+                color: #ffe4e4;
                 background: rgba(255,255,255,0.02);
             }
 
             body.cashier-layout .alert-success {
-                background: rgba(16, 185, 129, 0.16);
-                color: #d1fae5;
-                border: 1px solid rgba(16, 185, 129, 0.22);
+                background: rgba(255, 59, 59, 0.16);
+                color: #ffdddd;
+                border: 1px solid rgba(255, 59, 59, 0.22);
             }
 
             body.cashier-layout .alert-danger {
