@@ -69,6 +69,19 @@
             background: #ff5b5b;
             color: #fff;
         }
+
+        /* Badge metode pembayaran */
+        .badge-cash {
+            background: rgba(34, 197, 94, .15);
+            color: #22c55e;
+            border: 1px solid rgba(34, 197, 94, .25);
+        }
+
+        .badge-qris {
+            background: rgba(99, 102, 241, .15);
+            color: #818cf8;
+            border: 1px solid rgba(99, 102, 241, .25);
+        }
     </style>
 
     <div class="topbar-card p-4 mb-4 mt-4">
@@ -80,10 +93,9 @@
         $memberCheckins = collect($checkoutCheckins)
             ->filter(fn ($checkin) => $checkin->member !== null)
             ->values();
-        $dailyPaymentCheckouts = collect($checkoutDailyPayments)->values();
     @endphp
 
-    <!-- Member Check-in Hari Ini -->
+    {{-- ── Member Check-in Hari Ini ── --}}
     <div class="panel-card p-4 mb-4">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <div>
@@ -116,9 +128,9 @@
                     <tbody>
                         @foreach ($memberCheckins as $checkin)
                             @php
-                                $today = \Illuminate\Support\Carbon::today();
+                                $today     = \Illuminate\Support\Carbon::today();
                                 $expiresAt = $checkin->member->expires_at;
-                                if (!$expiresAt) {
+                                if (! $expiresAt) {
                                     $statusBadge = 'secondary';
                                     $statusLabel = 'Unknown';
                                 } elseif ($expiresAt->lt($today)) {
@@ -144,7 +156,8 @@
                                 </td>
                                 <td>{{ $checkin->checked_in_at->format('H:i') }}</td>
                                 <td>
-                                    <a href="{{ route('cashier.transactions.products', ['gym_member_id' => $checkin->member->id, 'has_payment' => 1]) }}" class="btn rounded-pill btn-sm checkout-action-btn">
+                                    <a href="{{ route('cashier.transactions.products', ['gym_member_id' => $checkin->member->id, 'has_payment' => 1]) }}"
+                                       class="btn rounded-pill btn-sm checkout-action-btn">
                                         Pembayaran
                                     </a>
                                 </td>
@@ -156,46 +169,54 @@
         @endif
     </div>
 
+    {{-- ── Non Member (Daily Guest) Hari Ini ── --}}
     <div class="panel-card p-4 mb-4">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <div>
                 <div class="section-label">Daily Pass</div>
-                <h3 class="h5 mb-1">Pembayaran Hari Ini</h3>
+                <h3 class="h5 mb-1">Non Member Hari Ini</h3>
             </div>
-            <span class="badge text-bg-light border text-dark">{{ $dailyPaymentCheckouts->count() }}</span>
+            <span class="badge text-bg-light border text-dark">{{ $dailyGuestsToday->count() }}</span>
         </div>
 
         <div class="mb-3">
-            <label for="daily-today-search" class="form-label fw-semibold">Cari pembayaran daily pass</label>
-            <input id="daily-today-search" type="text" class="form-control" placeholder="Cari nama, metode, atau waktu transaksi">
+            <label for="daily-today-search" class="form-label fw-semibold">Cari non member hari ini</label>
+            <input id="daily-today-search" type="text" class="form-control" placeholder="Cari nama, HP, atau metode pembayaran">
         </div>
 
-        @if ($dailyPaymentCheckouts->isEmpty())
-            <div class="text-muted">Tidak ada pembayaran daily pass hari ini.</div>
+        @if ($dailyGuestsToday->isEmpty())
+            <div class="text-muted">Tidak ada non member hari ini.</div>
         @else
             <div class="table-responsive">
-                <table class="table table-borderless align-middle mb-0" id="daily-payment-table">
+                <table class="table table-borderless align-middle mb-0" id="daily-guest-table">
                     <thead>
                         <tr>
                             <th>Nama</th>
-                            <th>Jumlah</th>
+                            <th>No. HP</th>
+                            <th>Nominal</th>
                             <th>Metode</th>
                             <th>Waktu</th>
-                            <th>Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($dailyPaymentCheckouts as $payment)
+                        @foreach ($dailyGuestsToday as $guest)
                             <tr>
-                                <td>{{ $payment->customer_name }}</td>
-                                <td>Rp{{ number_format($payment->amount, 0, ',', '.') }}</td>
-                                <td>{{ strtoupper($payment->payment_method) }}</td>
-                                <td>{{ $payment->transaction_at->format('H:i, d M Y') }}</td>
+                                <td class="fw-semibold">{{ $guest->full_name }}</td>
+                                <td>{{ $guest->phone ?: '-' }}</td>
                                 <td>
-                                    <a href="{{ route('cashier.transactions.products', ['customer_name' => $payment->customer_name]) }}" class="btn rounded-pill btn-sm checkout-action-btn">
-                                        Transaksi
-                                    </a>
+                                    @if ($guest->payment_amount)
+                                        Rp{{ number_format($guest->payment_amount, 0, ',', '.') }}
+                                    @else
+                                        -
+                                    @endif
                                 </td>
+                                <td>
+                                    @php $method = strtolower($guest->payment_method ?? ''); @endphp
+                                    <span class="badge rounded-pill fw-semibold {{ $method === 'qris' ? 'badge-qris' : 'badge-cash' }}">
+                                        {{ strtoupper($guest->payment_method ?? '-') }}
+                                    </span>
+                                </td>
+                                <td>{{ \Carbon\Carbon::parse($guest->visit_at)->format('H:i') }}</td>
                             </tr>
                         @endforeach
                     </tbody>
@@ -208,8 +229,9 @@
         document.addEventListener('DOMContentLoaded', function () {
             const normalize = (value) => value.toLowerCase();
 
+            // Member search
             const memberSearch = document.getElementById('member-today-search');
-            const memberRows = document.querySelectorAll('#member-checkin-table tbody tr');
+            const memberRows   = document.querySelectorAll('#member-checkin-table tbody tr');
             if (memberSearch) {
                 memberSearch.addEventListener('input', function () {
                     const query = normalize(this.value.trim());
@@ -220,8 +242,9 @@
                 });
             }
 
+            // Daily guest search
             const dailySearch = document.getElementById('daily-today-search');
-            const dailyRows = document.querySelectorAll('#daily-payment-table tbody tr');
+            const dailyRows   = document.querySelectorAll('#daily-guest-table tbody tr');
             if (dailySearch) {
                 dailySearch.addEventListener('input', function () {
                     const query = normalize(this.value.trim());

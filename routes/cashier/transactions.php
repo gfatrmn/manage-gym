@@ -2,6 +2,7 @@
 
 use App\Helpers\RouteHelpers;
 use App\Models\CashierTransaction;
+use App\Models\DailyGuest;
 use App\Models\GymCheckin;
 use App\Models\GymMember;
 use App\Models\Product;
@@ -59,13 +60,18 @@ Route::get('/transactions', function (Request $request) {
         )
         ->values();
 
-    $checkoutDailyPayments = collect($viewData['dailyPayments'])
-        ->filter(fn (CashierTransaction $t) => $t->transaction_at->isToday())
+    // ── Non Member (Daily Guest) hari ini ────────────────────────────────────
+    $dailyGuestsToday = DailyGuest::whereDate('visit_at', today())
+        ->orderByDesc('visit_at')
+        ->get()
         ->when(
             $search !== '',
             fn ($col) => $col->filter(
-                fn (CashierTransaction $t) => str_contains(
-                    str()->lower($t->customer_name),
+                fn (DailyGuest $g) => str_contains(
+                    str()->lower($g->full_name),
+                    str()->lower($search)
+                ) || str_contains(
+                    str()->lower($g->phone ?? ''),
                     str()->lower($search)
                 )
             )
@@ -78,7 +84,7 @@ Route::get('/transactions', function (Request $request) {
         'memberPayments'        => $filterByName($viewData['memberPayments']),
         'dailyPayments'         => $filterByName($viewData['dailyPayments']),
         'checkoutCheckins'      => $checkoutCheckins,
-        'checkoutDailyPayments' => $checkoutDailyPayments,
+        'dailyGuestsToday'      => $dailyGuestsToday,
     ]));
 })->name('transactions');
 
@@ -104,7 +110,7 @@ Route::get('/transactions/products', function (Request $request) {
 
     $monthEnd = (clone $monthStart)->endOfMonth();
 
-    $selectedMember      = null;
+    $selectedMember       = null;
     $selectedCustomerName = trim((string) $request->query('customer_name', ''));
 
     if ($request->query('gym_member_id')) {
@@ -157,7 +163,6 @@ Route::post('/transactions', function (Request $request) {
             ->get()
             ->keyBy('id');
 
-        // Validasi stok & status aktif sebelum menyimpan apapun
         foreach ($validated['product_ids'] as $productId) {
             $product  = $products->get((int) $productId);
             $quantity = max((int) data_get($validated, 'quantities.' . $product->id, 1), 1);
@@ -185,19 +190,19 @@ Route::post('/transactions', function (Request $request) {
             $quantity = max((int) data_get($validated, 'quantities.' . $product->id, 1), 1);
 
             CashierTransaction::create([
-                'invoice'          => RouteHelpers::generateInvoice('PRD'),
-                'gym_member_id'    => $validated['gym_member_id'] ?? null,
-                'product_id'       => $product->id,
-                'customer_name'    => $customerName,
-                'transaction_group'=> 'product_sale',
-                'transaction_type' => $product->name,
-                'amount'           => $product->price * $quantity,
-                'quantity'         => $quantity,
-                'payment_method'   => $paymentMethod,
-                'payment_status'   => $paymentStatus,
-                'receipt_status'   => $receiptStatus,
-                'transaction_at'   => now(),
-                'notes'            => $validated['notes'] ?? null,
+                'invoice'           => RouteHelpers::generateInvoice('PRD'),
+                'gym_member_id'     => $validated['gym_member_id'] ?? null,
+                'product_id'        => $product->id,
+                'customer_name'     => $customerName,
+                'transaction_group' => 'product_sale',
+                'transaction_type'  => $product->name,
+                'amount'            => $product->price * $quantity,
+                'quantity'          => $quantity,
+                'payment_method'    => $paymentMethod,
+                'payment_status'    => $paymentStatus,
+                'receipt_status'    => $receiptStatus,
+                'transaction_at'    => now(),
+                'notes'             => $validated['notes'] ?? null,
             ]);
 
             $product->decrement('stock', $quantity);
@@ -219,19 +224,19 @@ Route::post('/transactions', function (Request $request) {
     $paymentStatus = $validated['payment_method'] === 'cash' ? 'verified' : 'pending';
 
     CashierTransaction::create([
-        'invoice'          => RouteHelpers::generateInvoice('TRX'),
-        'gym_member_id'    => null,
-        'product_id'       => null,
-        'customer_name'    => $validated['customer_name'],
-        'transaction_group'=> 'other',
-        'transaction_type' => $validated['transaction_type'],
-        'amount'           => $validated['amount'],
-        'quantity'         => 1,
-        'payment_method'   => $validated['payment_method'],
-        'payment_status'   => $paymentStatus,
-        'receipt_status'   => $paymentStatus === 'verified' ? 'ready' : 'pending',
-        'transaction_at'   => now(),
-        'notes'            => $validated['notes'] ?? null,
+        'invoice'           => RouteHelpers::generateInvoice('TRX'),
+        'gym_member_id'     => null,
+        'product_id'        => null,
+        'customer_name'     => $validated['customer_name'],
+        'transaction_group' => 'other',
+        'transaction_type'  => $validated['transaction_type'],
+        'amount'            => $validated['amount'],
+        'quantity'          => 1,
+        'payment_method'    => $validated['payment_method'],
+        'payment_status'    => $paymentStatus,
+        'receipt_status'    => $paymentStatus === 'verified' ? 'ready' : 'pending',
+        'transaction_at'    => now(),
+        'notes'             => $validated['notes'] ?? null,
     ]);
 
     return redirect()->route('cashier.transactions.products')
