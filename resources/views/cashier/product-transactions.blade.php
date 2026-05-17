@@ -162,19 +162,40 @@
     </style>
 
     <div class="topbar-card p-4 mb-4">
-        <div class="section-label">Transaksi Produk</div>
-        <h1 class="display-6 fw-bold mt-2 mb-2">Ambil produk dulu, bayar kemudian</h1>
-        <p class="muted-copy mb-0">Konsep hotel-style: pelanggan member atau non-member dapat memilih produk terlebih dahulu, lalu bayar setelah selesai latihan. Produk yang dicatat akan masuk ke riwayat transaksi member apabila dipilih.</p>
+        <div class="d-flex justify-content-between align-items-center gap-3">
+            <div>
+                <div class="section-label">Produk</div>
+                <h1 class="display-6 fw-bold mt-2 mb-0">Transaksi Produk</h1>
+            </div>
+            @if (request()->query('has_payment') == 1)
+                <div class="d-flex gap-2">
+                    <a href="{{ request()->query('gym_member_id') ? route('cashier.member-payments') : route('cashier.daily-payments') }}" class="btn btn-outline-light rounded-pill px-4">
+                        Tidak Ada
+                    </a>
+                </div>
+            @endif
+        </div>
     </div>
+
+    @if (request()->query('has_payment') == 1)
+        <div class="alert alert-info mb-4 rounded-3 border-0" role="alert">
+            <div class="d-flex gap-2 align-items-start">
+                <svg class="flex-shrink-0 mt-1" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+                </svg>
+                <div>
+                    <h5 class="mb-2">Apakah ada transaksi produk?</h5>
+                    <p class="mb-0 small">Pembayaran telah tercatat. Apakah pelanggan membeli produk? Jika ya, pilih produk di bawah dan lanjutkan checkout.</p>
+                </div>
+            </div>
+        </div>
+    @endif
 
     <div class="panel-card p-4 mb-4">
         <div class="d-flex flex-column flex-md-row justify-content-between gap-3">
             <div>
-                <div class="section-label">Pelanggan terpilih</div>
+                <div class="section-label">Pelanggan</div>
                 <h2 class="h5 fw-bold mb-1">{{ $selectedMember ? $selectedMember->full_name : ($selectedCustomerName ? $selectedCustomerName : 'Belum ada pelanggan') }}</h2>
-                <div class="small muted-copy">
-                    {{ $selectedMember ? 'Member terpilih untuk pencatatan checkout produk.' : ($selectedCustomerName ? 'Nama pelanggan non-member untuk transaksi produk.' : 'Kembali ke halaman check-in untuk memilih nama pelanggan terlebih dahulu.') }}
-                </div>
             </div>
             <div class="text-md-end">
                 @if ($selectedMember)
@@ -190,54 +211,27 @@
     </div>
 
     <div class="row g-4 mb-4">
-        <div class="col-12 col-md-4">
-            <div class="panel-card p-4 h-100">
-                <div class="section-label">Master Produk</div>
-                <div class="fs-3 fw-bold mt-2">{{ number_format($products->count(), 0, ',', '.') }}</div>
-                <div class="muted-copy">Total produk dari input admin.</div>
-            </div>
-        </div>
-        <div class="col-12 col-md-4">
-            <div class="panel-card p-4 h-100">
-                <div class="section-label">Siap Dijual</div>
-                <div class="fs-3 fw-bold mt-2">{{ number_format($availableProducts->count(), 0, ',', '.') }}</div>
-                <div class="muted-copy">Produk aktif dengan stok tersedia untuk checkout.</div>
-            </div>
-        </div>
-        <div class="col-12 col-md-4">
-            <div class="panel-card p-4 h-100">
-                <div class="section-label">Terjual Hari Ini</div>
-                <div class="fs-3 fw-bold mt-2">{{ number_format($productTransactions->filter(fn ($item) => $item->transaction_at->isToday())->count(), 0, ',', '.') }}</div>
-                <div class="muted-copy">Jumlah transaksi produk yang tercatat hari ini.</div>
-            </div>
-        </div>
-    </div>
-
-    <div class="row g-4 mb-4">
         <div class="col-12 col-xl-7">
             <div class="panel-card p-4 h-100">
                 <div class="d-flex justify-content-between align-items-center mb-3 gap-3 flex-wrap">
                     <div>
-                        <h2 class="h4 fw-bold mb-1">Tabel produk dari admin</h2>
-                        <div class="small muted-copy">Klik tombol centang untuk menandai produk lalu lanjut checkout di panel sebelah kanan.</div>
+                        <h2 class="h4 fw-bold mb-1">Produk</h2>
                     </div>
                     <span class="badge text-bg-light border text-dark">{{ $products->count() }} produk</span>
                 </div>
 
                 <div class="d-flex justify-content-between align-items-center gap-3 mb-3 flex-wrap">
                     <div class="product-search-box w-100">
-                        <label for="cashierProductSearch" class="form-label fw-semibold mb-2">Cari produk</label>
+                        <label for="cashierProductSearch" class="form-label fw-semibold mb-2">Cari</label>
                         <input
                             type="search"
                             id="cashierProductSearch"
                             class="form-control"
-                            placeholder="Cari nama, brand, SKU, atau kategori"
+                            placeholder="Nama, brand, SKU, kategori"
                             autocomplete="off"
                             data-product-search>
                     </div>
-                    <div class="small muted-copy" data-product-search-summary>
-                        Menampilkan {{ $products->count() }} dari {{ $products->count() }} produk.
-                    </div>
+                    <div class="small muted-copy" data-product-search-summary>{{ $products->count() }} produk</div>
                 </div>
 
                 <div class="table-responsive">
@@ -277,7 +271,7 @@
                                             data-product-unit="{{ $product->unit }}"
                                             data-product-brand="{{ $product->brand ?: 'Tanpa brand' }}"
                                             @disabled(! $canCheckout)>
-                                            {{ $isSelected ? 'check' : '+' }}
+                                            {{ $isSelected ? '✓' : '+' }}
                                         </button>
                                     </td>
                                     <td class="product-name-cell">
@@ -328,14 +322,12 @@
             <div class="panel-card p-4 h-100">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <div>
-                        <h2 class="h4 fw-bold mb-1">Checkout produk</h2>
-                        <div class="small muted-copy">Pilih produk dari tabel, isi data pembeli, lalu catat sebagai bayar sekarang atau bayar nanti.</div>
+                        <h2 class="h4 fw-bold mb-1">Checkout</h2>
                     </div>
-                    <span class="badge text-bg-light border text-dark">Kasir</span>
                 </div>
 
                 <div class="list-card p-3 mb-3">
-                    <div class="small muted-copy mb-2">Produk dipilih</div>
+                    <div class="small muted-copy mb-2">Dipilih</div>
                     <div class="selected-product-list" data-selected-product-list>
                         @forelse ($preselectedProducts as $product)
                             <div class="selected-product-item">
@@ -354,7 +346,7 @@
                         @endforelse
                     </div>
                     <div class="mt-3">
-                        <div class="small muted-copy">Subtotal checkout</div>
+                        <div class="small muted-copy">Subtotal</div>
                         <div class="fs-4 fw-bold" data-selected-product-total>Rp{{ number_format($selectedTotal, 0, ',', '.') }}</div>
                     </div>
                 </div>
@@ -372,7 +364,7 @@
                     @if ($selectedMember)
                         <div class="col-12">
                             <div class="alert alert-secondary p-3">
-                                Produk akan dicatat untuk member <strong>{{ $selectedMember->full_name }}</strong>.
+                                Member: <strong>{{ $selectedMember->full_name }}</strong>
                             </div>
                             <input type="hidden" name="gym_member_id" value="{{ $selectedMember->id }}">
                             <input type="hidden" name="customer_name" value="{{ $selectedCustomerName }}">
@@ -380,15 +372,14 @@
                     @elseif ($selectedCustomerName)
                         <div class="col-12">
                             <div class="alert alert-secondary p-3">
-                                Produk akan dicatat untuk non member <strong>{{ $selectedCustomerName }}</strong>.
+                                Non member: <strong>{{ $selectedCustomerName }}</strong>
                             </div>
                             <input type="hidden" name="customer_name" value="{{ $selectedCustomerName }}">
                         </div>
                     @else
                         <div class="col-12">
-                            <label class="form-label fw-semibold">Nama pembeli</label>
-                            <input name="customer_name" class="form-control @error('customer_name') is-invalid @enderror" value="{{ old('customer_name') }}" placeholder="Nama pembeli jika bukan member atau untuk catatan" required>
-                            <div class="form-text">Pilih member dari halaman check-in bila pelanggan adalah member. Jika non-member, isi nama pembeli.</div>
+                            <label class="form-label fw-semibold">Nama</label>
+                            <input name="customer_name" class="form-control @error('customer_name') is-invalid @enderror" value="{{ old('customer_name') }}" placeholder="Nama pembeli" required>
                             @error('customer_name')
                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                             @enderror
@@ -396,7 +387,7 @@
                     @endif
 
                     <div class="col-12">
-                        <label class="form-label fw-semibold">Metode Pembayaran</label>
+                        <label class="form-label fw-semibold">Metode</label>
                         <div class="d-flex gap-3 flex-wrap">
                             <label class="btn btn-outline-secondary rounded-pill mb-0">
                                 <input type="radio" name="payment_method" value="cash" class="btn-check" autocomplete="off" {{ old('payment_method', 'cash') === 'cash' ? 'checked' : '' }}>
@@ -413,8 +404,8 @@
                     </div>
 
                     <div class="col-12">
-                        <label class="form-label fw-semibold">Catatan produk</label>
-                        <textarea name="notes" class="form-control @error('notes') is-invalid @enderror" rows="3" placeholder="Isi rasa, qty, atau detail penjualan">{{ old('notes') }}</textarea>
+                        <label class="form-label fw-semibold">Catatan</label>
+                        <textarea name="notes" class="form-control @error('notes') is-invalid @enderror" rows="3" placeholder="Opsional">{{ old('notes') }}</textarea>
                         @error('notes')
                             <div class="invalid-feedback d-block">{{ $message }}</div>
                         @enderror
@@ -422,7 +413,12 @@
 
                     <div class="col-12 d-flex justify-content-end gap-2">
                         <button type="reset" class="btn btn-outline-secondary rounded-pill px-4" data-product-reset>Reset</button>
-                        <button type="submit" class="btn btn-dark rounded-pill px-4">Checkout</button>
+                        @if (request()->query('has_payment') == 1)
+                            <a href="{{ request()->query('gym_member_id') ? route('cashier.member-payments') : route('cashier.daily-payments') }}" class="btn btn-outline-secondary rounded-pill px-4">
+                                Kembali
+                            </a>
+                        @endif
+                        <button type="submit" class="btn btn-dark rounded-pill px-4" @disabled($preselectedProducts->isEmpty())>Checkout</button>
                     </div>
                 </form>
             </div>
@@ -432,8 +428,7 @@
     <div class="panel-card p-4">
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 mb-3">
             <div>
-                <h2 class="h4 fw-bold mb-1">Daftar penjualan produk</h2>
-                <p class="muted-copy mb-0">Menampilkan transaksi produk untuk bulan {{ \Illuminate\Support\Carbon::createFromFormat('Y-m', $selectedMonth)->translatedFormat('F Y') }}.</p>
+                <h2 class="h4 fw-bold mb-1">Riwayat</h2>
             </div>
             <form method="GET" action="{{ route('cashier.transactions.products') }}" class="d-flex flex-wrap gap-2 align-items-center">
                 <input type="month" name="month" class="form-control form-control-sm" value="{{ $selectedMonth }}">
@@ -520,7 +515,7 @@
                 catalogButtons.forEach((button) => {
                     const isSelected = selectedProducts.has(button.dataset.productId);
                     button.classList.toggle('is-selected', isSelected);
-                    button.textContent = isSelected ? 'check' : '+';
+                    button.textContent = isSelected ? '✓' : '+';
                 });
             };
 
@@ -539,7 +534,7 @@
                 });
 
                 if (productSearchSummary) {
-                    productSearchSummary.textContent = `Menampilkan ${visibleCount} dari ${productRows.length} produk.`;
+                    productSearchSummary.textContent = `${visibleCount} / ${productRows.length}`;
                 }
 
                 emptySearchRow?.classList.toggle('d-none', visibleCount !== 0);

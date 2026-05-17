@@ -1233,10 +1233,10 @@
                 ['key' => 'reports', 'label' => 'Laporan', 'route' => route('admin.reports')],
             ];
             $cashierNavigation = [
-                ['key' => 'cashier.dashboard', 'label' => 'Dashboard Kasir', 'route' => route('cashier.dashboard')],
+                ['key' => 'cashier.dashboard', 'label' => 'Dashboard', 'route' => route('cashier.dashboard')],
                 ['key' => 'cashier.checkins', 'label' => 'Check-in', 'route' => route('cashier.checkins')],
-                ['key' => 'cashier.transactions', 'label' => 'Pembayaran', 'route' => route('cashier.transactions')],
-                ['key' => 'cashier.receipts', 'label' => 'Verifikasi & Bukti', 'route' => route('cashier.receipts')],
+                ['key' => 'cashier.transactions', 'label' => 'Transaksi', 'route' => route('cashier.transactions')],
+                ['key' => 'cashier.receipts', 'label' => 'Bukti', 'route' => route('cashier.receipts')],
             ];
             $navigationGroups = $isMasterAdmin
                 ? [
@@ -1271,12 +1271,12 @@
                                     <div>
                                         <div class="fw-bold">Arena Gym</div>
                                         <div class="small text-white-50">
-                                            {{ $isMasterAdmin ? 'Master Admin Access' : ($isCashierArea ? 'Kasir Dashboard' : 'Admin Dashboard') }}
+                                            {{ $isMasterAdmin ? 'Master Admin' : ($isCashierArea ? 'Kasir' : 'Admin') }}
                                         </div>
                                     </div>
                                 </div>
 
-                                <div class="small text-uppercase text-white-50 fw-bold mb-1" style="letter-spacing:.12em;">Navigation</div>
+                                <div class="small text-uppercase text-white-50 fw-bold mb-1" style="letter-spacing:.12em;">Menu</div>
                                 @foreach ($navigationGroups as $group)
                                     <div class="sidebar-nav-group">
                                         <nav class="sidebar-nav-list">
@@ -1285,7 +1285,7 @@
                                                     $isActive = $item['key'] === 'cashier.receipts'
                                                         ? in_array(($activePage ?? ''), ['cashier.verifications', 'cashier.receipts'], true)
                                                         : ($item['key'] === 'cashier.transactions'
-                                                            ? in_array(($activePage ?? ''), ['cashier.transactions', 'cashier.member-payments', 'cashier.daily-payments'], true)
+                                                            ? in_array(($activePage ?? ''), ['cashier.transactions', 'cashier.member-payments', 'cashier.daily-payments', 'cashier.product-transactions'], true)
                                                             : (($activePage ?? 'dashboard') === $item['key']));
                                                 @endphp
                                                 <a class="sidebar-link {{ $isActive ? 'active' : '' }}" href="{{ $item['route'] }}">
@@ -1299,7 +1299,7 @@
                             </div>
 
                             <div class="sidebar-bottom">
-                            @if (! empty($sidebarExtraSummary))
+                            @if (! $isCashierArea && ! empty($sidebarExtraSummary))
                                 <div class="sidebar-extra-card p-3">
                                     <div class="section-label text-white-50">{{ $sidebarExtraSummary['label'] ?? 'Ringkasan' }}</div>
                                     <div class="h4 fw-bold mt-3 mb-1">{{ $sidebarExtraSummary['title'] ?? '' }}</div>
@@ -1307,7 +1307,7 @@
                                 </div>
                             @endif
 
-                            @if (! empty($sidebarExtraItems))
+                            @if (! $isCashierArea && ! empty($sidebarExtraItems))
                                 <div class="sidebar-extra-card p-3">
                                     <div class="section-label text-white-50 mb-3">{{ $sidebarExtraItemsTitle ?? 'Prioritas' }}</div>
                                     <div class="d-grid gap-3">

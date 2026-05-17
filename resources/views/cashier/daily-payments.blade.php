@@ -3,13 +3,12 @@
 @section('content')
     <div class="topbar-card p-4 mb-4">
         <div class="section-label">Daily Non Member</div>
-        <h1 class="display-6 fw-bold mt-2 mb-2">Pembayaran daily non member</h1>
-        <p class="muted-copy mb-0">Halaman ini hanya menampilkan riwayat pembayaran non member 24 jam terakhir. Data yang lebih lama tetap tersedia di halaman transaksi.</p>
+        <h1 class="display-6 fw-bold mt-2 mb-0">Daily Pass</h1>
     </div>
 
     <div class="panel-card p-4">
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h2 class="h4 fw-bold mb-0">Transaksi daily pass</h2>
+            <h2 class="h4 fw-bold mb-0">Riwayat</h2>
             <button
                 class="btn btn-dark rounded-pill px-4"
                 type="button"
@@ -17,38 +16,35 @@
                 data-bs-target="#dailyPaymentFormCollapse"
                 aria-expanded="{{ $errors->any() ? 'true' : 'false' }}"
                 aria-controls="dailyPaymentFormCollapse">
-                Catat daily pass
+                Tambah
             </button>
         </div>
 
         <div class="collapse @if($errors->any()) show @endif mb-4" id="dailyPaymentFormCollapse">
             <div class="list-card p-4">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h3 class="h5 fw-bold mb-0">Form daily non member</h3>
-                    <span class="badge text-bg-light border text-dark">Isi data lalu simpan</span>
-                </div>
+                <h3 class="h5 fw-bold mb-3">Daily Pass Baru</h3>
 
                 <form method="POST" action="{{ route('cashier.daily-payments.store') }}" class="row g-3">
                     @csrf
 
                     <div class="col-12 col-lg-6">
-                        <label class="form-label fw-semibold">Nama pengunjung</label>
-                        <input name="customer_name" class="form-control @error('customer_name') is-invalid @enderror" value="{{ old('customer_name') }}" placeholder="Nama pengunjung" required>
+                        <label class="form-label fw-semibold">Nama</label>
+                        <input name="customer_name" class="form-control @error('customer_name') is-invalid @enderror" value="{{ old('customer_name') }}" placeholder="Nama" required>
                     </div>
 
                     <div class="col-12 col-lg-6">
-                        <label class="form-label fw-semibold">Jenis transaksi</label>
+                        <label class="form-label fw-semibold">Tipe</label>
                         <input class="form-control" value="Daily Pass" readonly>
                         <input type="hidden" name="transaction_type" value="Daily Pass">
                     </div>
 
                     <div class="col-12 col-lg-4">
-                        <label class="form-label fw-semibold">Nominal pembayaran</label>
-                        <input name="amount" type="number" min="1" class="form-control @error('amount') is-invalid @enderror" value="{{ old('amount') }}" placeholder="Nominal pembayaran" required>
+                        <label class="form-label fw-semibold">Nominal</label>
+                        <input name="amount" type="number" min="1" class="form-control @error('amount') is-invalid @enderror" value="{{ old('amount') }}" placeholder="Nominal" required>
                     </div>
 
                     <div class="col-12 col-lg-4">
-                        <label class="form-label fw-semibold">Metode pembayaran</label>
+                        <label class="form-label fw-semibold">Metode</label>
                         <div class="d-flex flex-wrap gap-2">
                             <input type="radio" class="btn-check" name="payment_method" id="daily_payment_cash" value="cash" @checked(old('payment_method', 'cash') === 'cash') required>
                             <label class="btn btn-outline-light rounded-pill px-4" for="daily_payment_cash">Cash</label>
@@ -62,20 +58,25 @@
                     </div>
 
                     <div class="col-12">
-                        <label class="form-label fw-semibold">Catatan transaksi</label>
-                        <textarea name="notes" class="form-control @error('notes') is-invalid @enderror" rows="3" placeholder="Catatan transaksi">{{ old('notes') }}</textarea>
+                        <label class="form-label fw-semibold">Catatan</label>
+                        <textarea name="notes" class="form-control @error('notes') is-invalid @enderror" rows="3" placeholder="Opsional">{{ old('notes') }}</textarea>
                     </div>
 
                     <div class="col-12 d-flex justify-content-end gap-2">
                         <button type="reset" class="btn btn-outline-secondary rounded-pill px-4">Reset</button>
-                        <button type="submit" class="btn btn-dark rounded-pill px-4">Simpan transaksi</button>
+                        <button type="submit" class="btn btn-dark rounded-pill px-4">Simpan</button>
                     </div>
                 </form>
             </div>
         </div>
 
+        <div class="mb-3">
+            <label for="daily-payment-history-search" class="form-label fw-semibold">Cari riwayat transaksi</label>
+            <input id="daily-payment-history-search" type="text" class="form-control" placeholder="Cari nama, tipe, metode, atau invoice">
+        </div>
+
         <div class="table-responsive">
-            <table class="table align-middle mb-0">
+            <table class="table align-middle mb-0" id="daily-payment-history-table">
                 <thead>
                     <tr>
                         <th>Pengunjung</th>
@@ -103,4 +104,22 @@
             </table>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const searchInput = document.getElementById('daily-payment-history-search');
+            const rows = document.querySelectorAll('#daily-payment-history-table tbody tr');
+            const normalize = (value) => value.toLowerCase();
+
+            if (searchInput) {
+                searchInput.addEventListener('input', function () {
+                    const query = normalize(this.value.trim());
+                    rows.forEach((row) => {
+                        const text = normalize(row.textContent || '');
+                        row.style.display = query === '' || text.includes(query) ? '' : 'none';
+                    });
+                });
+            }
+        });
+    </script>
 @endsection

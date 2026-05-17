@@ -121,7 +121,7 @@ Route::get('/transactions/products', function (Request $request) {
         'productTransactions' => collect($viewData['transactions'])
             ->filter(fn (CashierTransaction $t) => $t->product_id !== null && $t->transaction_at->between($monthStart, $monthEnd))
             ->values(),
-        'members'             => GymMember::query()->where('member_status', 'member')->orderBy('full_name')->get(),
+        'members'             => GymMember::query()->where('status', 'active')->orderBy('full_name')->get(),
         'selectedMember'      => $selectedMember,
         'selectedCustomerName'=> $selectedCustomerName,
         'selectedMonth'       => $selectedMonth,

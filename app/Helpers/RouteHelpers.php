@@ -177,7 +177,7 @@ class RouteHelpers
 
         $isQrMemberCheckin = $actor === 'qr_member';
 
-        if ($isQrMemberCheckin) {
+        if ($isQrMemberCheckin && empty($resolvedCheckinCode)) {
             $request->validate([
                 'submitted_name'  => ['required', 'string', 'max:255'],
                 'submitted_phone' => ['required', 'string', 'max:30'],
@@ -190,26 +190,24 @@ class RouteHelpers
                 ? Carbon::parse($validated['checkin_date'] . ' ' . $validated['checkin_time'])
                 : now(),
             'checkin_method'      => $actor,
-            'verification_status' => $isQrMemberCheckin ? 'pending' : 'verified',
+            'verification_status' => 'verified',
             'submitted_name'      => $validated['submitted_name'] ?? null,
             'submitted_phone'     => $validated['submitted_phone'] ?? null,
-            'verified_at'         => $isQrMemberCheckin ? null : now(),
-            'verified_by'         => $isQrMemberCheckin ? null : (string) (session('auth.name') ?? session('auth.login') ?? $actor),
+            'verified_at'         => now(),
+            'verified_by'         => (string) (session('auth.name') ?? session('auth.login') ?? $actor),
         ]);
-
-        if ($isQrMemberCheckin) {
-            return redirect()->route($redirectRoute, $redirectParams)
-                ->with('status', "Pengajuan check-in untuk {$member->full_name} sudah dikirim. Tunggu kasir memvalidasi sebelum masuk.");
-        }
 
         $successLabel = match ($actor) {
             'cashier'    => 'kasir',
-            'qr_member'  => 'mandiri',
+            'qr_member'  => 'QR',
             default      => 'admin',
         };
 
-        return redirect()->route($redirectRoute, $redirectParams)
-            ->with('status', "Check-in {$successLabel} untuk {$member->full_name} berhasil dicatat.");
+        $redirect = redirect()->route($redirectRoute, $redirectParams)
+            ->with('status', "Check-in {$successLabel} untuk {$member->full_name} berhasil dicatat.")
+            ->with('welcome_name', $member->full_name);
+
+        return $redirect;
     }
 
     // ─── Page meta ───────────────────────────────────────────────────────────

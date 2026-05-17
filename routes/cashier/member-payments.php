@@ -22,7 +22,7 @@ Route::get('/member-payments', function () {
     $viewData = RouteHelpers::buildCashierViewData([
         'pageTitle'  => 'Pembayaran Member - Kasir Arena Gym',
         'activePage' => 'cashier.member-payments',
-        'members'    => GymMember::query()->where('member_status', 'member')->orderBy('full_name')->get(),
+        'members'    => GymMember::query()->where('status', 'active')->orderBy('full_name')->get(),
     ]);
 
     return view('cashier.member-payments', array_merge($viewData, [
@@ -76,6 +76,10 @@ Route::post('/member-payments', function (Request $request) {
         'notes'            => $validated['notes'] ?? null,
     ]);
 
-    return redirect()->route('cashier.member-payments')
-        ->with('status', 'Pembayaran member berhasil dicatat.');
+    // Redirect ke halaman product transactions dengan member pre-selected
+    return redirect()->route('cashier.transactions.products', [
+        'gym_member_id' => $member->id,
+        'has_payment' => 1,
+    ])
+        ->with('status', 'Pembayaran member berhasil dicatat. Apakah ada transaksi produk?');
 })->name('member-payments.store');

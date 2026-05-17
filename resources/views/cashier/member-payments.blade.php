@@ -3,13 +3,12 @@
 @section('content')
     <div class="topbar-card p-4 mb-4">
         <div class="section-label">Pembayaran Member</div>
-        <h1 class="display-6 fw-bold mt-2 mb-2">Pencatatan pembayaran member</h1>
-        <p class="muted-copy mb-0">Halaman ini hanya menampilkan riwayat pembayaran member 24 jam terakhir. Data yang lebih lama tetap tersedia di halaman transaksi.</p>
+        <h1 class="display-6 fw-bold mt-2 mb-0">Pembayaran Member</h1>
     </div>
 
     <div class="panel-card p-4">
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h2 class="h4 fw-bold mb-0">Daftar pembayaran member</h2>
+            <h2 class="h4 fw-bold mb-0">Riwayat</h2>
             <button
                 class="btn btn-dark rounded-pill px-4"
                 type="button"
@@ -17,22 +16,16 @@
                 data-bs-target="#memberPaymentFormCollapse"
                 aria-expanded="{{ $errors->any() ? 'true' : 'false' }}"
                 aria-controls="memberPaymentFormCollapse">
-                Catat pembayaran member
+                Tambah
             </button>
         </div>
 
         <div class="collapse @if($errors->any()) show @endif mb-4" id="memberPaymentFormCollapse">
             <div class="list-card p-4">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <div>
-                        <h3 class="h5 fw-bold mb-0">Form pembayaran member</h3>
-                        <div class="small text-secondary">Pilih member aktif dengan checklist lalu isi nominal dan metode.</div>
-                    </div>
-                    <span class="badge text-bg-light border text-dark">Isi data lalu simpan</span>
-                </div>
+                <h3 class="h5 fw-bold mb-3">Pembayaran Baru</h3>
 
                 <div class="mb-4">
-                    <label class="form-label fw-semibold">Cari member</label>
+                    <label class="form-label fw-semibold">Member</label>
                     <input type="text" id="member-search" class="form-control" placeholder="Cari nama member">
                 </div>
 
@@ -72,12 +65,12 @@
                     </div>
 
                     <div class="col-12 col-lg-4">
-                        <label class="form-label fw-semibold">Nominal pembayaran</label>
-                        <input name="amount" type="number" min="1" class="form-control @error('amount') is-invalid @enderror" value="{{ old('amount') }}" placeholder="Nominal pembayaran" required>
+                        <label class="form-label fw-semibold">Nominal</label>
+                        <input name="amount" type="number" min="1" class="form-control @error('amount') is-invalid @enderror" value="{{ old('amount') }}" placeholder="Nominal" required>
                     </div>
 
                     <div class="col-12 col-lg-4">
-                        <label class="form-label fw-semibold">Metode pembayaran</label>
+                        <label class="form-label fw-semibold">Metode</label>
                         <div class="d-flex flex-wrap gap-2">
                             <input type="radio" class="btn-check" name="payment_method" id="member_payment_cash" value="cash" @checked(old('payment_method', 'cash') === 'cash') required>
                             <label class="btn btn-outline-light rounded-pill px-4" for="member_payment_cash">Cash</label>
@@ -92,19 +85,24 @@
 
                     <div class="col-12 col-lg-4">
                         <label class="form-label fw-semibold">Catatan</label>
-                        <textarea name="notes" class="form-control @error('notes') is-invalid @enderror" rows="3" placeholder="Catatan pembayaran">{{ old('notes') }}</textarea>
+                        <textarea name="notes" class="form-control @error('notes') is-invalid @enderror" rows="3" placeholder="Opsional">{{ old('notes') }}</textarea>
                     </div>
 
                     <div class="col-12 d-flex justify-content-end gap-2">
                         <button type="reset" class="btn btn-outline-secondary rounded-pill px-4">Reset</button>
-                        <button type="submit" class="btn btn-dark rounded-pill px-4">Simpan pembayaran</button>
+                        <button type="submit" class="btn btn-dark rounded-pill px-4">Simpan</button>
                     </div>
                 </form>
             </div>
         </div>
 
+        <div class="mb-3">
+            <label for="member-payment-history-search" class="form-label fw-semibold">Cari riwayat pembayaran</label>
+            <input id="member-payment-history-search" type="text" class="form-control" placeholder="Cari invoice, nama, paket, atau metode">
+        </div>
+
         <div class="table-responsive">
-            <table class="table align-middle mb-0">
+            <table class="table align-middle mb-0" id="member-payment-history-table">
                 <thead>
                     <tr>
                         <th>Invoice</th>
@@ -172,6 +170,20 @@
                     });
                 });
             });
+
+            const historySearchInput = document.getElementById('member-payment-history-search');
+            const historyRows = document.querySelectorAll('#member-payment-history-table tbody tr');
+
+            if (historySearchInput) {
+                historySearchInput.addEventListener('input', function () {
+                    const query = normalize(this.value.trim());
+
+                    historyRows.forEach((row) => {
+                        const text = normalize(row.textContent || '');
+                        row.style.display = query === '' || text.includes(query) ? '' : 'none';
+                    });
+                });
+            }
         });
     </script>
 @endsection

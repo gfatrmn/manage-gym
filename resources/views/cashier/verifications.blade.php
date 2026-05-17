@@ -3,8 +3,7 @@
 @section('content')
     <div class="topbar-card p-4 mb-4">
         <div class="section-label">Verifikasi</div>
-        <h1 class="display-6 fw-bold mt-2 mb-2">Verifikasi status pembayaran member</h1>
-        <p class="muted-copy mb-0">Pastikan pembayaran member yang masuk telah tervalidasi dan sesuai dengan paket yang dipilih.</p>
+        <h1 class="display-6 fw-bold mt-2 mb-0">Verifikasi</h1>
     </div>
 
     <div class="panel-card dark-panel p-4">
@@ -21,7 +20,7 @@
                     <div class="mt-3">
                         <form method="POST" action="{{ route('cashier.verifications.confirm', $item->id) }}">
                             @csrf
-                            <button class="btn btn-sm btn-outline-light rounded-pill" type="submit">Verifikasi pembayaran</button>
+                            <button class="btn btn-sm btn-outline-light rounded-pill" type="submit">Verifikasi</button>
                         </form>
                     </div>
                 </div>

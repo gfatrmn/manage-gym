@@ -2,7 +2,7 @@
 
 use App\Helpers\RouteHelpers;
 use App\Models\CashierTransaction;
-use App\Models\GymMember;
+use App\Models\DailyGuest; // <-- Pastikan model DailyGuest diimport di sini
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Route;
@@ -47,22 +47,16 @@ Route::post('/daily-payments', function (Request $request) {
 
     $paymentStatus = $validated['payment_method'] === 'cash' ? 'verified' : 'pending';
 
-    // Catat sebagai non-member untuk histori kunjungan
-    GymMember::create([
-        'full_name'       => $validated['customer_name'],
-        'member_status'   => 'non_member',
-        'membership_plan' => null,
-        'package_status'  => null,
-        'guest_visit_type'=> 'Daily Pass',
-        'payment_method'  => $validated['payment_method'],
-        'payment_amount'  => $validated['amount'],
-        'can_check_in'    => false,
-        'visit_date'      => Carbon::today()->toDateString(),
-        'joined_at'       => null,
-        'expires_at'      => null,
-        'notes'           => $validated['notes'] ?? null,
+    // 1. DIUBAH: Catat data langsung ke tabel daily_guests sesuai kolom di database
+    DailyGuest::create([
+        'full_name'      => $validated['customer_name'],
+        'phone'          => null,
+        'payment_amount' => $validated['amount'],
+        'payment_method' => $validated['payment_method'],
+        'visit_at'       => now(),
     ]);
 
+    // 2. Transaksi kasir tetap dicatat (jika masih diperlukan untuk history transaksi gabungan)
     CashierTransaction::create([
         'invoice'          => RouteHelpers::generateInvoice('DP'),
         'gym_member_id'    => null,
@@ -77,6 +71,6 @@ Route::post('/daily-payments', function (Request $request) {
         'notes'            => $validated['notes'] ?? null,
     ]);
 
-    return redirect()->route('cashier.daily-payments')
+    return redirect()->route('cashier.transactions')
         ->with('status', 'Pembayaran daily pass berhasil dicatat.');
 })->name('daily-payments.store');

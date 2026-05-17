@@ -1,13 +1,14 @@
 <?php
 
 use App\Helpers\RouteHelpers;
+use App\Models\DailyGuest;
 use App\Models\GymCheckin;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
-| Cashier – Check-in & Validasi Pending
+| Cashier – Check-in & Daily Guest (Non Member)
 |--------------------------------------------------------------------------
 */
 
@@ -17,15 +18,26 @@ Route::get('/checkins', function () {
         return $redirect;
     }
 
+    $section = request()->query('section', 'cashier') === 'nonmember' ? 'nonmember' : 'cashier';
+
+    $nonMemberCheckins = null;
+
+    if ($section === 'nonmember') {
+        $nonMemberCheckins = DailyGuest::whereDate('visit_at', today())
+            ->orderByDesc('visit_at')
+            ->get();
+    }
+
     return view('cashier.checkins', RouteHelpers::buildCashierViewData([
         'pageTitle'          => 'Check-in - Kasir Arena Gym',
         'activePage'         => 'cashier.checkins',
         'sidebarStatusTitle' => 'Check-in Kasir',
         'sidebarStatusNote'  => 'Bantu member check-in dan pantau daftar check-in hari ini.',
+        'nonMemberCheckins'  => $nonMemberCheckins,
     ]));
 })->name('checkins');
 
-// ── Simpan check-in oleh kasir ────────────────────────────────────────────────
+// ── Simpan check-in oleh kasir (member) ───────────────────────────────────────
 Route::post('/checkins', function (Request $request) {
     if ($redirect = RouteHelpers::ensureCashier()) {
         return $redirect;
@@ -34,47 +46,33 @@ Route::post('/checkins', function (Request $request) {
     return RouteHelpers::storeMemberCheckin(
         request: $request,
         actor: 'cashier',
-        redirectRoute: 'cashier.checkins'
+        redirectRoute: 'cashier.checkins',
+        redirectParams: [],
     );
 })->name('checkins.store');
 
-// ── Verifikasi check-in pending (dari QR self-service) ────────────────────────
-Route::post('/checkins/{checkin}/verify', function (GymCheckin $checkin) {
+// ── Simpan daily guest (non member) ──────────────────────────────────────────
+Route::post('/checkins/nonmember', function (Request $request) {
     if ($redirect = RouteHelpers::ensureCashier()) {
         return $redirect;
     }
 
-    if ($checkin->verification_status !== 'pending') {
-        return redirect()->route('cashier.checkins')->with('status', 'Pengajuan check-in ini sudah diproses.');
-    }
-
-    $checkin->update([
-        'verification_status' => 'verified',
-        'checkin_method'      => 'qr_member',
-        'verified_at'         => now(),
-        'verified_by'         => (string) (session('auth.name') ?? session('auth.login') ?? 'kasir'),
+    $data = $request->validate([
+        'submitted_name'   => ['required', 'string', 'max:255'],
+        'submitted_phone'  => ['nullable', 'string', 'max:30'],
+        'nominal'          => ['nullable', 'numeric', 'min:0'],
+        'payment_method'   => ['nullable', 'string', 'in:cash,qris'],
     ]);
 
-    return redirect()->route('cashier.checkins')
-        ->with('status', "Check-in {$checkin->member?->full_name} berhasil divalidasi kasir.");
-})->name('checkins.verify');
-
-// ── Tolak check-in pending ────────────────────────────────────────────────────
-Route::post('/checkins/{checkin}/reject', function (GymCheckin $checkin) {
-    if ($redirect = RouteHelpers::ensureCashier()) {
-        return $redirect;
-    }
-
-    if ($checkin->verification_status !== 'pending') {
-        return redirect()->route('cashier.checkins')->with('status', 'Pengajuan check-in ini sudah diproses.');
-    }
-
-    $checkin->update([
-        'verification_status' => 'rejected',
-        'verified_at'         => now(),
-        'verified_by'         => (string) (session('auth.name') ?? session('auth.login') ?? 'kasir'),
+    DailyGuest::create([
+        'full_name'      => $data['submitted_name'],
+        'phone'          => $data['submitted_phone'] ?? null,
+        'payment_amount' => $data['nominal'] ?? 0,
+        'payment_method' => $data['payment_method'] ?? 'cash',
+        'visit_at'       => now(),
     ]);
 
-    return redirect()->route('cashier.checkins')
-        ->with('status', "Pengajuan check-in {$checkin->member?->full_name} ditolak.");
-})->name('checkins.reject');
+    return redirect()
+        ->route('cashier.checkins', ['section' => 'nonmember'])
+        ->with('status', "Daily Pass atas nama {$data['submitted_name']} berhasil disimpan.");
+})->name('checkins.nonmember.store');

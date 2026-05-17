@@ -9,8 +9,10 @@
             vertical-align: middle;
         }
 
-        .reports-hero-copy {
-            max-width: 720px;
+        .reports-page .form-control,
+        .reports-page .form-select,
+        .reports-page .btn {
+            min-height: 44px;
         }
 
         .reports-filter-card,
@@ -18,9 +20,23 @@
         .reports-expense-card,
         .reports-finance-card {
             border: 1px solid var(--border);
-            border-radius: 1.5rem;
+            border-radius: 1rem;
             background: var(--panel-bg);
             box-shadow: var(--shadow-soft);
+        }
+
+        .reports-page .topbar-card,
+        .reports-page .metric-card {
+            border-radius: 1rem;
+        }
+
+        .reports-page .metric-card {
+            min-height: 0;
+        }
+
+        .reports-page .metric-card .fs-2 {
+            line-height: 1.15;
+            word-break: break-word;
         }
 
         .reports-stat-badge {
@@ -36,6 +52,11 @@
             font-weight: 600;
         }
 
+        .reports-stat-badge strong {
+            color: var(--text-main);
+            white-space: nowrap;
+        }
+
         .reports-category-badge {
             display: inline-flex;
             align-items: center;
@@ -48,11 +69,18 @@
         }
 
         .reports-list-card .table thead th {
-            font-size: .78rem;
+            font-size: .72rem;
             text-transform: uppercase;
             letter-spacing: .08em;
             color: var(--text-muted);
             border-bottom-color: var(--border);
+            background: rgba(255, 255, 255, 0.03);
+            white-space: nowrap;
+        }
+
+        .reports-list-card .table td {
+            padding-top: 1rem;
+            padding-bottom: 1rem;
         }
 
         .reports-list-card .table tbody tr + tr td {
@@ -63,8 +91,18 @@
             background: rgba(255, 255, 255, 0.02);
         }
 
+        .reports-report-title {
+            color: var(--text-main);
+            font-size: 1rem;
+        }
+
         .reports-highlight {
-            min-width: 160px;
+            min-width: 130px;
+        }
+
+        .reports-action-btn {
+            min-width: 118px;
+            font-weight: 700;
         }
 
         .reports-finance-table td:last-child,
@@ -72,38 +110,55 @@
             text-align: right;
         }
 
+        .reports-finance-table tbody tr:last-child td {
+            border-top: 1px solid var(--border);
+            font-weight: 800;
+        }
+
         .reports-month-form .form-label {
             font-size: .78rem;
             text-transform: uppercase;
             letter-spacing: .08em;
         }
+
+        @media (max-width: 575.98px) {
+            .reports-page .topbar-card,
+            .reports-filter-card,
+            .reports-expense-card,
+            .reports-finance-card {
+                padding: 1rem !important;
+            }
+
+            .reports-action-btn {
+                width: 100%;
+            }
+        }
     </style>
 
     <div class="reports-page">
-        <div class="topbar-card p-4 p-lg-5 mb-4">
-            <div class="row g-4 align-items-start">
-                <div class="col-12 col-xl-8">
+        <div class="topbar-card p-4 mb-4">
+            <div class="row g-3 align-items-center">
+                <div class="col-12 col-xl-7">
                     <div class="section-label">Laporan</div>
-                    <h1 class="display-6 fw-bold mt-2 mb-3">Pusat laporan Arena Gym</h1>
-                    <p class="muted-copy mb-0 reports-hero-copy">Halaman ini merangkum semua jenis laporan dalam format Bootstrap yang lebih mudah dibaca. Mulai dari ringkasan cepat, cari jenis laporan yang dibutuhkan, lalu buka detail untuk melihat isi tabel lengkap.</p>
+                    <h1 class="h2 fw-bold mt-2 mb-0">Pusat laporan Arena Gym</h1>
                 </div>
-                <div class="col-12 col-xl-4">
+                <div class="col-12 col-xl-5">
                     <div class="row g-3">
-                        <div class="col-6 col-xl-12">
+                        <div class="col-6 col-lg-4">
                             <div class="reports-stat-badge w-100 justify-content-between">
-                                <span>Total laporan</span>
+                                <span>Laporan</span>
                                 <strong>{{ $reportCatalog->count() }}</strong>
                             </div>
                         </div>
-                        <div class="col-6 col-xl-12">
+                        <div class="col-6 col-lg-4">
                             <div class="reports-stat-badge w-100 justify-content-between">
-                                <span>Periode aktif</span>
+                                <span>Periode</span>
                                 <strong>{{ $financialSummary['month_label'] }}</strong>
                             </div>
                         </div>
-                        <div class="col-12">
+                        <div class="col-12 col-lg-4">
                             <div class="reports-stat-badge w-100 justify-content-between">
-                                <span>Transaksi & pengeluaran</span>
+                                <span>Transaksi</span>
                                 <strong>{{ $financialSummary['verified_transaction_count'] }} / {{ $financialSummary['expense_count'] }}</strong>
                             </div>
                         </div>
@@ -117,28 +172,24 @@
                 <div class="metric-card p-4 h-100">
                     <div class="section-label">Check-in Hari Ini</div>
                     <div class="fs-2 fw-bold mt-2">{{ $dailyTrainingStats['today_checkins'] }}</div>
-                    <div class="small muted-copy mt-2">Aktivitas latihan yang tercatat hari ini.</div>
                 </div>
             </div>
             <div class="col-12 col-md-6 col-xxl-3">
                 <div class="metric-card p-4 h-100">
                     <div class="section-label">Member Perlu Follow-up</div>
                     <div class="fs-2 fw-bold mt-2">{{ $membershipReportSummary['ending'] + $membershipReportSummary['expired'] }}</div>
-                    <div class="small muted-copy mt-2">Member akan berakhir atau sudah expired.</div>
                 </div>
             </div>
             <div class="col-12 col-md-6 col-xxl-3">
                 <div class="metric-card p-4 h-100">
                     <div class="section-label">Pemasukan Bulan Ini</div>
                     <div class="fs-2 fw-bold mt-2">Rp{{ number_format($financialSummary['total_revenue'], 0, ',', '.') }}</div>
-                    <div class="small muted-copy mt-2">Total pemasukan terverifikasi bulan berjalan.</div>
                 </div>
             </div>
             <div class="col-12 col-md-6 col-xxl-3">
                 <div class="metric-card p-4 h-100">
                     <div class="section-label">Laba Bersih</div>
                     <div class="fs-2 fw-bold mt-2">Rp{{ number_format($financialSummary['net_revenue'], 0, ',', '.') }}</div>
-                    <div class="small muted-copy mt-2">Setelah dikurangi total pengeluaran.</div>
                 </div>
             </div>
         </div>
@@ -146,9 +197,8 @@
         <div class="card reports-filter-card p-4 mb-4">
             <div class="row g-3 align-items-end">
                 <div class="col-12 col-xl-5">
-                    <div class="section-label">Data detail laporan</div>
-                    <h2 class="h4 fw-bold mt-2 mb-1">Daftar jenis laporan</h2>
-                    <div class="small muted-copy">Cari jenis laporan, cek ringkasannya, lalu buka detail untuk melihat isi laporan di halaman penuh.</div>
+                    <div class="section-label">Daftar Laporan</div>
+                    <h2 class="h4 fw-bold mt-2 mb-0">Pilih laporan</h2>
                 </div>
                 <div class="col-12 col-md-6 col-xl-3">
                     <form method="GET" action="{{ route('admin.reports') }}" class="reports-month-form">
@@ -156,15 +206,14 @@
                         <label class="form-label fw-semibold small mb-2" for="report_month_filter">Filter bulan laporan</label>
                         <div class="input-group">
                             <input id="report_month_filter" type="month" name="detail_month" class="form-control" value="{{ $detailFilterMonth }}">
-                            <button type="submit" class="btn btn-dark">Terapkan</button>
+                            <button type="submit" class="btn btn-dark px-4 fw-semibold">Terapkan</button>
                         </div>
                     </form>
                 </div>
                 <div class="col-12 col-md-6 col-xl-4">
-                    <label class="form-label fw-semibold small mb-2">Cari jenis laporan</label>
+                    <label class="form-label fw-semibold small mb-2">Cari laporan</label>
                     <div class="input-group">
-                        <span class="input-group-text">Cari</span>
-                        <input type="search" class="form-control" placeholder="Contoh: keuangan, membership, transaksi" data-report-search>
+                        <input type="search" class="form-control" placeholder="Cari: keuangan, member, stok" data-report-search>
                     </div>
                 </div>
             </div>
@@ -174,7 +223,7 @@
             <div class="card-header bg-transparent border-0 px-4 pt-4 pb-3">
                 <div class="d-flex justify-content-between align-items-center gap-3 flex-wrap">
                     <div class="reports-stat-badge" data-report-search-summary>Menampilkan {{ $reportCatalog->count() }} dari {{ $reportCatalog->count() }} laporan.</div>
-                    <div class="small muted-copy">Periode aktif: {{ $detailFilterLabel }}. Pilih tombol detail untuk melihat isi laporan dalam bentuk tabel penuh.</div>
+                    <div class="reports-stat-badge">Periode: {{ $detailFilterLabel }}</div>
                 </div>
             </div>
 
@@ -184,7 +233,6 @@
                         <tr>
                             <th class="ps-4">Jenis Laporan</th>
                             <th>Kategori</th>
-                            <th>Ringkasan</th>
                             <th>Tanggal Laporan</th>
                             <th>Data</th>
                             <th>Highlight</th>
@@ -195,23 +243,21 @@
                         @foreach ($reportCatalog as $report)
                             <tr data-report-row data-report-search-text="{{ strtolower($report['title'].' '.$report['group'].' '.$report['summary']) }}">
                                 <td class="ps-4">
-                                    <div class="fw-semibold">{{ $report['title'] }}</div>
-                                    <div class="small muted-copy mt-1">{{ $report['preview'] }}</div>
+                                    <div class="fw-semibold reports-report-title">{{ $report['title'] }}</div>
                                 </td>
                                 <td>
                                     <span class="reports-category-badge">{{ $report['group'] }}</span>
                                 </td>
-                                <td class="small muted-copy">{{ $report['summary'] }}</td>
                                 <td class="small fw-semibold">{{ $report['date_label'] }}</td>
                                 <td class="fw-semibold">{{ $report['count_label'] }}</td>
                                 <td class="fw-semibold reports-highlight">{{ $report['highlight'] }}</td>
                                 <td class="text-end pe-4">
-                                    <a href="{{ route('admin.reports.show', ['reportSlug' => $report['slug'], 'detail_filter' => 'month', 'detail_month' => $detailFilterMonth]) }}" class="btn btn-sm btn-dark rounded-pill px-3">Detail</a>
+                                    <a href="{{ route('admin.reports.show', ['reportSlug' => $report['slug'], 'detail_filter' => 'month', 'detail_month' => $detailFilterMonth]) }}" class="btn btn-dark rounded-pill px-4 reports-action-btn">Lihat Detail</a>
                                 </td>
                             </tr>
                         @endforeach
                         <tr class="d-none" data-report-empty-search>
-                            <td colspan="7" class="text-center py-5 text-secondary">Jenis laporan tidak ditemukan.</td>
+                            <td colspan="6" class="text-center py-5 text-secondary">Jenis laporan tidak ditemukan.</td>
                         </tr>
                     </tbody>
                 </table>
@@ -224,7 +270,6 @@
                     <div class="card-body p-4">
                         <div class="section-label">Pengeluaran</div>
                         <h3 class="h5 fw-bold mt-2 mb-1">Tambah pengeluaran</h3>
-                        <div class="small muted-copy mb-4">Catat pengeluaran operasional baru agar laporan keuangan tetap rapi dan mudah diaudit.</div>
 
                         <form method="POST" action="{{ route('admin.reports.expenses.store') }}">
                             @csrf
@@ -238,7 +283,7 @@
                                     <select id="expense_category" name="category" class="form-select" required>
                                         <option value="">Pilih kategori</option>
                                         <option value="operasional" @selected(old('category') === 'operasional')>Operasional</option>
-                                        <option value="inventaris" @selected(old('category') === 'inventaris')>Inventaris</option>
+                                        <option value="stok_barang" @selected(old('category') === 'stok_barang')>Stok Barang</option>
                                         <option value="maintenance" @selected(old('category') === 'maintenance')>Maintenance</option>
                                         <option value="gaji" @selected(old('category') === 'gaji')>Gaji</option>
                                         <option value="lainnya" @selected(old('category') === 'lainnya')>Lainnya</option>
@@ -264,7 +309,7 @@
                                     <input id="expense_notes" type="text" name="notes" class="form-control" value="{{ old('notes') }}" placeholder="Opsional, misalnya detail vendor atau kebutuhan follow-up">
                                 </div>
                                 <div class="col-12">
-                                    <button type="submit" class="btn btn-dark rounded-pill w-100">Simpan Pengeluaran</button>
+                                    <button type="submit" class="btn btn-dark rounded-pill w-100 fw-semibold">Simpan Pengeluaran</button>
                                 </div>
                             </div>
                         </form>
@@ -279,7 +324,6 @@
                             <div>
                                 <div class="section-label">Ringkasan Keuangan</div>
                                 <h3 class="h5 fw-bold mt-2 mb-1">Angka utama bulan berjalan</h3>
-                                <div class="small muted-copy">Gunakan ringkasan ini untuk membaca kondisi keuangan utama dengan cepat.</div>
                             </div>
                             <span class="reports-stat-badge">{{ $financialSummary['month_label'] }}</span>
                         </div>

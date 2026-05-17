@@ -4,16 +4,14 @@
     <div class="topbar-card p-3 p-lg-4 mb-3 mb-lg-4">
         <div class="row g-3 align-items-center">
             <div class="col-12 col-xl-8">
-                <div class="section-label">Cashier Summary</div>
-                <h1 class="display-6 fw-bold mt-2 mb-2">Dashboard kasir Arena Gym</h1>
-                <p class="muted-copy mb-0">Kelola pembayaran member, pembayaran daily non member, data transaksi, verifikasi status pembayaran, dan pencetakan bukti pembayaran dalam area kasir yang terpisah dari admin.</p>
+                <div class="section-label">Kasir</div>
+                <h1 class="display-6 fw-bold mt-2 mb-0">Dashboard</h1>
             </div>
             <div class="col-12 col-xl-4">
                 <div class="dark-panel rounded-4 p-4">
                     <div class="section-label text-white-50">Shift Aktif</div>
                     <div class="h3 fw-bold mt-2 mb-1">{{ $cashierShift['label'] ?? '08:00 - 16:00' }}</div>
                     <div class="small text-white fw-semibold mb-1 js-shift-countdown">Menghitung waktu shift...</div>
-                    <div class="small muted-copy js-shift-note">Kasir utama bertugas di front counter Arena Gym.</div>
                 </div>
             </div>
         </div>
@@ -39,7 +37,7 @@
             <div class="panel-card p-4 mb-3 mb-lg-4">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h2 class="h4 fw-bold mb-0">Pembayaran member</h2>
-                    <button class="btn btn-dark rounded-pill px-4" type="button">Catat pembayaran member</button>
+                    <button class="btn btn-dark rounded-pill px-4" type="button">Tambah</button>
                 </div>
                 <div class="table-responsive">
                     <table class="table align-middle mb-0">
@@ -72,7 +70,7 @@
             <div class="panel-card p-4 mb-3 mb-lg-4">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h2 class="h4 fw-bold mb-0">Pembayaran daily non member</h2>
-                    <button class="btn btn-outline-secondary rounded-pill px-4" type="button">Catat daily pass</button>
+                    <button class="btn btn-outline-secondary rounded-pill px-4" type="button">Tambah</button>
                 </div>
                 <div class="table-responsive">
                     <table class="table align-middle mb-0">
@@ -102,8 +100,8 @@
 
             <div class="panel-card p-4">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h2 class="h4 fw-bold mb-0">Kelola data transaksi</h2>
-                    <button class="btn btn-dark rounded-pill px-4" type="button">Input transaksi</button>
+                    <h2 class="h4 fw-bold mb-0">Transaksi</h2>
+                    <button class="btn btn-dark rounded-pill px-4" type="button">Tambah</button>
                 </div>
                 <div class="table-responsive">
                     <table class="table align-middle mb-0">
@@ -135,7 +133,7 @@
         </div>
         <div class="col-12 col-xl-4">
             <div class="panel-card dark-panel p-4 mb-3 mb-lg-4">
-                <h2 class="h4 fw-bold mb-4">Verifikasi status pembayaran member</h2>
+                <h2 class="h4 fw-bold mb-4">Verifikasi</h2>
                 <div class="d-grid gap-3">
                     @foreach ($memberPayments as $item)
                         <div class="rounded-4 p-3" style="background: rgba(255,255,255,.06);">
@@ -147,7 +145,7 @@
                                 <span class="badge text-bg-{{ $item['status'] === 'Terverifikasi' ? 'success' : 'warning' }}">{{ $item['status'] }}</span>
                             </div>
                             <div class="mt-3">
-                                <button class="btn btn-sm btn-outline-light rounded-pill">Verifikasi pembayaran</button>
+                                <button class="btn btn-sm btn-outline-light rounded-pill">Verifikasi</button>
                             </div>
                         </div>
                     @endforeach
@@ -155,7 +153,7 @@
             </div>
 
             <div class="panel-card p-4 mb-3 mb-lg-4">
-                <h2 class="h4 fw-bold mb-4">Cetak bukti pembayaran</h2>
+                <h2 class="h4 fw-bold mb-4">Bukti</h2>
                 <div class="d-grid gap-3">
                     @foreach ($receiptQueue as $item)
                         <div class="list-card p-3">
@@ -167,7 +165,7 @@
                                 <span class="badge text-bg-light border text-dark">{{ $item['status'] }}</span>
                             </div>
                             <div class="mt-3">
-                                <button class="btn btn-outline-secondary btn-sm rounded-pill">Cetak bukti</button>
+                                <button class="btn btn-outline-secondary btn-sm rounded-pill">Cetak</button>
                             </div>
                         </div>
                     @endforeach
@@ -204,8 +202,6 @@
             const startValue = @json($cashierShift['start'] ?? '08:00');
             const endValue = @json($cashierShift['end'] ?? '16:00');
             const countdownEl = shiftCard.querySelector('.js-shift-countdown');
-            const noteEl = shiftCard.querySelector('.js-shift-note');
-
             const toDate = (timeValue) => {
                 const [hours, minutes] = timeValue.split(':').map(Number);
                 const now = new Date();
@@ -229,18 +225,15 @@
 
                 if (now < startAt) {
                     countdownEl.textContent = `Shift dimulai dalam ${formatRemaining(startAt - now)}`;
-                    noteEl.textContent = 'Sistem sedang menunggu jam buka shift kasir.';
                     return;
                 }
 
                 if (now >= endAt) {
                     countdownEl.textContent = 'Shift hari ini sudah selesai';
-                    noteEl.textContent = 'Waktu operasional kasir hari ini sudah melewati jam tutup.';
                     return;
                 }
 
                 countdownEl.textContent = `Sisa waktu shift ${formatRemaining(endAt - now)}`;
-                noteEl.textContent = 'Hitungan mundur berjalan dari jam buka sampai jam tutup shift kasir.';
             };
 
             updateShiftCountdown();
