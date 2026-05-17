@@ -15,18 +15,23 @@
                 $quantity = $preselectedQuantities->get($product->id, 1);
 
                 return [
-                    'id' => $product->id,
-                    'name' => $product->name,
+                    'id'       => $product->id,
+                    'name'     => $product->name,
                     'category' => ucfirst($product->category),
-                    'brand' => $product->brand ?: 'Tanpa brand',
-                    'price' => $product->price,
-                    'stock' => $product->stock,
-                    'unit' => $product->unit,
+                    'brand'    => $product->brand ?: 'Tanpa brand',
+                    'price'    => $product->price,
+                    'stock'    => $product->stock,
+                    'unit'     => $product->unit,
                     'quantity' => $quantity,
                 ];
             })
             ->values();
         $selectedTotal = $preselectedProducts->sum(fn ($product) => $product['price'] * $product['quantity']);
+
+        // Tentukan apakah ini konteks non-member (customer_name ada, gym_member_id tidak ada)
+        $isNonMemberContext = request()->query('has_payment') == 1
+            && ! request()->query('gym_member_id')
+            && request()->query('customer_name');
     @endphp
 
     <style>
@@ -167,17 +172,17 @@
                 <div class="section-label">Produk</div>
                 <h1 class="display-6 fw-bold mt-2 mb-0">Transaksi Produk</h1>
             </div>
-            @if (request()->query('has_payment') == 1)
+            @if (request()->query('has_payment') == 1 && ! $isNonMemberContext)
                 <div class="d-flex gap-2">
-                    <a href="{{ request()->query('gym_member_id') ? route('cashier.member-payments') : route('cashier.daily-payments') }}" class="btn btn-outline-light rounded-pill px-4">
-                        Tidak Ada
+                    <a href="{{ route('cashier.transactions') }}" class="btn btn-outline-light rounded-pill px-4">
+                        Kembali
                     </a>
                 </div>
             @endif
         </div>
     </div>
 
-    @if (request()->query('has_payment') == 1)
+    @if (request()->query('has_payment') == 1 && ! $isNonMemberContext)
         <div class="alert alert-info mb-4 rounded-3 border-0" role="alert">
             <div class="d-flex gap-2 align-items-start">
                 <svg class="flex-shrink-0 mt-1" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
@@ -201,7 +206,7 @@
                 @if ($selectedMember)
                     <div class="small text-muted mb-1">ID Member: {{ $selectedMember->id }}</div>
                     <span class="badge text-bg-success">Member</span>
-                @elseif($selectedCustomerName)
+                @elseif ($selectedCustomerName)
                     <span class="badge text-bg-secondary">Non-member</span>
                 @else
                     <span class="badge text-bg-warning">Belum dipilih</span>
@@ -250,7 +255,7 @@
                             @forelse ($products as $product)
                                 @php
                                     $canCheckout = $product->is_active && $product->stock > 0;
-                                    $isSelected = $preselectedProductIds->contains((int) $product->id);
+                                    $isSelected  = $preselectedProductIds->contains((int) $product->id);
                                 @endphp
                                 <tr
                                     data-product-row="{{ $product->id }}"
@@ -413,8 +418,9 @@
 
                     <div class="col-12 d-flex justify-content-end gap-2">
                         <button type="reset" class="btn btn-outline-secondary rounded-pill px-4" data-product-reset>Reset</button>
-                        @if (request()->query('has_payment') == 1)
-                            <a href="{{ request()->query('gym_member_id') ? route('cashier.member-payments') : route('cashier.daily-payments') }}" class="btn btn-outline-secondary rounded-pill px-4">
+                        @if (request()->query('has_payment') == 1 && ! $isNonMemberContext)
+                            {{-- Tombol kembali hanya untuk member, bukan non member --}}
+                            <a href="{{ route('cashier.member-payments') }}" class="btn btn-outline-secondary rounded-pill px-4">
                                 Kembali
                             </a>
                         @endif
@@ -432,10 +438,10 @@
             </div>
             <form method="GET" action="{{ route('cashier.transactions.products') }}" class="d-flex flex-wrap gap-2 align-items-center">
                 <input type="month" name="month" class="form-control form-control-sm" value="{{ $selectedMonth }}">
-                @if($selectedMember)
+                @if ($selectedMember)
                     <input type="hidden" name="gym_member_id" value="{{ $selectedMember->id }}">
                 @endif
-                @if($selectedCustomerName)
+                @if ($selectedCustomerName)
                     <input type="hidden" name="customer_name" value="{{ $selectedCustomerName }}">
                 @endif
                 <button type="submit" class="btn btn-outline-dark rounded-pill btn-sm">Filter Bulan</button>
@@ -467,7 +473,11 @@
                             <td>{{ $item->quantity }}</td>
                             <td>{{ in_array($item->payment_method, ['later', null], true) ? 'Bayar Nanti' : strtoupper($item->payment_method) }}</td>
                             <td>Rp{{ number_format($item->amount, 0, ',', '.') }}</td>
-                            <td><span class="badge text-bg-{{ $item->payment_status === 'verified' ? 'success' : 'warning' }}">{{ $item->payment_status === 'verified' ? 'Lunas' : 'Pending' }}</span></td>
+                            <td>
+                                <span class="badge text-bg-{{ $item->payment_status === 'verified' ? 'success' : 'warning' }}">
+                                    {{ $item->payment_status === 'verified' ? 'Lunas' : 'Pending' }}
+                                </span>
+                            </td>
                         </tr>
                     @empty
                         <tr>
@@ -527,10 +537,7 @@
                     const haystack = (row.dataset.productSearchText || '').toLowerCase();
                     const isVisible = keyword === '' || haystack.includes(keyword);
                     row.classList.toggle('d-none', !isVisible);
-
-                    if (isVisible) {
-                        visibleCount += 1;
-                    }
+                    if (isVisible) visibleCount += 1;
                 });
 
                 if (productSearchSummary) {
@@ -585,9 +592,7 @@
                 button.addEventListener('click', function () {
                     const productId = String(this.dataset.productId || '');
 
-                    if (!productId) {
-                        return;
-                    }
+                    if (!productId) return;
 
                     if (selectedProducts.has(productId)) {
                         selectedProducts.delete(productId);
@@ -596,13 +601,13 @@
                     }
 
                     selectedProducts.set(productId, {
-                        id: productId,
-                        name: this.dataset.productName || 'Produk',
+                        id:       productId,
+                        name:     this.dataset.productName || 'Produk',
                         category: this.dataset.productCategory || '-',
-                        brand: this.dataset.productBrand || '-',
-                        price: parseInt(this.dataset.productPrice || '0', 10),
-                        stock: parseInt(this.dataset.productStock || '0', 10),
-                        unit: this.dataset.productUnit || 'pcs',
+                        brand:    this.dataset.productBrand || '-',
+                        price:    parseInt(this.dataset.productPrice || '0', 10),
+                        stock:    parseInt(this.dataset.productStock || '0', 10),
+                        unit:     this.dataset.productUnit || 'pcs',
                         quantity: 1,
                     });
 
@@ -613,17 +618,11 @@
 
             selectedList.addEventListener('input', function (event) {
                 const input = event.target.closest('[data-selected-quantity]');
+                if (!input) return;
 
-                if (!input) {
-                    return;
-                }
-
-                const productId = String(input.dataset.selectedQuantity || '');
+                const productId      = String(input.dataset.selectedQuantity || '');
                 const selectedProduct = selectedProducts.get(productId);
-
-                if (!selectedProduct) {
-                    return;
-                }
+                if (!selectedProduct) return;
 
                 const nextQuantity = Math.min(
                     Math.max(parseInt(input.value || '1', 10), 1),
@@ -637,16 +636,13 @@
             selectedList.addEventListener('click', function (event) {
                 const stepButton = event.target.closest('[data-selected-step]');
                 if (stepButton) {
-                    const productId = String(stepButton.dataset.selectedStepId || '');
+                    const productId      = String(stepButton.dataset.selectedStepId || '');
                     const selectedProduct = selectedProducts.get(productId);
-
-                    if (!selectedProduct) {
-                        return;
-                    }
+                    if (!selectedProduct) return;
 
                     const currentQuantity = Number(selectedProduct.quantity) || 1;
-                    const maxStock = Number(selectedProduct.stock) || 1;
-                    const nextQuantity = stepButton.dataset.selectedStep === 'increase'
+                    const maxStock        = Number(selectedProduct.stock) || 1;
+                    const nextQuantity    = stepButton.dataset.selectedStep === 'increase'
                         ? Math.min(currentQuantity + 1, maxStock)
                         : Math.max(currentQuantity - 1, 1);
 
@@ -656,10 +652,7 @@
                 }
 
                 const removeButton = event.target.closest('[data-selected-remove]');
-
-                if (!removeButton) {
-                    return;
-                }
+                if (!removeButton) return;
 
                 const productId = String(removeButton.dataset.selectedRemove || '');
                 selectedProducts.delete(productId);

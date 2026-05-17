@@ -70,7 +70,6 @@
             color: #fff;
         }
 
-        /* Badge metode pembayaran */
         .badge-cash {
             background: rgba(34, 197, 94, .15);
             color: #22c55e;
@@ -196,6 +195,7 @@
                             <th>Nominal</th>
                             <th>Metode</th>
                             <th>Waktu</th>
+                            <th>Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -217,6 +217,12 @@
                                     </span>
                                 </td>
                                 <td>{{ \Carbon\Carbon::parse($guest->visit_at)->format('H:i') }}</td>
+                                <td>
+                                    <a href="{{ route('cashier.transactions.products', ['customer_name' => $guest->full_name]) }}"
+                                       class="btn rounded-pill btn-sm checkout-action-btn">
+                                        Transaksi
+                                    </a>
+                                </td>
                             </tr>
                         @endforeach
                     </tbody>

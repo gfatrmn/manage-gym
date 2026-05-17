@@ -131,7 +131,7 @@
         }
 
         .ci-panel-title {
-            font-size: 13px;
+            font-size: 17px;
             font-weight: 700;
             margin-bottom: 6px;
             display: flex;
@@ -555,7 +555,7 @@
             </div>
             <div class="ci-stat ci-stat-amber">
                 <div class="ci-stat-label">Pemasukan Guest Hari Ini</div>
-                <div class="ci-stat-val" style="font-size: 1.25rem;">
+                <div class="ci-stat-val">
                     Rp {{ number_format($todayGuestRevenue ?? 0, 0, ',', '.') }}
                 </div>
                 <div class="ci-stat-note">Dari tamu harian</div>

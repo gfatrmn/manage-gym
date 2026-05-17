@@ -50,12 +50,9 @@ Route::get('/members', function (Request $request) {
     }
 
     // ── Counter (selalu dari seluruh data, tidak ikut section) ───────
-    // Pakai query DB langsung agar tidak terpengaruh pagination/filter section
     $totalActiveCount   = GymMember::where('expires_at', '>=', $today)->count();
     $totalExpiredCount  = GymMember::where('expires_at', '<', $today)->count();
     $totalMembersCount  = GymMember::count();
-
-    // Expiring soon (7 hari ke depan) — dari seluruh data
     $expiringSoonCount  = GymMember::whereBetween('expires_at', [$today, $today->copy()->addDays(7)])->count();
 
     // ── Data untuk tabel (paginated, ikut search & section) ──────────
@@ -75,8 +72,6 @@ Route::get('/members', function (Request $request) {
         'activeMembers'      => $activeMembers,
         'expiredMembers'     => $expiredMembers,
         'currentItems'       => $currentItems,
-
-        // Counter cards — selalu total keseluruhan
         'totalActiveCount'   => $totalActiveCount,
         'totalExpiredCount'  => $totalExpiredCount,
         'totalMembersCount'  => $totalMembersCount,
@@ -84,7 +79,7 @@ Route::get('/members', function (Request $request) {
     ]));
 })->name('members');
 
-// ── Store ─────────────────────────────────────────────────────────────────────
+// ── Store (DIUBAH: Ditambahkan pencatatan transaksi masuk) ───────────────────
 Route::post('/members', function (Request $request) {
     if ($redirect = RouteHelpers::ensureAdmin()) return $redirect;
 
@@ -115,7 +110,27 @@ Route::post('/members', function (Request $request) {
         $memberData['profile_photo_path'] = $request->file('profile_photo')->store('member-photos', 'public');
     }
 
-    GymMember::create($memberData);
+    // 1. Simpan data member baru ke database
+    $member = GymMember::create($memberData);
+
+    // 2. TAMBAHAN: Catat transaksi pendaftaran ke CashierTransaction agar masuk pemasukan hari ini
+    $hargaPendaftaran = 90000; // Sesuaikan dengan harga paket pendaftaran Anda
+
+    CashierTransaction::create([
+        'invoice'           => 'INV-' . date('Ymd') . strtoupper(Str::random(6)),
+        'gym_member_id'     => $member->id,
+        'customer_name'     => $member->full_name,
+        'transaction_group' => 'membership',
+        'transaction_type'  => 'registration', // Tipe: Registrasi Baru
+        'amount'            => $hargaPendaftaran,
+        'quantity'          => 1,
+        'payment_method'    => $member->payment_method,
+        'payment_status'    => 'verified', // Set verified agar langsung terjumlah di dashboard
+        'receipt_status'    => 'printed',
+        'transaction_at'    => now(),
+        'notes'             => "Pendaftaran member baru oleh Admin: 1 Bulan",
+    ]);
+
     return redirect()->back()->with('status', 'Member berhasil ditambahkan!');
 })->name('members.store');
 
@@ -144,12 +159,12 @@ Route::put('/members/{member}', function (Request $request, GymMember $member) u
 
         $hargaPerBulan = 90000;
 
-        \App\Models\CashierTransaction::create([
+        CashierTransaction::create([
             'invoice'            => 'INV-' . date('Ymd') . strtoupper(Str::random(6)),
             'gym_member_id'      => $member->id,
             'customer_name'      => $data['full_name'],
             'transaction_group'  => 'membership',
-            'transaction_type'   => 'renewal',
+            'transaction_type'   => 'renewal', // Tipe: Perpanjangan
             'amount'             => $months * $hargaPerBulan,
             'quantity'           => $months,
             'payment_method'     => $data['payment_method'],
