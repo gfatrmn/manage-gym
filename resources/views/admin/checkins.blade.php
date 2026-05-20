@@ -69,7 +69,7 @@
         .ci-stat:hover { transform: translateY(-2px); }
 
         .ci-stat-label {
-            font-size: 10px;
+            font-size: 12px;
             text-transform: uppercase;
             letter-spacing: 1.5px;
             font-weight: 700;
@@ -82,7 +82,7 @@
         }
 
         .ci-stat-note {
-            font-size: 11px;
+            font-size: 12px;
             margin-top: 4px;
             opacity: .55;
         }
@@ -342,7 +342,7 @@
             font-size: 10px;
             text-transform: uppercase;
             letter-spacing: 1px;
-            color: rgba(255,255,255,0.3);
+            color: rgb(255, 255, 255);
             padding: 0.9rem 1.25rem;
             border-bottom: 1px solid rgba(255,255,255,0.05);
             font-weight: 600;
@@ -691,14 +691,14 @@
                                         <span class="badge-guest">Guest</span>
                                     @endif
                                 </td>
-                                <td class="hide-mobile" style="color: rgba(255,255,255,0.5); font-size: 12px;">
+                                <td class="hide-mobile" style="color: rgb(255, 255, 255); font-size: 14px;">
                                     {{ $log['info'] ?? '-' }}
                                 </td>
                                 <td class="hide-mobile">
                                     @if ($log['type'] === 'member')
-                                        <span class="badge-verified">Verified</span>
+                                        <span class="badge-verified" style="font-size: 13px;">Verified</span>
                                     @else
-                                        <span class="badge-pay">{{ $log['payment_method'] ?? '-' }}</span>
+                                        <span class="badge-pay" style="font-size: 13px;">{{ $log['payment_method'] ?? '-' }}</span>
                                     @endif
                                 </td>
                                 <td class="hide-mobile fw-bold" style="font-size: 13px; color: rgba(255,255,255,0.7);">
@@ -708,7 +708,7 @@
                                         <span style="color: rgba(255,255,255,0.2);">—</span>
                                     @endif
                                 </td>
-                                <td style="font-size: 12px; color: rgba(255,255,255,0.5); font-weight: 600; white-space: nowrap;">
+                                <td style="font-size: 13px; color: rgb(255, 255, 255); font-weight: 600; white-space: nowrap;">
                                     {{ $log['waktu'] }}
                                 </td>
                             </tr>

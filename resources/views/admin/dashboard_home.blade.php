@@ -71,8 +71,9 @@
         }
 
         .stat-label {
-            font-size: 12px;
+            font-size: 14px;
             text-transform: uppercase;
+            font-weight: 600;
             color: rgb(255, 255, 255);
             margin-bottom: 6px;
         }
@@ -84,8 +85,8 @@
         }
 
         .stat-note {
-            font-size: 11px;
-            color: rgba(255, 255, 255, 0.558);
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.631);
             margin-top: 6px;
         }
 
@@ -278,13 +279,13 @@
             font-size: 10px;
             text-transform: uppercase;
             letter-spacing: 1.5px;
-            color: rgba(255, 255, 255, 0.4);
+            color: rgba(255, 255, 255, 0.615);
             margin-bottom: 3px;
-            margin-right: 15px;
+            margin-right: 40px;
         }
 
         .qac-text-title {
-            font-size: 1rem;
+            font-size: 1.2rem;
             font-weight: 700;
             /* margin-left: px; */
             color: #fff;

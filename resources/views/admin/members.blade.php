@@ -26,7 +26,7 @@
         }
 
         .member-summary-card {
-            background: rgba(255, 255, 255, .03);
+            background: rgba(255, 255, 255, 0.099);
             border: 1px solid rgba(255, 255, 255, .06);
             border-radius: 1rem;
             padding: 0.85rem 1.1rem;
@@ -54,7 +54,7 @@
         }
 
         .panel-card {
-            background: rgba(255, 255, 255, .025);
+            background: rgba(255, 255, 255, 0.09);
             border: 1px solid rgba(255, 255, 255, .05);
             border-radius: 1.2rem;
             padding: 1.5rem;
@@ -63,7 +63,7 @@
         .member-table thead th {
             font-size: .7rem;
             text-transform: uppercase;
-            color: #9ca3af;
+            color: #ffffff;
             padding: 1rem;
             border-bottom: 1px solid rgba(255, 255, 255, .06);
         }
@@ -132,10 +132,7 @@
             color: rgba(255, 255, 255, 0.45);
             margin-bottom: .3rem;
         }
-
-        /* =============================================
-                                                           SEARCH INPUT
-                                                           ============================================= */
+        
         .member-search-wrap {
             position: relative;
             flex: 0 0 auto;
@@ -146,16 +143,16 @@
             left: 12px;
             top: 50%;
             transform: translateY(-50%);
-            color: rgba(255, 255, 255, 0.35);
+            color: rgb(255, 255, 255);
             font-size: 13px;
             pointer-events: none;
         }
 
         .member-search-input {
-            background: rgba(255, 255, 255, 0.06);
+            background: rgba(255, 255, 255, 0.2);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 50px;
-            color: #fff;
+            color: #ffffff;
             font-size: 13px;
             padding: 0.42rem 1rem 0.42rem 2.1rem;
             width: 230px;
@@ -164,7 +161,7 @@
         }
 
         .member-search-input::placeholder {
-            color: rgba(255, 255, 255, 0.3);
+            color: rgb(255, 255, 255);
         }
 
         .member-search-input:focus {
@@ -402,7 +399,7 @@
         <div class="member-summary-grid">
             <div class="member-summary-card">
                 <div class="summary-label">Aktif</div>
-                <div class="summary-value text-success">{{ $totalActiveCount }}</div>
+                <div class="summary-value" style="color: #08CB00">{{ $totalActiveCount }}</div>
                 <div class="summary-note">Member Aktif</div>
             </div>
             <div class="member-summary-card">
