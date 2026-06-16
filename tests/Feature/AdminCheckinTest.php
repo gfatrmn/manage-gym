@@ -98,8 +98,8 @@ class AdminCheckinTest extends TestCase
             ],
         ])->get(route('admin.checkins'))
             ->assertOk()
-            ->assertSee('Scan Barcode Member')
-            ->assertSee('Buka Kamera Scan')
+            ->assertSee('Check-in Member')
+            ->assertSee('Ketik nama atau kode member')
             ->assertSee('Dewa Barcode');
     }
 }

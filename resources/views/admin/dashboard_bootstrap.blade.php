@@ -48,6 +48,15 @@
                 font-weight: 800;
             }
 
+            .brand-logo {
+                width: 3.2rem;
+                height: auto;
+                object-fit: contain;
+                border-radius: 1rem;
+                background: rgba(255,255,255,0.08);
+                padding: 0.35rem;
+            }
+
             .sidebar-link {
                 display: flex;
                 align-items: center;
@@ -185,9 +194,9 @@
                 <aside class="col-12 col-lg-3 col-xl-2">
                     <div class="sidebar p-3 p-lg-4">
                         <div class="d-flex align-items-center gap-3 mb-4">
-                            <div class="brand-mark">IP</div>
+                            <img src="{{ asset('images/arena-fitness-logo.jpg') }}" alt="Arena Fitness" class="brand-logo">
                             <div>
-                                <div class="fw-bold">Arena Gym</div>
+                                <div class="fw-bold">Arena Fitness</div>
                                 <div class="small text-white-50">Admin Dashboard</div>
                             </div>
                         </div>
@@ -217,7 +226,7 @@
                                 <div class="section-label">Operations Summary</div>
                                 <h1 class="display-6 fw-bold mt-2 mb-2">Dashboard admin Arena Gym yang fokus pada operasional harian</h1>
                                 <p class="muted-copy mb-0">
-                                    Kelola data member dan non member, pantau aktivitas check-in, status membership, informasi dan pengumuman, serta akses laporan harian dalam satu tampilan admin yang rapi.
+                                    Kelola data member dan daily pass, pantau aktivitas check-in, status membership, informasi dan pengumuman, serta akses laporan harian dalam satu tampilan admin yang rapi.
                                 </p>
                             </div>
                             <div class="col-12 col-xl-4">
@@ -226,14 +235,14 @@
                                         <div class="list-card p-3">
                                             <div class="section-label">Jam Operasional</div>
                                             <div class="fw-bold fs-5 mt-2">05:30 - 22:00</div>
-                                            <div class="small muted-copy">Layanan member, guest, dan front desk</div>
+                                            <div class="small muted-copy">Layanan member, daily pass, dan front desk</div>
                                         </div>
                                     </div>
                                     <div class="col-sm-4 col-xl-12">
                                         <div class="list-card p-3">
                                             <div class="section-label">Check-in Hari Ini</div>
                                             <div class="fw-bold fs-5 mt-2">286</div>
-                                            <div class="small muted-copy">Member dan non member tercatat</div>
+                                            <div class="small muted-copy">Member dan daily pass tercatat</div>
                                         </div>
                                     </div>
                                     <div class="col-sm-4 col-xl-12">
@@ -272,7 +281,7 @@
                                 <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-3">
                                     <div>
                                         <div class="section-label">Member Management</div>
-                                        <h2 class="h3 fw-bold mt-2 mb-1">Pengelolaan data member dan non member</h2>
+                                        <h2 class="h3 fw-bold mt-2 mb-1">Pengelolaan data member dan daily pass</h2>
                                         <div class="muted-copy">Memantau kategori pengguna gym untuk kebutuhan follow-up, validasi akses, dan layanan front desk.</div>
                                     </div>
                                     <div class="d-flex gap-2">
@@ -330,7 +339,7 @@
                                         <div class="mt-4 p-4 rounded-4" style="background: rgba(22,163,74,.08); border:1px solid rgba(22,163,74,.15);">
                                             <div class="section-label text-success">Check-in Insight</div>
                                             <div class="display-6 fw-bold mt-2 mb-1">190</div>
-                                            <div class="small muted-copy">Total check-in member aktif hari ini. Sisanya berasal dari guest pass dan trial.</div>
+                                            <div class="small muted-copy">Total check-in member aktif hari ini. Sisanya berasal dari daily pass dan trial.</div>
                                         </div>
                                     </div>
                                 </div>
@@ -442,7 +451,7 @@
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content border-0 shadow">
                     <div class="modal-header">
-                        <h5 class="modal-title">Tambah Data Member / Non Member</h5>
+                        <h5 class="modal-title">Tambah Data Member / Daily Pass</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
@@ -455,7 +464,7 @@
                             <select class="form-select">
                                 <option>Member Reguler</option>
                                 <option>Member Personal Training</option>
-                                <option>Non Member / Guest</option>
+                                <option>Daily Pass</option>
                             </select>
                         </div>
                         <div class="mb-0">
@@ -482,7 +491,7 @@
                         <p class="text-muted mb-3">Aksi cepat untuk memonitor kunjungan hari ini.</p>
                         <div class="list-group">
                             <a href="#checkin-monitoring" class="list-group-item list-group-item-action" data-bs-dismiss="modal">Lihat daftar check-in terbaru</a>
-                            <button type="button" class="list-group-item list-group-item-action" data-bs-dismiss="modal">Verifikasi guest pass</button>
+                            <button type="button" class="list-group-item list-group-item-action" data-bs-dismiss="modal">Verifikasi daily pass</button>
                             <button type="button" class="list-group-item list-group-item-action" data-bs-dismiss="modal">Cetak ringkasan check-in</button>
                         </div>
                     </div>

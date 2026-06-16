@@ -4,9 +4,11 @@ use App\Helpers\RouteHelpers;
 use App\Models\CashierTransaction;
 use App\Models\GymCheckin;
 use App\Models\GymMember;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -38,7 +40,34 @@ Route::get('/members', function (Request $request) {
     $memberSearch  = trim($request->string('q')->value());
 
     // ── Base query untuk search ──────────────────────────────────────
-    $baseQuery = GymMember::query()->latest();
+    $hasCheckinHistory = Schema::hasTable('gym_checkins')
+        && Schema::hasColumn('gym_checkins', 'gym_member_id')
+        && Schema::hasColumn('gym_checkins', 'checked_in_at');
+    $hasProductHistory = Schema::hasTable('cashier_transactions')
+        && Schema::hasColumn('cashier_transactions', 'gym_member_id')
+        && Schema::hasColumn('cashier_transactions', 'product_id')
+        && Schema::hasColumn('cashier_transactions', 'transaction_at');
+    $hasMemberHistory = Schema::hasTable('member_histories')
+        && Schema::hasColumn('member_histories', 'gym_member_id')
+        && Schema::hasColumn('member_histories', 'history_type')
+        && Schema::hasColumn('member_histories', 'occurred_at');
+
+    $baseQuery = GymMember::query();
+
+    if ($hasMemberHistory) {
+        $baseQuery->withCount([
+            'checkinHistories as checkins_count',
+            'productPurchaseHistories as product_transactions_count',
+        ]);
+    } elseif ($hasCheckinHistory) {
+        $baseQuery->withCount(['verifiedCheckins as checkins_count']);
+    }
+
+    if (! $hasMemberHistory && $hasProductHistory) {
+        $baseQuery->withCount(['productTransactions as product_transactions_count']);
+    }
+
+    $baseQuery->latest();
 
     if ($memberSearch !== '') {
         $baseQuery->where(function ($q) use ($memberSearch) {
@@ -69,6 +98,24 @@ Route::get('/members', function (Request $request) {
         $currentItems   = $activeMembers;
     }
 
+    $historyRelations = [];
+
+    if ($hasMemberHistory) {
+        $historyRelations[] = 'checkinHistories';
+        $historyRelations[] = 'verifiedCheckins';
+        $historyRelations[] = 'productPurchaseHistories.product';
+    } elseif ($hasCheckinHistory) {
+        $historyRelations[] = 'verifiedCheckins';
+    }
+
+    if (! $hasMemberHistory && $hasProductHistory) {
+        $historyRelations[] = 'productTransactions.product';
+    }
+
+    if ($historyRelations !== []) {
+        $currentItems->getCollection()->load($historyRelations);
+    }
+
     return view('admin.members', array_merge(RouteHelpers::pageMeta('members'), [
         'memberSection'      => $memberSection,
         'memberSearch'       => $memberSearch,
@@ -90,33 +137,50 @@ Route::post('/members', function (Request $request) {
 
     $validated = $request->validate([
         'full_name'      => 'required|string|max:255',
-        'email'          => 'nullable|email|unique:gym_members,email',
+        'email'          => 'required|email|unique:gym_members,email|unique:users,email',
         'phone'          => 'nullable|string|max:20',
         'joined_at'      => 'required|date',
         'payment_method' => 'required|string',
+        'notes'          => 'nullable|string',
         'profile_photo'  => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
     ]);
 
     $joinedAt = Carbon::parse($validated['joined_at']);
-    $expiresAt = $joinedAt->copy()->addMonth();
+    $expiresAt = $joinedAt->copy()->addMonthNoOverflow();
+
+    // Create User record first
+    $user = User::create([
+        'name'     => $validated['full_name'],
+        'email'    => $validated['email'],
+        'login'    => $validated['email'], // Use email as login
+        'role'     => 'member',
+        'password' => bcrypt(Str::random(12)), // Random password, member will set via activate route
+    ]);
 
     $memberData = [
+        'user_id'        => $user->id,
         'full_name'      => $validated['full_name'],
-        'email'          => $validated['email'],
-        'phone'          => $validated['phone'],
+        'email'          => $validated['email'] ?? null,
+        'phone'          => $validated['phone'] ?? null,
+        'member_status'  => 'member',
+        'membership_plan'=> 'Membership 1 Bulan',
+        'package_status' => 'active',
+        'payment_amount' => 90000,
+        'can_check_in'   => false,
         'joined_at'      => $joinedAt,
         'expires_at'     => $expiresAt,
         'payment_method' => $validated['payment_method'],
-        'status'         => 'active',
+        'status'         => 'member',
         'checkin_code'   => 'AGM-' . strtoupper(Str::random(8)),
+        'notes'          => $validated['notes'] ?? null,
     ];
 
     if ($request->hasFile('profile_photo')) {
         $memberData['profile_photo_path'] = $request->file('profile_photo')->store('member-photos', 'public');
     }
 
-    GymMember::create($memberData);
-    return redirect()->back()->with('status', 'Member berhasil ditambahkan!');
+    $member = GymMember::create($memberData);
+    return redirect()->route('admin.members')->with('status', 'Member berhasil ditambahkan! Silakan beritahu member untuk mengaktifkan akun via /member/activate!');
 })->name('members.store');
 
 // ── Update & Perpanjang ────────────────────────────────────────────────────────
@@ -140,7 +204,7 @@ Route::put('/members/{member}', function (Request $request, GymMember $member) u
             : now();
 
         $data['expires_at'] = $baseDate->addMonths($months);
-        $data['status']     = 'active';
+        $data['status']     = 'member';
 
         $hargaPerBulan = 90000;
 

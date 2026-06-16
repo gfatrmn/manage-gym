@@ -10,8 +10,8 @@
         .panel-card { background: rgba(255,255,255,.025); border: 1px solid rgba(255,255,255,.05); border-radius: 1.2rem; padding: 1.5rem; }
 
         /* Memaksa teks tabel menjadi putih */
-        .guest-table tbody td { color: #ffffff !important; vertical-align: middle; padding: 1rem; border-bottom: 1px solid rgba(255,255,255,.04); }
-        .guest-table thead th { font-size: .7rem; text-transform: uppercase; letter-spacing: .06em; color: #9ca3af; padding: 1rem; border-bottom: 1px solid rgba(255,255,255,.06); }
+        .daily-pass-table tbody td { color: #ffffff !important; vertical-align: middle; padding: 1rem; border-bottom: 1px solid rgba(255,255,255,.04); }
+        .daily-pass-table thead th { font-size: .7rem; text-transform: uppercase; letter-spacing: .06em; color: #9ca3af; padding: 1rem; border-bottom: 1px solid rgba(255,255,255,.06); }
 
         .btn-action-danger { width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; background: rgba(239, 68, 68, 0.2); color: #f87171; border: none; transition: 0.2s; }
         .btn-action-danger:hover { background: #ef4444; color: white; }
@@ -31,14 +31,14 @@
 
         <div class="panel-card">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h5 class="text-white fw-bold mb-0">Data Non-Member</h5>
-                <form action="{{ route('admin.non-members') }}" method="GET" style="max-width: 300px;">
+                <h5 class="text-white fw-bold mb-0">Data Daily Pass</h5>
+                <form action="{{ route('admin.daily-passes') }}" method="GET" style="max-width: 300px;">
                     <input type="text" name="q" value="{{ $search ?? '' }}" class="form-control form-control-sm bg-dark border-secondary text-white rounded-pill px-3" placeholder="Cari nama tamu...">
                 </form>
             </div>
 
             <div class="table-responsive">
-                <table class="table align-middle mb-0 guest-table">
+                <table class="table align-middle mb-0 daily-pass-table">
                     <thead>
                         <tr>
                             <th>Nama Tamu</th>
@@ -50,28 +50,26 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {{-- PERBAIKAN: Menggunakan $guests sesuai kiriman dari Route --}}
-                        @forelse ($guests as $guest)
+                        @forelse ($dailyPasses as $dailyPass)
                             <tr>
                                 <td>
-                                    <div class="fw-bold text-white">{{ $guest->full_name }}</div>
+                                    <div class="fw-bold text-white">{{ $dailyPass->full_name }}</div>
                                 </td>
-                                <td>{{ $guest->phone ?: '-' }}</td>
+                                <td>{{ $dailyPass->phone ?: '-' }}</td>
                                 <td>
                                     <span class="badge bg-primary bg-opacity-20 text-primary rounded-pill" style="font-size: 10px;">
-                                        {{ strtoupper($guest->payment_method ?? 'CASH') }}
+                                        {{ strtoupper($dailyPass->payment_method ?? 'CASH') }}
                                     </span>
                                 </td>
                                 <td class="fw-bold text-white">
-                                    Rp{{ number_format($guest->payment_amount, 0, ',', '.') }}
+                                    Rp{{ number_format($dailyPass->payment_amount, 0, ',', '.') }}
                                 </td>
                                 <td>
-                                    {{-- PERBAIKAN: Menggunakan visit_at sesuai tabel daily_guests --}}
-                                    <div class="small">{{ $guest->visit_at ? $guest->visit_at->format('d M Y') : '-' }}</div>
-                                    <div class="small text-muted" style="font-size: 11px;">Jam: {{ $guest->visit_at ? $guest->visit_at->format('H:i') : '-' }}</div>
+                                    <div class="small">{{ $dailyPass->visit_at ? $dailyPass->visit_at->format('d M Y') : '-' }}</div>
+                                    <div class="small text-muted" style="font-size: 11px;">Jam: {{ $dailyPass->visit_at ? $dailyPass->visit_at->format('H:i') : '-' }}</div>
                                 </td>
                                 <td class="text-end">
-                                    <form action="{{ route('admin.non-members.destroy', $guest) }}" method="POST" onsubmit="return confirm('Hapus riwayat kunjungan {{ $guest->full_name }}?')">
+                                    <form action="{{ route('admin.daily-passes.destroy', $dailyPass) }}" method="POST" onsubmit="return confirm('Hapus riwayat kunjungan {{ $dailyPass->full_name }}?')">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn-action-danger">
@@ -90,7 +88,7 @@
             </div>
 
             <div class="mt-4">
-                {{ $guests->links() }}
+                {{ $dailyPasses->links() }}
             </div>
         </div>
     </div>

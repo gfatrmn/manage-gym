@@ -22,6 +22,13 @@ Route::get('/login', function () {
         'pageTitle' => 'Login Portal Arena Gym',
         'roles'     => [
             [
+                'value'       => 'member',
+                'label'       => 'Member',
+                'description' => 'Akses dashboard member dan informasi gym.',
+                'icon'        => 'user',
+                'img'         => 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&q=80&w=400',
+            ],
+            [
                 'value'       => 'admin',
                 'label'       => 'Admin',
                 'description' => 'Kelola member, check-in, dan operasional.',
@@ -47,30 +54,55 @@ Route::get('/login', function () {
 })->name('login');
 
 // ── Role-specific login shortcuts (redirect ke /login dengan ?role=xxx) ───────
-Route::get('/login/admin',        fn () => redirect()->route('login', ['role' => 'admin']))->name('admin.login');
-Route::post('/login/admin',       fn () => redirect()->route('login', ['role' => 'admin']))->name('admin.login.submit');
+Route::get('/login/member',        fn () => redirect()->route('member.login'))->name('member.login');
+Route::get('/login/admin',         fn () => redirect()->route('login', ['role' => 'admin']))->name('admin.login');
+Route::post('/login/admin',        fn () => redirect()->route('login', ['role' => 'admin']))->name('admin.login.submit');
 
-Route::get('/login/cashier',      fn () => redirect()->route('login', ['role' => 'cashier']))->name('cashier.login');
-Route::post('/login/cashier',     fn () => redirect()->route('login', ['role' => 'cashier']))->name('cashier.login.submit');
+Route::get('/login/cashier',       fn () => redirect()->route('login', ['role' => 'cashier']))->name('cashier.login');
+Route::post('/login/cashier',      fn () => redirect()->route('login', ['role' => 'cashier']))->name('cashier.login.submit');
 
-Route::get('/login/master-admin', fn () => redirect()->route('login', ['role' => 'master_admin']))->name('master-admin.login');
-Route::post('/login/master-admin',fn () => redirect()->route('login', ['role' => 'master_admin']))->name('master-admin.login.submit');
+Route::get('/login/master-admin',  fn () => redirect()->route('login', ['role' => 'master_admin']))->name('master-admin.login');
+Route::post('/login/master-admin', fn () => redirect()->route('login', ['role' => 'master_admin']))->name('master-admin.login.submit');
 
 // ── Login submit ──────────────────────────────────────────────────────────────
 Route::post('/login', function (Request $request) {
     $validated = $request->validate([
-        'role'     => ['required', 'in:admin,master_admin,cashier'],
-        'login'    => ['required'],
+        'role'     => ['required', 'in:member,admin,master_admin,cashier'],
+        'login'    => ['required_if:role,admin,master_admin,cashier'],
+        'email'    => ['required_if:role,member', 'email'],
         'password' => ['required'],
     ]);
 
-    // Coba cari user sesuai role yang dipilih di form
+    if ($validated['role'] === 'member') {
+        // Handle member login
+        $user = User::query()
+            ->where('email', $validated['email'])
+            ->where('role', 'member')
+            ->first();
+
+        if (! $user || ! Hash::check($validated['password'], $user->password)) {
+            return back()
+                ->withErrors(['email' => 'Email atau password tidak sesuai.'])
+                ->withInput();
+        }
+
+        $request->session()->regenerate();
+        $request->session()->put('auth', [
+            'id'    => $user->id,
+            'name'  => $user->name,
+            'email' => $user->email,
+            'role'  => 'member',
+        ]);
+
+        return redirect()->route('member.dashboard');
+    }
+
+    // Handle admin/cashier login
     $user = User::query()
         ->where('login', $validated['login'])
         ->where('role', $validated['role'])
         ->first();
 
-    // Fallback: cari tanpa filter role (agar cashier/admin tetap bisa login dari /login)
     if (! $user) {
         $user = User::query()->where('login', $validated['login'])->first();
     }

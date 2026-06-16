@@ -15,6 +15,7 @@ return new class extends Migration
             $table->foreignId('gym_member_id')->constrained('gym_members')->onDelete('cascade');
             $table->datetime('checked_in_at');
             $table->string('checkin_method', 20)->default('admin');
+            $table->text('notes')->nullable();
             $table->timestamps();
         });
     }

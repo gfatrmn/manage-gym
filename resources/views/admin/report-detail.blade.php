@@ -2,232 +2,265 @@
 
 @section('content')
     <style>
-        .report-detail-page .table th,
-        .report-detail-page .table td {
-            vertical-align: middle;
-        }
-
-        .report-detail-toolbar,
-        .report-detail-table-card {
+        .report-detail-page .detail-card,
+        .report-detail-page .filter-card,
+        .report-detail-page .table-card {
             border: 1px solid var(--border);
-            border-radius: 1.5rem;
+            border-radius: 1.25rem;
             background: var(--panel-bg);
             box-shadow: var(--shadow-soft);
         }
 
-        .report-detail-pill {
-            display: inline-flex;
-            align-items: center;
-            padding: .45rem .8rem;
-            border-radius: 999px;
-            border: 1px solid var(--border);
-            background: rgba(255, 255, 255, 0.04);
+        .report-detail-page .help-text {
             color: var(--text-muted);
-            font-size: .85rem;
-            font-weight: 600;
+            font-size: .92rem;
+            line-height: 1.55;
         }
 
-        .report-detail-category {
+        .report-detail-page .report-pill {
             display: inline-flex;
             align-items: center;
-            padding: .35rem .75rem;
+            gap: .35rem;
+            padding: .38rem .75rem;
             border-radius: 999px;
-            background: rgba(13, 110, 253, 0.12);
-            color: var(--accent, #0d6efd);
-            font-size: .78rem;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: .8rem;
             font-weight: 700;
         }
 
-        .report-detail-table-card .table thead th {
-            font-size: .78rem;
+        .report-detail-page .section-button {
+            min-height: 42px;
+            border-radius: 999px;
+            font-weight: 700;
+        }
+
+        .report-detail-page .section-button.active,
+        .report-detail-page .section-button:hover {
+            color: #fff;
+            background: rgba(255, 59, 59, .92);
+            border-color: rgba(255, 59, 59, .92);
+        }
+
+        .report-detail-page .table th {
+            font-size: .76rem;
             text-transform: uppercase;
             letter-spacing: .08em;
             color: var(--text-muted);
             border-bottom-color: var(--border);
+            background: rgba(255, 255, 255, .04);
+            white-space: nowrap;
         }
 
-        .report-detail-table-card .table tbody tr + tr td {
+        .report-detail-page .table td {
+            vertical-align: middle;
+            padding: .9rem 1rem;
             border-top-color: var(--border);
+            white-space: normal;
+            word-break: break-word;
         }
 
-        .report-detail-table-card .table-responsive {
-            max-height: 72vh;
+        .report-detail-page .table tbody tr:hover {
+            background: rgba(255, 255, 255, .03);
         }
 
-        .report-month-form .form-label {
-            font-size: .78rem;
-            text-transform: uppercase;
-            letter-spacing: .08em;
+        .report-detail-page .table-responsive {
+            max-height: 68vh;
         }
 
-        .report-stat-card {
-            border: 1px solid var(--border);
-            border-radius: 1.5rem;
-            background: var(--panel-bg);
-            box-shadow: var(--shadow-soft);
+        .report-detail-page .btn,
+        .report-detail-page .form-control {
+            min-height: 44px;
         }
 
-        .report-stat-card .table-responsive {
-            max-height: 24rem;
+        @media (max-width: 575.98px) {
+            .report-detail-page .detail-card,
+            .report-detail-page .filter-card,
+            .report-detail-page .table-card {
+                padding: 1rem !important;
+            }
+
+            .report-detail-page .action-button {
+                width: 100%;
+            }
         }
     </style>
 
+    @php
+        $activeSection = request()->query('detail_section', '');
+        $tableTitle = $selectedReport['detail_title'] ?? match ($selectedReport['slug']) {
+            'laporan-member' => 'Daftar member',
+            'laporan-keuangan' => 'Rincian keuangan',
+            'laporan-kehadiran' => 'Daftar check-in',
+            'laporan-stok-barang' => 'Daftar stok barang',
+            default => 'Detail laporan',
+        };
+    @endphp
+
     <div class="report-detail-page">
-        <div class="topbar-card p-4 p-lg-5 mb-4">
-            <div class="row g-4 align-items-start">
-                <div class="col-12 col-xl-8">
-                    <span class="report-detail-category">{{ $selectedReport['group'] }}</span>
-                    <h1 class="display-6 fw-bold mt-3 mb-3">{{ $selectedReport['title'] }}</h1>
-                    <p class="muted-copy mb-0">{{ $selectedReport['summary'] }}</p>
-                </div>
-                <div class="col-12 col-xl-4">
-                    <form method="GET" action="{{ route('admin.reports.show', ['reportSlug' => $selectedReport['slug']]) }}" class="report-month-form mb-3">
-                        <input type="hidden" name="detail_filter" value="month">
-                        <label class="form-label fw-semibold small mb-2" for="detail_report_month">Bulan laporan</label>
-                        <div class="input-group">
-                            <input id="detail_report_month" type="month" name="detail_month" class="form-control" value="{{ $detailFilterMonth }}">
-                            <button type="submit" class="btn btn-dark">Terapkan</button>
+        <div class="detail-card p-4 p-lg-5 mb-4">
+            <div class="row g-4 align-items-center">
+                <div class="col-12 col-xl-7">
+                    <div class="d-flex align-items-center gap-3">
+                        <img src="{{ asset('images/arena-fitness-logo.jpg') }}" alt="Arena Fitness" class="brand-logo">
+                        <div>
+                            <div class="section-label">Detail Laporan</div>
+                            <h1 class="h2 fw-bold mt-2 mb-2">{{ $selectedReport['title'] }}</h1>
+                            <p class="help-text mb-3">{{ $selectedReport['summary'] }}</p>
+                            <div class="d-flex flex-wrap gap-2">
+                                <span class="report-pill">{{ $selectedReport['group'] }}</span>
+                                <span class="report-pill">Periode: {{ $detailFilterLabel }}</span>
+                                <span class="report-pill">{{ $selectedReport['count_label'] }}</span>
+                            </div>
                         </div>
-                    </form>
-                    <div class="d-grid gap-2 d-sm-flex justify-content-xl-end">
-                        <a href="{{ route('admin.reports', ['detail_filter' => 'month', 'detail_month' => $detailFilterMonth]) }}" class="btn btn-outline-secondary rounded-pill px-4">Kembali ke daftar</a>
-                        <a href="{{ route('admin.reports.show', ['reportSlug' => $selectedReport['slug'], 'detail_filter' => 'month', 'detail_month' => $detailFilterMonth, 'export' => 1]) }}" class="btn btn-dark rounded-pill px-4">Export Excel</a>
+                    </div>
+                </div>
+                <div class="col-12 col-xl-5">
+                    <div class="filter-card p-3">
+                        <form method="GET" action="{{ route('admin.reports.show', ['reportSlug' => $selectedReport['slug']]) }}">
+                            <input type="hidden" name="detail_filter" value="month">
+                            <input type="hidden" name="detail_section" id="detail_section_input" value="{{ $activeSection }}">
+                            <label class="form-label fw-semibold small mb-2" for="detail_report_month">Bulan laporan</label>
+                            <div class="input-group mb-3">
+                                <input id="detail_report_month" type="month" name="detail_month" class="form-control" value="{{ $detailFilterMonth }}">
+                                <button type="submit" class="btn btn-dark fw-semibold px-4">Tampilkan</button>
+                            </div>
+                        </form>
+                        <div class="d-grid d-sm-flex gap-2">
+                            <a href="{{ route('admin.reports', ['detail_filter' => 'month', 'detail_month' => $detailFilterMonth]) }}" class="btn btn-outline-secondary rounded-pill px-4 action-button">Kembali</a>
+                            <a href="{{ route('admin.reports.show', ['reportSlug' => $selectedReport['slug'], 'detail_filter' => 'month', 'detail_month' => $detailFilterMonth, 'export' => 1]) }}" class="btn btn-dark rounded-pill px-4 action-button">Unduh Excel</a>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="row g-4 mb-4">
-            <div class="col-12 col-md-6 col-xl-3">
-                <div class="metric-card p-4 h-100">
-                    <div class="section-label">Jumlah Data</div>
-                    <div class="fs-4 fw-bold mt-2">{{ $selectedReport['count_label'] }}</div>
-                    <div class="small muted-copy mt-2">Total data yang tampil untuk laporan ini.</div>
-                </div>
+        <div class="table-card overflow-hidden">
+            <div class="p-4 border-bottom" style="border-color: var(--border) !important;">
+                <div class="section-label">Tabel Data</div>
+                <h2 class="h5 fw-bold mt-2 mb-0">{{ $tableTitle }}</h2>
             </div>
-            <div class="col-12 col-md-6 col-xl-3">
-                <div class="metric-card p-4 h-100">
-                    <div class="section-label">Tanggal Laporan</div>
-                    <div class="fs-5 fw-bold mt-2">{{ $selectedReport['date_label'] }}</div>
-                    <div class="small muted-copy mt-2">Tanggal atau periode utama yang melekat pada laporan ini.</div>
-                </div>
-            </div>
-            <div class="col-12 col-md-6 col-xl-3">
-                <div class="metric-card p-4 h-100">
-                    <div class="section-label">Highlight</div>
-                    <div class="fs-4 fw-bold mt-2">{{ $selectedReport['highlight'] }}</div>
-                    <div class="small muted-copy mt-2">Angka atau indikator utama yang perlu diperhatikan lebih dulu.</div>
-                </div>
-            </div>
-            <div class="col-12 col-md-6 col-xl-3">
-                <div class="metric-card p-4 h-100">
-                    <div class="section-label">Filter Aktif</div>
-                    <div class="fs-4 fw-bold mt-2">{{ $detailFilterLabel }}</div>
-                    <div class="small muted-copy mt-2">Periode data mengikuti filter yang diterapkan dari halaman laporan.</div>
-                </div>
-            </div>
-        </div>
 
-        <div class="card report-detail-toolbar p-4 mb-4">
-            <div class="row g-3 align-items-center">
-                <div class="col-12 col-lg-8">
-                    <div class="section-label">Isi laporan</div>
-                    <h2 class="h4 fw-bold mt-2 mb-1">Tabel detail {{ strtolower($selectedReport['title']) }}</h2>
-                    <div class="small muted-copy">Semua data ditampilkan dalam tabel Bootstrap agar mudah dibaca dan siap diexport ke Excel.</div>
-                </div>
-                <div class="col-12 col-lg-4">
-                    <div class="d-flex flex-wrap gap-2 justify-content-lg-end">
-                        <span class="report-detail-pill">{{ $selectedReport['group'] }}</span>
-                        <span class="report-detail-pill">{{ $selectedReport['date_label'] }}</span>
-                        <span class="report-detail-pill">{{ $selectedReport['count_label'] }}</span>
+            <div class="p-4">
+                @if ($selectedReport['slug'] === 'laporan-member' && ! empty($selectedReport['member_table_groups']))
+                    <div class="d-flex flex-wrap gap-2 mb-4">
+                        @foreach ($selectedReport['member_table_groups'] as $groupLabel => $groupMembers)
+                            <button type="button" class="btn btn-outline-secondary section-button {{ $loop->first ? 'active' : '' }}" data-group="{{ $groupLabel }}">
+                                {{ $groupLabel }} ({{ $groupMembers->count() }})
+                            </button>
+                        @endforeach
                     </div>
-                </div>
-            </div>
-        </div>
 
-        <div class="row g-4 mb-4">
-            <div class="col-12 col-xl-6">
-                <div class="card report-stat-card p-4 h-100">
-                    <div class="section-label">Statistik Harian</div>
-                    <h3 class="h5 fw-bold mt-2 mb-1">Per hari dalam {{ $detailFilterLabel }}</h3>
-                    <div class="small muted-copy mb-3">Gunakan tabel ini untuk membaca pergerakan laporan harian selama bulan yang sedang dipilih.</div>
+                    @foreach ($selectedReport['member_table_groups'] as $groupLabel => $groupMembers)
+                        <div class="report-section-table {{ $loop->first ? '' : 'd-none' }}" data-group="{{ $groupLabel }}">
+                            <div class="table-responsive">
+                                <table class="table align-middle mb-0">
+                                    <thead>
+                                        <tr>
+                                            @foreach ($selectedReport['member_table_columns'] as $column)
+                                                <th>{{ $column }}</th>
+                                            @endforeach
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @forelse ($groupMembers as $member)
+                                            <tr>
+                                                <td>{{ $member->full_name }}</td>
+                                                <td>{{ $member->payment_method ? ucfirst($member->payment_method) : 'Reguler' }}</td>
+                                                <td>{{ $member->joined_at?->format('d M Y') ?? '-' }}</td>
+                                                <td>{{ $member->expires_at?->format('d M Y') ?? '-' }}</td>
+                                            </tr>
+                                        @empty
+                                            <tr>
+                                                <td colspan="{{ count($selectedReport['member_table_columns']) }}" class="text-center py-4 text-secondary">Tidak ada data untuk kategori ini.</td>
+                                            </tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    @endforeach
+                @elseif (! empty($selectedReport['reportSections']))
+                    <div class="d-flex flex-wrap gap-2 mb-4">
+                        @foreach ($selectedReport['reportSections'] as $sectionLabel => $sectionData)
+                            <button type="button" class="btn btn-outline-secondary section-button {{ ($activeSection === $sectionLabel || (!$activeSection && $loop->first)) ? 'active' : '' }}" data-group="{{ $sectionLabel }}">
+                                {{ $sectionLabel }}
+                            </button>
+                        @endforeach
+                    </div>
+
+                    @foreach ($selectedReport['reportSections'] as $sectionLabel => $sectionData)
+                        <div class="report-section-table {{ ($activeSection === $sectionLabel || (!$activeSection && $loop->first)) ? '' : 'd-none' }}" data-group="{{ $sectionLabel }}">
+                            <div class="table-responsive">
+                                <table class="table align-middle mb-0">
+                                    <thead>
+                                        <tr>
+                                            @foreach ($sectionData['columns'] as $column)
+                                                <th>{{ $column }}</th>
+                                            @endforeach
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @forelse ($sectionData['rows'] as $row)
+                                            <tr>
+                                                @foreach ($row as $cell)
+                                                    <td>{{ $cell }}</td>
+                                                @endforeach
+                                            </tr>
+                                        @empty
+                                            <tr>
+                                                <td colspan="{{ count($sectionData['columns']) }}" class="text-center py-4 text-secondary">Tidak ada data untuk bagian ini.</td>
+                                            </tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    @endforeach
+                @else
                     <div class="table-responsive">
                         <table class="table align-middle mb-0">
                             <thead>
                                 <tr>
-                                    @foreach ($selectedReport['daily_stat_columns'] as $column)
+                                    @foreach ($selectedReport['columns'] ?? [] as $column)
                                         <th>{{ $column }}</th>
                                     @endforeach
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach ($selectedReport['daily_stat_rows'] as $row)
+                                @forelse ($selectedReport['rows'] ?? [] as $row)
                                     <tr>
                                         @foreach ($row as $cell)
                                             <td>{{ $cell }}</td>
                                         @endforeach
                                     </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-12 col-xl-6">
-                <div class="card report-stat-card p-4 h-100">
-                    <div class="section-label">Statistik Bulanan</div>
-                    <h3 class="h5 fw-bold mt-2 mb-1">Setiap bulan dalam {{ \Illuminate\Support\Carbon::createFromFormat('Y-m', $detailFilterMonth)->format('Y') }}</h3>
-                    <div class="small muted-copy mb-3">Ringkasan ini membantu membandingkan performa laporan antar bulan dalam satu tahun aktif.</div>
-                    <div class="table-responsive">
-                        <table class="table align-middle mb-0">
-                            <thead>
-                                <tr>
-                                    @foreach ($selectedReport['monthly_stat_columns'] as $column)
-                                        <th>{{ $column }}</th>
-                                    @endforeach
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($selectedReport['monthly_stat_rows'] as $row)
+                                @empty
                                     <tr>
-                                        @foreach ($row as $cell)
-                                            <td>{{ $cell }}</td>
-                                        @endforeach
+                                        <td colspan="{{ count($selectedReport['columns'] ?? []) ?: 1 }}" class="text-center py-5 text-secondary">Belum ada data pada laporan ini.</td>
                                     </tr>
-                                @endforeach
+                                @endforelse
                             </tbody>
                         </table>
                     </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="card report-detail-table-card p-0 overflow-hidden">
-            <div class="table-responsive">
-                <table class="table align-middle mb-0">
-                    <thead>
-                        <tr>
-                            @foreach ($selectedReport['columns'] as $column)
-                                <th>{{ $column }}</th>
-                            @endforeach
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse ($selectedReport['rows'] as $row)
-                            <tr>
-                                @foreach ($row as $cell)
-                                    <td>{{ $cell }}</td>
-                                @endforeach
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="{{ count($selectedReport['columns']) }}" class="text-center py-5 text-secondary">Belum ada data pada laporan ini.</td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
+                @endif
             </div>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const buttons = document.querySelectorAll('.section-button');
+            const tables = document.querySelectorAll('.report-section-table');
+            const sectionInput = document.querySelector('#detail_section_input');
+
+            buttons.forEach(function (button) {
+                button.addEventListener('click', function () {
+                    const group = this.dataset.group;
+                    buttons.forEach(btn => btn.classList.toggle('active', btn === this));
+                    tables.forEach(table => table.classList.toggle('d-none', table.dataset.group !== group));
+                    if (sectionInput) sectionInput.value = group;
+                });
+            });
+        });
+    </script>
 @endsection

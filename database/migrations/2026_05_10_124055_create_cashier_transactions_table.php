@@ -6,6 +6,10 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
     public function up(): void {
+        if (Schema::hasTable('cashier_transactions')) {
+            return;
+        }
+
         Schema::create('cashier_transactions', function (Blueprint $table) {
             $table->id();
             $table->string('invoice')->unique();

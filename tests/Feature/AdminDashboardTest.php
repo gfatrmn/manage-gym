@@ -60,4 +60,35 @@ class AdminDashboardTest extends TestCase
             ->assertSee('Rp15.000')
             ->assertSee('Rp35.000');
     }
+
+    public function test_recent_member_registrations_exclude_non_members(): void
+    {
+        GymMember::query()->create([
+            'full_name' => 'Member Benar',
+            'member_status' => 'member',
+            'payment_method' => 'cash',
+            'joined_at' => now(),
+            'expires_at' => now()->addMonth(),
+        ]);
+
+        GymMember::query()->create([
+            'full_name' => 'Guest Non Member Uji',
+            'member_status' => 'non_member',
+            'payment_method' => 'cash',
+            'payment_amount' => 30000,
+            'visit_date' => now(),
+            'joined_at' => null,
+            'expires_at' => null,
+        ]);
+
+        $this->withSession([
+            'auth' => [
+                'role' => 'admin',
+                'login' => 'admin',
+            ],
+        ])->get(route('admin.dashboard'))
+            ->assertOk()
+            ->assertSee('Member Benar')
+            ->assertDontSee('Guest Non Member Uji');
+    }
 }

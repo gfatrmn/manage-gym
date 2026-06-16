@@ -69,7 +69,8 @@ class AdminProductTest extends TestCase
         $this->withSession($session)
             ->get(route('admin.products'))
             ->assertOk()
-            ->assertSee('Kelola produk suplemen dan vitamin')
+            ->assertSee('Master Produk Suplemen')
+            ->assertSee('Daftar Produk')
             ->assertSee('Vitamin C 1000')
             ->assertSee('Rp95.000');
 

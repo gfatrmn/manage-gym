@@ -995,6 +995,171 @@
                 color: #ff8a65 !important;
             }
 
+            .page-loader {
+                position: fixed;
+                inset: 0;
+                z-index: 3000;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 1.25rem;
+                background:
+                    radial-gradient(circle at 50% 42%, rgba(255, 59, 59, 0.2), transparent 24rem),
+                    rgba(5, 5, 6, 0.78);
+                backdrop-filter: blur(18px);
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity .22s ease;
+            }
+
+            .page-loader.is-visible {
+                opacity: 1;
+                pointer-events: auto;
+            }
+
+            .page-loader-card {
+                position: relative;
+                overflow: hidden;
+                width: min(420px, 100%);
+                padding: 1.5rem;
+                border: 1px solid rgba(255,255,255,.12);
+                border-radius: 1.25rem;
+                background:
+                    radial-gradient(circle at 16% 12%, rgba(255, 59, 59, .24), transparent 9rem),
+                    linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.035)),
+                    rgba(18,18,20,.9);
+                box-shadow: 0 28px 70px rgba(0,0,0,.52);
+            }
+
+            .page-loader-brand {
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+                color: #fff;
+                font-weight: 800;
+                position: relative;
+                z-index: 1;
+            }
+
+            .page-loader-mark {
+                position: relative;
+                width: 3.8rem;
+                height: 3.8rem;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 1.15rem;
+                background: linear-gradient(135deg, #ff3b3b, #b80f24);
+                box-shadow: 0 18px 34px rgba(255,59,59,.28);
+                letter-spacing: .04em;
+                isolation: isolate;
+            }
+
+            .page-loader-mark::after {
+                content: '';
+                position: absolute;
+                inset: -.45rem;
+                border: 1px solid rgba(255, 59, 59, .32);
+                border-radius: 1.45rem;
+                animation: page-loader-pulse 1.45s ease-in-out infinite;
+                z-index: -1;
+            }
+
+            .page-loader-mark i {
+                font-size: 1.35rem;
+            }
+
+            .brand-logo {
+                display: block;
+                width: 3.8rem;
+                max-width: 3.8rem;
+                height: 3rem;
+                max-height: 3rem;
+                object-fit: contain;
+                border-radius: 1rem;
+                box-shadow: 0 18px 32px rgba(255, 59, 59, 0.18);
+                background: rgba(255,255,255,0.04);
+                flex: 0 0 auto;
+            }
+
+            .page-loader-mark .brand-logo {
+                width: 3.1rem;
+                max-width: 3.1rem;
+                height: 3.1rem;
+                max-height: 3.1rem;
+                border-radius: .9rem;
+                box-shadow: none;
+            }
+
+            .page-loader-title {
+                font-size: 1.08rem;
+                line-height: 1.15;
+            }
+
+            .page-loader-subtitle {
+                margin-top: .2rem;
+                color: rgba(255,255,255,.62);
+                font-size: .86rem;
+                font-weight: 600;
+            }
+
+            .page-loader-wordmark {
+                display: inline-flex;
+                align-items: center;
+                gap: .45rem;
+                margin-bottom: .15rem;
+                color: rgba(255,255,255,.58);
+                font-size: .7rem;
+                font-weight: 800;
+                letter-spacing: .16em;
+                text-transform: uppercase;
+            }
+
+            .page-loader-wordmark::before {
+                content: '';
+                width: 1.4rem;
+                height: 2px;
+                border-radius: 999px;
+                background: #ff4b53;
+            }
+
+            .page-loader-bar {
+                position: relative;
+                overflow: hidden;
+                height: .5rem;
+                margin-top: 1.15rem;
+                border-radius: 999px;
+                background: rgba(255,255,255,.1);
+                z-index: 1;
+            }
+
+            .page-loader-bar::after {
+                content: '';
+                position: absolute;
+                inset: 0 auto 0 0;
+                width: 42%;
+                border-radius: inherit;
+                background: linear-gradient(90deg, #ff7a7a, #ff3b3b, #b80f24);
+                animation: page-loader-slide 1s ease-in-out infinite;
+            }
+
+            @keyframes page-loader-slide {
+                0% { transform: translateX(-110%); }
+                55% { transform: translateX(95%); }
+                100% { transform: translateX(250%); }
+            }
+
+            @keyframes page-loader-pulse {
+                0%, 100% {
+                    transform: scale(.96);
+                    opacity: .55;
+                }
+                50% {
+                    transform: scale(1.08);
+                    opacity: 1;
+                }
+            }
+
             .container-fluid,
             .row,
             aside,
@@ -1041,6 +1206,17 @@
                     font-size: 0.8rem;
                     box-shadow: 0 18px 32px rgba(255, 59, 59, 0.28);
                     border: 1px solid rgba(255,255,255,0.08);
+                }
+
+                .brand-logo {
+                    display: block;
+                    width: 3.8rem;
+                    height: auto;
+                    max-height: 3rem;
+                    object-fit: contain;
+                    border-radius: 1rem;
+                    box-shadow: 0 18px 32px rgba(255, 59, 59, 0.18);
+                    background: rgba(255,255,255,0.04);
                 }
 
                 .sidebar-link {
@@ -1224,19 +1400,35 @@
         $isCashierArea = str_starts_with(($activePage ?? 'dashboard'), 'cashier');
     @endphp
     <body class="sidebar-hidden {{ $isCashierArea ? 'cashier-layout' : 'admin-layout' }} page-{{ str_replace('.', '-', $activePage ?? 'dashboard') }}">
+        <div class="page-loader is-visible" id="pageLoader" aria-live="polite" aria-label="Memuat halaman">
+            <div class="page-loader-card">
+                <div class="page-loader-brand">
+                    <span class="page-loader-mark"><img src="{{ asset('images/arena-fitness-logo.jpg') }}" alt="Arena Fitness" class="brand-logo"></span>
+                    <div>
+                        <div class="page-loader-wordmark">Loading</div>
+                        <div class="page-loader-title">Arena Fitness</div>
+                        <div class="page-loader-subtitle" id="pageLoaderText">Menyiapkan halaman...</div>
+                    </div>
+                </div>
+                <div class="page-loader-bar" aria-hidden="true"></div>
+            </div>
+        </div>
+
         @php
             $adminNavigation = [
                 ['key' => 'dashboard', 'label' => 'Dashboard', 'route' => route('admin.dashboard')],
                 ['key' => 'members', 'label' => 'Member', 'route' => route('admin.members')],
-                ['key' => 'checkin', 'label' => 'Check In', 'route' => route('admin.checkins')],
+                ['key' => 'feedbacks', 'label' => 'Kritik & Saran', 'route' => route('admin.feedbacks')],
+                ['key' => 'announcements', 'label' => 'Pengumuman', 'route' => route('admin.announcements')],
+                ['key' => 'profile-photo-requests', 'label' => 'Persetujuan Foto', 'route' => route('admin.profile-photo-requests')],
                 ['key' => 'products', 'label' => 'Produk', 'route' => route('admin.products')],
                 ['key' => 'reports', 'label' => 'Laporan', 'route' => route('admin.reports')],
             ];
             $cashierNavigation = [
-                ['key' => 'cashier.dashboard', 'label' => 'Dashboard Kasir', 'route' => route('cashier.dashboard')],
+                ['key' => 'cashier.dashboard', 'label' => 'Dashboard', 'route' => route('cashier.dashboard')],
                 ['key' => 'cashier.checkins', 'label' => 'Check-in', 'route' => route('cashier.checkins')],
-                ['key' => 'cashier.transactions', 'label' => 'Pembayaran', 'route' => route('cashier.transactions')],
-                ['key' => 'cashier.receipts', 'label' => 'Verifikasi & Bukti', 'route' => route('cashier.receipts')],
+                ['key' => 'cashier.transactions', 'label' => 'Transaksi', 'route' => route('cashier.transactions')],
+                ['key' => 'cashier.receipts', 'label' => 'Verifikasi QRIS', 'route' => route('cashier.receipts')],
             ];
             $navigationGroups = $isMasterAdmin
                 ? [
@@ -1267,16 +1459,16 @@
                         <div class="sidebar-stack sidebar-inner">
                             <div class="sidebar-main">
                                 <div class="d-flex align-items-center gap-3 mb-4">
-                                    <div class="brand-mark">Arena</div>
+                                    <img src="{{ asset('images/arena-fitness-logo.jpg') }}" alt="Arena Fitness" class="brand-logo">
                                     <div>
-                                        <div class="fw-bold">Arena Gym</div>
+                                        <div class="fw-bold">Arena Fitness</div>
                                         <div class="small text-white-50">
-                                            {{ $isMasterAdmin ? 'Master Admin Access' : ($isCashierArea ? 'Kasir Dashboard' : 'Admin Dashboard') }}
+                                            {{ $isMasterAdmin ? 'Master Admin' : ($isCashierArea ? 'Kasir' : 'Admin') }}
                                         </div>
                                     </div>
                                 </div>
 
-                                <div class="small text-uppercase text-white-50 fw-bold mb-1" style="letter-spacing:.12em;">Navigation</div>
+                                <div class="small text-uppercase text-white-50 fw-bold mb-1" style="letter-spacing:.12em;">Menu</div>
                                 @foreach ($navigationGroups as $group)
                                     <div class="sidebar-nav-group">
                                         <nav class="sidebar-nav-list">
@@ -1299,7 +1491,7 @@
                             </div>
 
                             <div class="sidebar-bottom">
-                            @if (! empty($sidebarExtraSummary))
+                            @if (! $isCashierArea && ! empty($sidebarExtraSummary))
                                 <div class="sidebar-extra-card p-3">
                                     <div class="section-label text-white-50">{{ $sidebarExtraSummary['label'] ?? 'Ringkasan' }}</div>
                                     <div class="h4 fw-bold mt-3 mb-1">{{ $sidebarExtraSummary['title'] ?? '' }}</div>
@@ -1307,7 +1499,7 @@
                                 </div>
                             @endif
 
-                            @if (! empty($sidebarExtraItems))
+                            @if (! $isCashierArea && ! empty($sidebarExtraItems))
                                 <div class="sidebar-extra-card p-3">
                                     <div class="section-label text-white-50 mb-3">{{ $sidebarExtraItemsTitle ?? 'Prioritas' }}</div>
                                     <div class="d-grid gap-3">
@@ -1355,6 +1547,34 @@
                 const toggleIcon = document.getElementById('sidebarToggleIcon');
                 const overlay = document.getElementById('sidebarOverlay');
                 const themeToggles = document.querySelectorAll('[data-theme-toggle]');
+                const pageLoader = document.getElementById('pageLoader');
+                const pageLoaderText = document.getElementById('pageLoaderText');
+
+                const hidePageLoader = () => {
+                    pageLoader?.classList.remove('is-visible');
+                };
+
+                const showPageLoader = (message = 'Memuat halaman...') => {
+                    if (pageLoaderText) {
+                        pageLoaderText.textContent = message;
+                    }
+
+                    pageLoader?.classList.add('is-visible');
+                };
+
+                window.addEventListener('load', () => {
+                    window.setTimeout(hidePageLoader, 380);
+                });
+
+                window.addEventListener('pageshow', hidePageLoader);
+
+                window.addEventListener('beforeunload', () => {
+                    showPageLoader('Memuat ulang halaman...');
+                });
+
+                window.addEventListener('pagehide', () => {
+                    showPageLoader('Memuat halaman...');
+                });
 
                 const syncThemeToggle = () => {
                     const theme = root.getAttribute('data-theme') || 'dark';
@@ -1407,6 +1627,58 @@
                     if (event.key === 'Escape') {
                         closeSidebar();
                     }
+                });
+
+                document.addEventListener('click', function (event) {
+                    const link = event.target.closest('a[href]');
+
+                    if (!link || event.defaultPrevented) {
+                        return;
+                    }
+
+                    const href = link.getAttribute('href') || '';
+                    const target = link.getAttribute('target');
+                    const isModifiedClick = event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0;
+
+                    if (
+                        link.dataset.noLoader !== undefined ||
+                        target === '_blank' ||
+                        link.hasAttribute('download') ||
+                        isModifiedClick ||
+                        href === '' ||
+                        href.startsWith('#') ||
+                        href.startsWith('javascript:') ||
+                        href.startsWith('mailto:') ||
+                        href.startsWith('tel:')
+                    ) {
+                        return;
+                    }
+
+                    try {
+                        const url = new URL(link.href, window.location.href);
+
+                        if (url.origin !== window.location.origin) {
+                            return;
+                        }
+                    } catch (error) {
+                        return;
+                    }
+
+                    showPageLoader('Membuka halaman...');
+                });
+
+                document.addEventListener('submit', function (event) {
+                    const form = event.target;
+
+                    if (
+                        form?.dataset?.noLoader !== undefined ||
+                        form?.target === '_blank' ||
+                        event.defaultPrevented
+                    ) {
+                        return;
+                    }
+
+                    showPageLoader('Memproses data...');
                 });
 
                 syncThemeToggle();

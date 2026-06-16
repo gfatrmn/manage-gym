@@ -3,10 +3,28 @@
 @section('content')
     <style>
         /* ... (Style tetap sama seperti sebelumnya) ... */
+        body.page-dashboard .container-fluid {
+            width: 100%;
+            max-width: none;
+            padding-left: 1rem !important;
+            padding-right: 1rem !important;
+        }
+
+        body.page-dashboard .row {
+            --bs-gutter-x: 0;
+        }
+
+        body.page-dashboard main.col-12 {
+            width: 100%;
+            max-width: none;
+            flex: 0 0 100%;
+        }
+
         .ds {
-            max-width: 1320px;
-            margin: 0 auto;
-            padding: 0.5rem 1.5rem 1rem;
+            width: 100%;
+            max-width: none;
+            margin: 0;
+            padding: 0.25rem 0 1rem;
             color: #fff;
         }
 
@@ -54,7 +72,7 @@
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
+            gap: 16px;
         }
 
         .stat-card {
@@ -92,7 +110,7 @@
         .content-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 1.2rem;
+            gap: 1.5rem;
             align-items: start;
         }
 
@@ -167,7 +185,7 @@
             color: #00e87a;
         }
 
-        .type-guest {
+        .type-daily-pass {
             background: rgba(59, 158, 255, 0.1);
             color: #3b9eff;
         }
@@ -194,8 +212,8 @@
            ============================================= */
         .quick-action-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
             margin-bottom: 0;
         }
 
@@ -260,6 +278,21 @@
             background: rgba(220, 53, 69, 0.05);
         }
 
+        /* Daily Pass Card */
+        .qac-daily-pass {
+            background: rgba(13, 110, 253, 0.08);
+            border-color: rgba(13, 110, 253, 0.2);
+        }
+
+        .qac-daily-pass:hover {
+            border-color: rgba(13, 110, 253, 0.45);
+            box-shadow: 0 8px 28px rgba(13, 110, 253, 0.15);
+        }
+
+        .qac-daily-pass::before {
+            background: rgba(13, 110, 253, 0.05);
+        }
+
         .qac-icon {
             width: 52px;
             height: 52px;
@@ -273,6 +306,7 @@
 
         .qac-icon-green  { background: rgba(25, 135, 84, 0.18); color: #34d399; }
         .qac-icon-red    { background: rgba(220, 53, 69, 0.18); color: #f87171; }
+        .qac-icon-blue   { background: rgba(13, 110, 253, 0.18); color: #60a5fa; }
 
         .qac-text-label {
             font-size: 10px;
@@ -324,7 +358,12 @@
            RESPONSIVE — Tablet (max-width: 1024px)
            ============================================= */
         @media (max-width: 1024px) {
-            .ds { padding: 0.5rem 1.2rem 1rem; }
+            body.page-dashboard .container-fluid {
+                padding-left: 0.85rem !important;
+                padding-right: 0.85rem !important;
+            }
+
+            .ds { padding: 0.5rem 0 1rem; }
 
             .stats-grid {
                 grid-template-columns: repeat(2, 1fr);
@@ -339,7 +378,7 @@
             .dashboard-title { font-size: 1.8rem; }
 
             .quick-action-grid {
-                grid-template-columns: 1fr 1fr;
+                grid-template-columns: 1fr;
                 gap: 10px;
             }
         }
@@ -348,7 +387,12 @@
            RESPONSIVE — Mobile (max-width: 640px)
            ============================================= */
         @media (max-width: 640px) {
-            .ds { padding: 0.5rem 0.85rem 1.5rem; }
+            body.page-dashboard .container-fluid {
+                padding-left: 0.75rem !important;
+                padding-right: 0.75rem !important;
+            }
+
+            .ds { padding: 0.5rem 0 1.5rem; }
 
             .ds-header {
                 margin-bottom: 1.25rem;
@@ -448,7 +492,6 @@
     </style>
 
     @php
-        $paymentMethods = ['Cash', 'Transfer Bank', 'QRIS', 'Debit Card'];
     @endphp
 
     <div class="ds">
@@ -459,73 +502,73 @@
             </div>
         </div>
 
+        @if (session('status'))
+            <div class="alert alert-success border-0 bg-success text-white rounded-3 mb-4 py-2 small shadow-sm" style="background-color: #198754 !important;">
+                <i class="fas fa-check-circle me-2"></i> {{ session('status') }}
+            </div>
+        @endif
+
+        @if ($errors->any())
+            <div class="alert alert-danger border-0 bg-danger text-white rounded-3 mb-4 py-2 small shadow-sm" style="background-color: #dc3545 !important;">
+                <i class="fas fa-exclamation-circle me-2"></i> {{ $errors->first() }}
+            </div>
+        @endif
+
+        @if(session('whatsapp_dispatch'))
+            @php
+                $dispatch = session('whatsapp_dispatch');
+                $recipient = $dispatch['recipients'][0] ?? null;
+            @endphp
+            @if($recipient)
+                <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; padding: 1.5rem; margin-bottom: 2rem;">
+                    <div style="display: flex; align-items: start; justify-content: space-between; gap: 1rem; margin-bottom: 1rem;">
+                        <div>
+                            <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem;">
+                                @if($recipient['delivery_status'] === 'sent')
+                                    <span style="color: #10b981;"><i class="fas fa-check-circle"></i> Pesan Berhasil Dikirim</span>
+                                @elseif($recipient['delivery_status'] === 'pending')
+                                    <span style="color: #f59e0b;"><i class="fas fa-info-circle"></i> Siap Dikirim Manual</span>
+                                @else
+                                    <span style="color: #ef4444;"><i class="fas fa-exclamation-circle"></i> Gagal Dikirim</span>
+                                @endif
+                            </h3>
+                            <p style="margin-bottom: 0; font-size: 0.9rem;">
+                                <strong>Member:</strong> {{ $recipient['name'] }}<br>
+                                <strong>Nomor:</strong> {{ $recipient['phone'] ?: 'Tidak tersedia' }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 0.75rem; margin-bottom: 1rem; font-family: monospace; font-size: 0.85rem; white-space: pre-wrap; word-wrap: break-word; color: rgba(255,255,255,0.8);">{{ $dispatch['message'] }}</div>
+
+                    @if($recipient['delivery_status'] === 'pending' && $recipient['url'])
+                        <div style="background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.3); padding: 1rem; border-radius: 0.75rem;">
+                            <div style="margin-bottom: 1rem; font-size: 0.9rem;">Pengiriman otomatis tidak berhasil. Silakan kirim manual melalui WhatsApp:</div>
+                            <a href="{{ $recipient['url'] }}" target="_blank" style="display: inline-flex; align-items: center; gap: 0.5rem; background: #25d366; color: white; padding: 0.5rem 1rem; border-radius: 999px; text-decoration: none; font-weight: 600; font-size: 0.9rem;">
+                                <i class="fab fa-whatsapp"></i> Buka WhatsApp
+                            </a>
+                        </div>
+                    @elseif($recipient['delivery_status'] === 'failed' && !$recipient['url'])
+                        <div style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); padding: 1rem; border-radius: 0.75rem; color: #fca5a5;">
+                            <i class="fas fa-times-circle"></i> {{ $recipient['delivery_error'] ?: 'Tidak dapat mengirim pesan' }}
+                        </div>
+                    @endif
+                </div>
+            @endif
+        @endif
+
         <div class="section-divider">
             <span>Ringkasan Statistik</span>
         </div>
 
         <div class="stats-grid">
-            {{-- Card 1: Total Member --}}
-            <div class="stat-card">
-                <div class="stat-label">{{ $stats[0]['label'] }}</div>
-                <div class="stat-value">{{ $stats[0]['value'] }}</div>
-                <div class="stat-note">{{ $stats[0]['note'] }}</div>
-            </div>
-
-            {{-- Card 2: Pemasukan --}}
-            <div class="stat-card">
-                <div class="stat-label">{{ $stats[1]['label'] }}</div>
-                <div class="stat-value" style="color: #00e87a !important;">{{ $stats[1]['value'] }}</div>
-                <div class="stat-note">{{ $stats[1]['note'] }}</div>
-            </div>
-
-            {{-- Card 3: Check-in Hari Ini --}}
-            <div class="stat-card">
-                <div class="stat-label">{{ $heroSummary[0]['label'] }}</div>
-                <div class="stat-value">{{ $heroSummary[0]['value'] }}</div>
-                <div class="stat-note">{{ $heroSummary[0]['note'] }}</div>
-            </div>
-
-            {{-- Card 4: Membership Alert --}}
-            <div class="stat-card">
-                <div class="stat-label">{{ $heroSummary[1]['label'] }}</div>
-                <div class="stat-value text-warning">{{ $heroSummary[1]['value'] }}</div>
-                <div class="stat-note">{{ $heroSummary[1]['note'] }}</div>
-            </div>
-        </div>
-
-        {{-- ============================================= --}}
-        {{-- SECTION: AKSI CEPAT --}}
-        {{-- ============================================= --}}
-        <div class="section-divider">
-            <span>Aksi Cepat</span>
-        </div>
-
-        <div class="quick-action-grid">
-            {{-- Quick Action: Check-in --}}
-            <button class="quick-action-card qac-checkin" data-bs-toggle="modal" data-bs-target="#quickCheckinModal"
-                style="border: 1px solid rgba(25,135,84,0.2);">
-                <div class="qac-icon qac-icon-green">
-                    <i class="fas fa-qrcode"></i>
+            @foreach ($stats as $stat)
+                <div class="stat-card">
+                    <div class="stat-label">{{ $stat['label'] }}</div>
+                    <div class="stat-value">{{ $stat['value'] }}</div>
+                    <div class="stat-note">{{ $stat['note'] }}</div>
                 </div>
-                <div>
-                    <div class="qac-text-label">Proses Sekarang</div>
-                    <div class="qac-text-title">Check-in Member</div>
-                </div>
-                <i class="fas fa-chevron-right qac-arrow"></i>
-            </button>
-
-            {{-- Quick Action: Tambah Member --}}
-            <button class="quick-action-card qac-addmember" data-bs-toggle="modal" data-bs-target="#quickAddMemberModal"
-                style="border: 1px solid rgba(220,53,69,0.2);">
-                <div class="qac-icon qac-icon-red">
-                    <i class="fas fa-user-plus"></i>
-                </div>
-                <div>
-                    <div class="qac-text-label">Daftarkan Baru</div>
-                    <div class="qac-text-title">Tambah Member</div>
-                </div>
-                <i class="fas fa-chevron-right qac-arrow"></i>
-            </button>
+            @endforeach
         </div>
 
         <div class="section-divider">
@@ -563,299 +606,59 @@
                 </table>
             </div>
 
-            {{-- Tabel Check-in Terbaru (Gabungan Member & Guest) --}}
+            {{-- Tabel Member Perlu Peringatan --}}
             <div class="box">
                 <div class="box-head">
                     <div class="d-flex align-items-center gap-2">
-                        <i class="fas fa-list-ul text-warning"></i>
-                        <span class="box-title">Log Aktivitas Terkini</span>
+                        <i class="fas fa-bell text-warning"></i>
+                        <span class="box-title">Member Perlu Notifikasi</span>
                     </div>
                 </div>
                 <table class="tbl">
                     <thead>
                         <tr>
                             <th>Nama</th>
-                            <th>Tipe</th>
-                            <th>Waktu</th>
+                            <th>Masa Aktif</th>
+                            <th class="text-end">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($recentCheckins as $c)
+                        @forelse ($expiringMembers as $member)
                             <tr>
-                                <td class="fw-bold">{{ $c['nama'] }}</td>
-                                <td><span
-                                        style="font-size: 10px; padding: 3px 8px; border-radius: 4px; background: rgba(255,255,255,0.1);">{{ $c['tipe'] }}</span>
+                                <td>
+                                    <div class="fw-bold">{{ $member->full_name }}</div>
+                                    <div style="font-size: 11px; color: rgba(255,255,255,0.45);">{{ $member->phone }}</div>
                                 </td>
-                                <td class="date-text">{{ $c['waktu'] }}</td>
+                                <td>
+                                    <div class="expires-val">{{ $member->expires_at }}</div>
+                                    <div style="display:inline-flex; margin-top:4px; font-size:10px; padding:3px 8px; border-radius:999px; background:rgba(245,158,11,0.18); color:#fbbf24; font-weight:700;">
+                                        {{ $member->days_left === 0 ? 'Hari ini' : 'H-' . $member->days_left }}
+                                    </div>
+                                    <div style="font-size: 10px; color: rgba(255,255,255,0.42); margin-top:4px;">
+                                        Diingatkan: {{ $member->last_reminder }}
+                                    </div>
+                                </td>
+                                <td class="text-end">
+                                    <form method="POST" action="{{ route('admin.announcements.reminders.send') }}">
+                                        @csrf
+                                        <input type="hidden" name="gym_member_id" value="{{ $member->id }}">
+                                        <button type="submit" class="btn {{ $member->last_reminder !== 'Belum' ? 'btn-success' : 'btn-danger' }} btn-sm rounded-pill fw-bold"
+                                            onclick="return confirm('Kirim pengingat perpanjangan untuk {{ $member->full_name }}?')">
+                                            Ingatkan
+                                        </button>
+                                    </form>
+                                </td>
                             </tr>
-                        @endforeach
+                        @empty
+                            <tr>
+                                <td colspan="3" class="text-center py-4" style="color: rgba(255,255,255,0.45);">
+                                    Tidak ada member yang perlu diberi peringatan.
+                                </td>
+                            </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
-
-    {{-- ============================================================== --}}
-    {{-- MODAL: QUICK CHECK-IN (Desain sama dengan view checkins)       --}}
-    {{-- ============================================================== --}}
-    <div class="modal fade" id="quickCheckinModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content bg-dark text-white border-0 shadow-lg" style="border-radius: 1.5rem;">
-                <div class="modal-header border-bottom border-white border-opacity-10 p-4">
-                    <h5 class="modal-title fw-bold">
-                        <i class="fas fa-qrcode me-2 text-danger"></i>Member Check-in
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-
-                <form action="{{ route('admin.checkins.store') }}" method="POST">
-                    @csrf
-                    <div class="modal-body p-4">
-                        <p class="small text-white-50 mb-3">Ketik nama atau kode member untuk mencari.</p>
-
-                        {{-- Hidden select untuk menyimpan ID yang dipilih --}}
-                        <select name="gym_member_id" id="quickMemberSelectHidden" style="display:none;" required>
-                            <option value="">-- Pilih Member --</option>
-                            @foreach ($memberOptions as $member)
-                                <option value="{{ $member->id }}"
-                                    data-name="{{ $member->full_name }}"
-                                    data-code="{{ $member->checkin_code }}">
-                                    {{ $member->full_name }} ({{ $member->checkin_code }})
-                                </option>
-                            @endforeach
-                        </select>
-
-                        {{-- Search input + dropdown --}}
-                        <div style="position: relative;">
-                            <div class="input-group">
-                                <input type="text" id="quickMemberSearchInput"
-                                    class="form-control bg-white bg-opacity-10 border-0 text-white p-3"
-                                    style="border-radius: 12px 0 0 12px;"
-                                    placeholder="Cari nama atau kode member..."
-                                    autocomplete="off">
-                                <button type="submit" class="btn btn-danger px-4"
-                                    style="border-radius: 0 12px 12px 0;">
-                                    <i class="fas fa-check me-1"></i> Check In
-                                </button>
-                            </div>
-                            <div id="quickMemberDropdown"
-                                style="display:none; position:fixed; z-index:999999;
-                                background:#1e1e2e; border:1px solid rgba(255,255,255,0.12);
-                                border-radius:10px; max-height:220px; overflow-y:auto;">
-                            </div>
-                        </div>
-
-                        {{-- Divider --}}
-                        <div class="d-flex align-items-center gap-3 my-4">
-                            <hr class="flex-grow-1" style="border-color: rgba(255,255,255,0.08); margin: 0;">
-                            <span class="small text-white-50">atau</span>
-                            <hr class="flex-grow-1" style="border-color: rgba(255,255,255,0.08); margin: 0;">
-                        </div>
-
-                        {{-- Daily Guest shortcut --}}
-                        <button type="button" class="btn w-100 fw-bold py-3"
-                            style="border-radius: 12px; background: rgba(13,110,253,0.1); border: 1px solid rgba(13,110,253,0.25); color: #60a5fa;"
-                            data-bs-dismiss="modal"
-                            data-bs-toggle="modal"
-                            data-bs-target="#quickAddGuestModal">
-                            <i class="fas fa-user-plus me-2"></i> Input Tamu Harian (Guest)
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    {{-- ============================================================== --}}
-    {{-- MODAL: QUICK ADD GUEST (dari halaman checkins)                 --}}
-    {{-- ============================================================== --}}
-    <div class="modal fade" id="quickAddGuestModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content bg-dark text-white border-0 shadow-lg" style="border-radius: 1.5rem;">
-                <div class="modal-header border-bottom border-white border-opacity-10 p-4">
-                    <h5 class="modal-title fw-bold">Input Tamu Harian</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <form action="{{ route('admin.checkins.guest.store') }}" method="POST">
-                    @csrf
-                    <div class="modal-body p-4">
-                        <div class="mb-3">
-                            <label class="form-label small text-uppercase fw-bold opacity-50">Nama Tamu</label>
-                            <input type="text" name="name"
-                                class="form-control bg-white bg-opacity-10 border-0 text-white p-3"
-                                style="border-radius: 0.8rem;" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label small text-uppercase fw-bold opacity-50">Harga (Rp)</label>
-                            <input type="number" name="price"
-                                class="form-control bg-white bg-opacity-10 border-0 text-white p-3"
-                                style="border-radius: 0.8rem;" value="25000" required>
-                        </div>
-                        <div class="mb-0">
-                            <label class="form-label small text-uppercase fw-bold opacity-50">Metode Pembayaran</label>
-                            <select name="payment_method"
-                                class="form-select bg-white bg-opacity-10 border-0 text-white p-3"
-                                style="border-radius: 0.8rem;" required>
-                                @foreach ($paymentMethods as $pm)
-                                    <option value="{{ $pm }}" class="text-dark">{{ $pm }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-                    <div class="modal-footer border-0 p-4 pt-0">
-                        <button type="submit"
-                            class="btn btn-info w-100 rounded-pill fw-bold py-3 text-white">
-                            Konfirmasi &amp; Simpan
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    {{-- ============================================================== --}}
-    {{-- MODAL: QUICK TAMBAH MEMBER (Desain sama dengan view members)   --}}
-    {{-- ============================================================== --}}
-    <div class="modal fade" id="quickAddMemberModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content bg-dark text-white border-0 shadow-lg" style="border-radius: 1.5rem;">
-                <div class="modal-header border-bottom border-white border-opacity-10 p-4">
-                    <h5 class="modal-title fw-bold">Tambah Member</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <form action="{{ route('admin.members.store') }}" method="POST" enctype="multipart/form-data">
-                    @csrf
-                    <div class="modal-body p-4">
-                        <div class="mb-3">
-                            <label class="form-label small text-uppercase fw-bold opacity-50">Nama Lengkap</label>
-                            <input type="text" name="full_name"
-                                class="form-control bg-white bg-opacity-10 border-0 text-white p-3"
-                                style="border-radius: 0.8rem;" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label small text-uppercase fw-bold opacity-50">Email</label>
-                            <input type="email" name="email"
-                                class="form-control bg-white bg-opacity-10 border-0 text-white p-3"
-                                style="border-radius: 0.8rem;">
-                        </div>
-                        <div class="row">
-                            <div class="col-6 mb-3">
-                                <label class="form-label small text-uppercase fw-bold opacity-50">No. Telepon</label>
-                                <input type="text" name="phone"
-                                    class="form-control bg-white bg-opacity-10 border-0 text-white p-3"
-                                    style="border-radius: 0.8rem;">
-                            </div>
-                            <div class="col-6 mb-3">
-                                <label class="form-label small text-uppercase fw-bold opacity-50">Metode Bayar</label>
-                                <select name="payment_method"
-                                    class="form-select bg-white bg-opacity-10 border-0 text-white p-3"
-                                    style="border-radius: 0.8rem;" required>
-                                    @foreach ($paymentMethods as $pm)
-                                        <option value="{{ $pm }}" class="text-dark">{{ $pm }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label small text-uppercase fw-bold opacity-50">Tgl Daftar</label>
-                            <input type="date" name="joined_at"
-                                class="form-control bg-white bg-opacity-10 border-0 text-white p-3"
-                                style="border-radius: 0.8rem;" value="{{ date('Y-m-d') }}" required>
-                        </div>
-                        <div class="mb-0">
-                            <label class="form-label small text-uppercase fw-bold opacity-50">Foto Profil</label>
-                            <input type="file" name="profile_photo"
-                                class="form-control bg-white bg-opacity-10 border-0 text-white p-2"
-                                style="border-radius: 0.8rem;">
-                        </div>
-                    </div>
-                    <div class="modal-footer border-0 p-4 pt-0">
-                        <button type="submit"
-                            class="btn btn-danger w-100 rounded-pill fw-bold py-3">
-                            Simpan Member
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    {{-- ============================================================== --}}
-    {{-- SCRIPT: Member Search Dropdown (untuk Quick Check-in Modal)    --}}
-    {{-- ============================================================== --}}
-    <script>
-        (function () {
-            const searchInput  = document.getElementById('quickMemberSearchInput');
-            const selectHidden = document.getElementById('quickMemberSelectHidden');
-            const dropdown     = document.getElementById('quickMemberDropdown');
-
-            // Angkat ke body agar mengambang di atas segalanya
-            document.body.appendChild(dropdown);
-
-            const allMembers = Array.from(selectHidden.options)
-                .filter(o => o.value)
-                .map(o => ({
-                    value: o.value,
-                    name:  o.dataset.name,
-                    code:  o.dataset.code
-                }));
-
-            function positionDropdown() {
-                const rect      = searchInput.getBoundingClientRect();
-                const dropH     = dropdown.offsetHeight;
-                dropdown.style.top   = (rect.top - dropH - 4) + 'px';
-                dropdown.style.left  = rect.left + 'px';
-                dropdown.style.width = rect.width + 'px';
-            }
-
-            function renderDropdown(query) {
-                const q = query.toLowerCase().trim();
-                const filtered = q
-                    ? allMembers.filter(m =>
-                        m.name.toLowerCase().includes(q) ||
-                        m.code.toLowerCase().includes(q))
-                    : allMembers;
-
-                dropdown.innerHTML = '';
-
-                if (!filtered.length) {
-                    dropdown.innerHTML =
-                        '<div style="padding:12px 16px;color:rgba(255,255,255,.4);font-size:13px;">Tidak ada member ditemukan</div>';
-                } else {
-                    filtered.forEach(m => {
-                        const div = document.createElement('div');
-                        div.style.cssText =
-                            'padding:10px 16px;color:#fff;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.05);font-size:14px;';
-                        div.innerHTML = `${m.name} <span style="font-size:11px;opacity:.5;">${m.code}</span>`;
-                        div.addEventListener('mousedown', e => {
-                            e.preventDefault();
-                            searchInput.value  = `${m.name} (${m.code})`;
-                            selectHidden.value = m.value;
-                            dropdown.style.display = 'none';
-                        });
-                        div.addEventListener('mouseover', () => div.style.background = 'rgba(220,53,69,.15)');
-                        div.addEventListener('mouseout',  () => div.style.background = '');
-                        dropdown.appendChild(div);
-                    });
-                }
-
-                dropdown.style.display = 'block';
-                positionDropdown();
-            }
-
-            searchInput.addEventListener('input',  () => { selectHidden.value = ''; renderDropdown(searchInput.value); });
-            searchInput.addEventListener('focus',  () => renderDropdown(searchInput.value));
-            searchInput.addEventListener('blur',   () => setTimeout(() => dropdown.style.display = 'none', 150));
-            window.addEventListener('scroll', () => { if (dropdown.style.display !== 'none') positionDropdown(); }, true);
-            window.addEventListener('resize', () => { if (dropdown.style.display !== 'none') positionDropdown(); });
-
-            // Reset dropdown & input saat modal dibuka
-            document.getElementById('quickCheckinModal').addEventListener('shown.bs.modal', function () {
-                searchInput.value  = '';
-                selectHidden.value = '';
-                dropdown.style.display = 'none';
-                searchInput.focus();
-            });
-        })();
-    </script>
 @endsection

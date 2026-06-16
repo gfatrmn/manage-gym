@@ -125,6 +125,34 @@
             color: #f87171;
         }
 
+        .btn-action-reminder-pending {
+            background: rgba(239, 68, 68, 0.22);
+            color: #f87171;
+        }
+
+        .btn-action-reminder-sent {
+            background: rgba(34, 197, 94, 0.22);
+            color: #4ade80;
+        }
+
+        .member-row-warning {
+            background: rgba(245, 158, 11, 0.08);
+        }
+
+        .member-expiry-warning {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            background: rgba(245, 158, 11, 0.16);
+            border: 1px solid rgba(245, 158, 11, 0.28);
+            color: #fbbf24;
+            border-radius: 999px;
+            padding: 0.18rem 0.55rem;
+            font-size: 11px;
+            font-weight: 700;
+            margin-top: 0.25rem;
+        }
+
         .ds-section-label {
             font-size: 11px;
             text-transform: uppercase;
@@ -387,10 +415,6 @@
                 <div class="ds-section-label">Arena Gym · Management Member</div>
                 <h1 class="dashboard-title">Manajemen Member</h1>
             </div>
-            <button class="btn btn-danger rounded-pill px-4 fw-bold shadow-sm" data-bs-toggle="modal"
-                data-bs-target="#addMemberModal">
-                <i class="fas fa-plus me-2"></i> Tambah Member
-            </button>
         </div>
 
         @if (session('status'))
@@ -458,12 +482,13 @@
                             @php
                                 $diff = $member->expires_at ? now()->diffInDays($member->expires_at, false) : null;
                                 $daysLeft = $diff !== null ? ceil($diff) : null;
+                                $needsRenewalReminder = $daysLeft !== null && $daysLeft >= 0 && $daysLeft <= 7;
                             @endphp
-                            <tr class="member-row" data-name="{{ strtolower($member->full_name) }}"
+                            <tr class="member-row {{ $needsRenewalReminder ? 'member-row-warning' : '' }}" data-name="{{ strtolower($member->full_name) }}"
                                 data-phone="{{ $member->phone }}">
                                 <td>
-                                    @if ($member->profile_photo_path)
-                                        <img src="{{ asset('storage/' . $member->profile_photo_path) }}"
+                                    @if ($member->profile_photo_url)
+                                        <img src="{{ $member->profile_photo_url }}"
                                             class="member-photo"
                                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                                         <div class="member-photo-placeholder" style="display: none;">
@@ -487,15 +512,32 @@
                                         class="fw-bold {{ $isExpiredSection ? 'text-danger' : ($daysLeft <= 7 ? 'text-warning' : 'text-white') }}">
                                         Hingga: {{ $member->expires_at?->format('d M Y') }}
                                     </div>
-                                    @if (!$isExpiredSection && $daysLeft <= 7)
-                                        <div class="fw-bold text-warning" style="font-size: 11px; margin-top: 2px;">
-                                            <i class="fas fa-clock me-1"></i>Sisa {{ $daysLeft }} Hari
+                                    @if ($needsRenewalReminder)
+                                        <div class="member-expiry-warning">
+                                            <i class="fas fa-clock"></i>
+                                            {{ $daysLeft === 0 ? 'Hari ini' : 'H-' . $daysLeft }}
+                                        </div>
+                                        <div class="small opacity-50 mt-1">
+                                            Diingatkan:
+                                            {{ $member->last_membership_reminder_at ? $member->last_membership_reminder_at->format('d M Y, H:i') : 'Belum' }}
                                         </div>
                                     @endif
                                 </td>
                                 <td class="text-end">
                                     <div class="d-flex justify-content-end gap-2">
-                                        <button class="btn-action btn-action-success" data-bs-toggle="modal"
+                                        @if ($needsRenewalReminder)
+                                            <form method="POST" action="{{ route('admin.announcements.reminders.send') }}"
+                                                class="d-inline">
+                                                @csrf
+                                                <input type="hidden" name="gym_member_id" value="{{ $member->id }}">
+                                                <button type="submit" class="btn-action {{ $member->last_membership_reminder_at ? 'btn-action-reminder-sent' : 'btn-action-reminder-pending' }}"
+                                                    title="Ingatkan untuk perpanjang"
+                                                    onclick="return confirm('Kirim pengingat perpanjangan untuk {{ $member->full_name }}?')">
+                                                    <i class="fas fa-bell"></i>
+                                                </button>
+                                            </form>
+                                        @endif
+                                        <button class="btn-action {{ $needsRenewalReminder ? 'btn-action-warning' : 'btn-action-success' }}" data-bs-toggle="modal"
                                             data-bs-target="#renewMemberModal{{ $member->id }}"><i
                                                 class="fas fa-sync-alt"></i></button>
                                         <button class="btn-action btn-action-info" data-bs-toggle="modal"
@@ -583,16 +625,26 @@
     </div>
 
     @forelse ($currentItems as $member)
+        @php
+            $memberCheckins = $member->relationLoaded('checkinHistories')
+                ? ($member->checkinHistories->isNotEmpty()
+                    ? $member->checkinHistories
+                    : ($member->relationLoaded('verifiedCheckins') ? $member->verifiedCheckins : collect()))
+                : ($member->relationLoaded('verifiedCheckins') ? $member->verifiedCheckins : collect());
+            $memberProductTransactions = $member->relationLoaded('productPurchaseHistories')
+                ? $member->productPurchaseHistories
+                : ($member->relationLoaded('productTransactions') ? $member->productTransactions : collect());
+        @endphp
         <div class="modal fade" id="detailMemberModal{{ $member->id }}" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
                 <div class="modal-content bg-dark text-white border-0 shadow-lg" style="border-radius: 1.5rem;">
                     <div class="modal-header border-bottom border-white border-opacity-10 p-4">
-                        <h5 class="modal-title fw-bold">Detail Profil</h5>
+                        <h5 class="modal-title fw-bold">Detail Member</h5>
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body p-4 text-center">
-                        @if ($member->profile_photo_path)
-                            <img src="{{ asset('storage/' . $member->profile_photo_path) }}"
+                        @if ($member->profile_photo_url)
+                            <img src="{{ $member->profile_photo_url }}"
                                 class="rounded-circle mb-3 border border-3 border-danger"
                                 style="width: 100px; height: 100px; object-fit: cover;">
                         @else
@@ -619,6 +671,65 @@
                             <div class="col-6"><label class="small d-block text-uppercase fw-bold opacity-50">Masa
                                     Aktif</label>
                                 <span class="fw-bold text-danger">{{ $member->expires_at?->format('d M Y') }}</span>
+                            </div>
+                        </div>
+
+                        <div class="row g-3 text-start mb-4">
+                            <div class="col-md-6">
+                                <div class="bg-white bg-opacity-10 p-4 rounded-4 h-100">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <div>
+                                            <div class="small text-uppercase fw-bold opacity-50">Riwayat Check-in</div>
+                                            <div class="fw-bold">{{ $member->checkins_count ?? 0 }} kali check-in</div>
+                                        </div>
+                                        <i class="fas fa-calendar-check text-danger fs-4"></i>
+                                    </div>
+
+                                    @forelse ($memberCheckins->take(5) as $checkin)
+                                        <div class="d-flex justify-content-between gap-3 py-2 border-top border-white border-opacity-10">
+                                            <span class="small opacity-75">Tanggal</span>
+                                            <span class="small fw-bold text-end">
+                                                {{ ($checkin->occurred_at ?? $checkin->checked_in_at)?->format('d M Y, H:i') ?: '-' }}
+                                            </span>
+                                        </div>
+                                    @empty
+                                        <div class="small opacity-50 border-top border-white border-opacity-10 pt-3">
+                                            Belum ada riwayat check-in.
+                                        </div>
+                                    @endforelse
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="bg-white bg-opacity-10 p-4 rounded-4 h-100">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <div>
+                                            <div class="small text-uppercase fw-bold opacity-50">Riwayat Pembelian</div>
+                                            <div class="fw-bold">{{ $member->product_transactions_count ?? 0 }} transaksi barang</div>
+                                        </div>
+                                        <i class="fas fa-shopping-bag text-danger fs-4"></i>
+                                    </div>
+
+                                    @forelse ($memberProductTransactions->take(5) as $transaction)
+                                        <div class="py-2 border-top border-white border-opacity-10">
+                                            <div class="d-flex justify-content-between gap-3">
+                                                <span class="small fw-bold">
+                                                    {{ $transaction->product?->name ?? $transaction->title ?? $transaction->transaction_type ?? 'Barang' }}
+                                                </span>
+                                                <span class="small opacity-75 text-end">
+                                                    {{ ($transaction->occurred_at ?? $transaction->transaction_at)?->format('d M Y') ?: '-' }}
+                                                </span>
+                                            </div>
+                                            <div class="small opacity-50">
+                                                {{ $transaction->quantity ?? 1 }} item · Rp{{ number_format($transaction->amount ?? 0, 0, ',', '.') }}
+                                            </div>
+                                        </div>
+                                    @empty
+                                        <div class="small opacity-50 border-top border-white border-opacity-10 pt-3">
+                                            Belum ada riwayat pembelian barang.
+                                        </div>
+                                    @endforelse
+                                </div>
                             </div>
                         </div>
 
@@ -701,11 +812,20 @@
 
         {{-- MODAL RENEW (PERPANJANG) --}}
         @forelse ($currentItems as $member)
+            @php
+                $renewDiff = $member->expires_at ? now()->diffInDays($member->expires_at, false) : null;
+                $renewDaysLeft = $renewDiff !== null ? ceil($renewDiff) : null;
+                $renewNeedsWarning = $renewDaysLeft !== null && $renewDaysLeft >= 0 && $renewDaysLeft <= 7;
+                $renewAccentText = $renewNeedsWarning ? 'text-warning' : 'text-success';
+                $renewAccentBg = $renewNeedsWarning ? 'bg-warning' : 'bg-success';
+                $renewAccentBorder = $renewNeedsWarning ? 'border-warning' : 'border-success';
+                $renewButtonClass = $renewNeedsWarning ? 'btn-warning text-dark' : 'btn-success';
+            @endphp
             <div class="modal fade" id="renewMemberModal{{ $member->id }}" tabindex="-1" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content bg-dark text-white border-0 shadow-lg" style="border-radius: 1.5rem;">
                         <div class="modal-header border-bottom border-white border-opacity-10 p-4">
-                            <h5 class="modal-title fw-bold text-success">
+                            <h5 class="modal-title fw-bold {{ $renewAccentText }}">
                                 <i class="fas fa-history me-2"></i>Perpanjang Member
                             </h5>
                             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
@@ -730,6 +850,12 @@
                                                     <span
                                                         class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-3 py-1 rounded-pill"
                                                         style="font-size: 0.7rem;">Expired</span>
+                                                @elseif ($renewNeedsWarning)
+                                                    <span
+                                                        class="badge bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25 px-3 py-1 rounded-pill"
+                                                        style="font-size: 0.7rem;">
+                                                        {{ $renewDaysLeft === 0 ? 'Hari Ini' : 'H-' . $renewDaysLeft }}
+                                                    </span>
                                                 @else
                                                     <span
                                                         class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-3 py-1 rounded-pill"
@@ -760,12 +886,12 @@
                                 </div>
 
                                 <div
-                                    class="p-3 rounded-4 bg-success bg-opacity-10 border border-success border-opacity-25 mt-4">
+                                    class="p-3 rounded-4 {{ $renewAccentBg }} bg-opacity-10 border {{ $renewAccentBorder }} border-opacity-25 mt-4">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div>
-                                            <div class="small text-success fw-bold opacity-75">Masa Aktif Baru (+<span
+                                            <div class="small {{ $renewAccentText }} fw-bold opacity-75">Masa Aktif Baru (+<span
                                                     id="prevMonths{{ $member->id }}">1</span> Bln)</div>
-                                            <div id="prevNew{{ $member->id }}" class="fw-bold text-success fs-5 mt-1">
+                                            <div id="prevNew{{ $member->id }}" class="fw-bold {{ $renewAccentText }} fs-5 mt-1">
                                                 {{-- Inisialisasi tampilan awal: Masa Aktif Sekarang + 1 Bulan --}}
                                                 @php
                                                     $baseDate =
@@ -776,8 +902,8 @@
                                                 @endphp
                                             </div>
                                         </div>
-                                        <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center"
-                                            style="width: 45px; height: 45px; background: rgba(25, 135, 84, 0.2) !important;">
+                                        <div class="{{ $renewAccentBg }} text-white rounded-circle d-flex align-items-center justify-content-center"
+                                            style="width: 45px; height: 45px;">
                                             <i class="fas fa-calendar-plus"></i>
                                         </div>
                                     </div>
@@ -788,7 +914,7 @@
                                 <input type="hidden" name="full_name" value="{{ $member->full_name }}">
                                 <input type="hidden" name="payment_method" value="{{ $member->payment_method }}">
 
-                                <button type="submit" class="btn btn-success w-100 rounded-pill fw-bold py-3 shadow-sm">
+                                <button type="submit" class="btn {{ $renewButtonClass }} w-100 rounded-pill fw-bold py-3 shadow-sm">
                                     Konfirmasi & Perbarui Member
                                 </button>
                             </div>
@@ -803,7 +929,7 @@
         <div class="d-flex flex-column align-items-center gap-3">
             {{-- Tombol Navigasi --}}
             <div class="custom-pagination">
-                @if (isset($currentItems) && $currentItems instanceof \Illuminate\Pagination\LengthAwarePaginator)
+                @if (isset($currentItems) && method_exists($currentItems, 'links'))
                     {{-- Kita sembunyikan info bawaan lewat CSS di atas --}}
                     {{ $currentItems->links('pagination::bootstrap-5') }}
                 @endif
@@ -811,9 +937,11 @@
 
             {{-- Keterangan Data Manual (Yang ini tetap dipertahankan) --}}
             <div class="small text-white-50">
-                @if (isset($currentItems) && $currentItems instanceof \Illuminate\Pagination\LengthAwarePaginator)
+                @if (isset($currentItems) && method_exists($currentItems, 'total'))
                     Menampilkan {{ $currentItems->firstItem() ?: 0 }} - {{ $currentItems->lastItem() ?: 0 }}
                     dari {{ $currentItems->total() }} member
+                @elseif (isset($currentItems))
+                    Menampilkan {{ $currentItems->count() }} member
                 @endif
             </div>
         </div>

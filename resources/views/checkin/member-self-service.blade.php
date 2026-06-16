@@ -59,6 +59,12 @@
                                 </div>
                             @endif
 
+                            @if (session('welcome_name'))
+                                <div id="checkin-notification" class="alert alert-info rounded-4 mb-4" role="alert">
+                                    Selamat datang, <strong>{{ session('welcome_name') }}</strong>! Nikmati hari latihan Anda.
+                                </div>
+                            @endif
+
                             @if ($errors->any())
                                 <div class="alert alert-danger rounded-4 mb-4" role="alert">
                                     {{ $errors->first() }}
@@ -94,5 +100,21 @@
                 </div>
             </div>
         </div>
+
+        @if (session('welcome_name'))
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    const name = @json(session('welcome_name'));
+                    const message = `Selamat datang, ${name}`;
+
+                    if ('speechSynthesis' in window) {
+                        const utterance = new SpeechSynthesisUtterance(message);
+                        utterance.lang = 'id-ID';
+                        utterance.rate = 0.95;
+                        speechSynthesis.speak(utterance);
+                    }
+                });
+            </script>
+        @endif
     </body>
 </html>

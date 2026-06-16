@@ -35,9 +35,9 @@ class AdminMemberTest extends TestCase
         $this->assertDatabaseHas('gym_members', [
             'full_name' => 'Member Bulanan',
             'member_status' => 'member',
-            'membership_plan' => 'Bulanan',
+            'membership_plan' => 'Membership 1 Bulan',
             'payment_method' => 'qris',
-            'payment_amount' => 50000,
+            'payment_amount' => 90000,
             'package_status' => 'active',
             'joined_at' => now()->startOfDay()->toDateTimeString(),
             'expires_at' => now()->copy()->startOfDay()->addMonthNoOverflow()->toDateTimeString(),
@@ -45,9 +45,8 @@ class AdminMemberTest extends TestCase
 
         $this->get(route('admin.members'))
             ->assertOk()
-            ->assertSee('Bulanan')
             ->assertSee('QRIS')
-            ->assertSee('Rp50.000');
+            ->assertSee('Member Bulanan');
     }
 
     public function test_member_page_shows_detail_action_and_monthly_training_history(): void
@@ -78,10 +77,10 @@ class AdminMemberTest extends TestCase
         ])->get(route('admin.members'))
             ->assertOk()
             ->assertSee('Detail')
-            ->assertSee('Barcode Member')
-            ->assertSee('Riwayat tanggal latihan selama 1 bulan terakhir.')
+            ->assertSee('QR Code Member')
+            ->assertSee('Riwayat Check-in')
             ->assertSee('Raka Pradana')
-            ->assertSee('Latihan pagi');
+            ->assertSee('10 Apr 2026');
     }
 
     public function test_admin_can_search_member_data(): void
@@ -121,7 +120,7 @@ class AdminMemberTest extends TestCase
             ],
         ])->get(route('admin.members', ['q' => 'rina']))
             ->assertOk()
-            ->assertSee('Cari member')
+            ->assertSee('Cari nama atau no. HP')
             ->assertSee('Rina Saputri')
             ->assertDontSee('Budi Hartono');
     }

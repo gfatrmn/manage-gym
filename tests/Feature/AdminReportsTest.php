@@ -6,6 +6,7 @@ use App\Models\CashierTransaction;
 use App\Models\ExpenseRecord;
 use App\Models\GymCheckin;
 use App\Models\GymMember;
+use App\Models\Product;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Tests\TestCase;
@@ -95,20 +96,104 @@ class AdminReportsTest extends TestCase
             ],
         ])->get(route('admin.reports'))
             ->assertOk()
-            ->assertSee('Data detail laporan')
             ->assertSee('Tambah pengeluaran')
             ->assertSee('Simpan Pengeluaran')
-            ->assertSee('Alya Fitri')
-            ->assertSee('Latihan kardio pagi')
-            ->assertSee('Ringkasan membership')
-            ->assertSee('Laporan keuangan bulanan')
-            ->assertSee('Pendapatan per hari')
-            ->assertSee('Breakdown pemasukan')
-            ->assertSee('Breakdown pengeluaran')
-            ->assertSee('Beli Suplemen Stok')
+            ->assertSee('Laporan Member')
+            ->assertSee('Laporan Keuangan')
+            ->assertSee('Laporan Kehadiran')
             ->assertSee('Rp50.000')
             ->assertSee('Rp100.000')
             ->assertSee('Rp15.000')
             ->assertSee('Rp85.000');
+
+        $this->withSession([
+            'auth' => [
+                'role' => 'admin',
+                'login' => 'admin',
+            ],
+        ])->get(route('admin.reports.show', [
+            'reportSlug' => 'laporan-kehadiran',
+            'detail_month' => now()->format('Y-m'),
+        ]))
+            ->assertOk()
+            ->assertSee('Alya Fitri')
+            ->assertSee('Latihan kardio pagi');
+
+        $this->withSession([
+            'auth' => [
+                'role' => 'admin',
+                'login' => 'admin',
+            ],
+        ])->get(route('admin.reports.show', [
+            'reportSlug' => 'laporan-keuangan',
+            'detail_month' => now()->format('Y-m'),
+        ]))
+            ->assertOk()
+            ->assertSee('Sumber Pendapatan')
+            ->assertSee('Riwayat Pemasukan')
+            ->assertSee('Riwayat Pengeluaran')
+            ->assertSee('Beli Suplemen Stok');
+    }
+
+    public function test_stock_report_shows_sold_product_transaction_details_and_exports_them(): void
+    {
+        $product = Product::query()->create([
+            'name' => 'Whey Protein Vanilla',
+            'category' => 'vitamin',
+            'brand' => 'FitFuel',
+            'sku' => 'WF-001',
+            'price' => 125000,
+            'stock' => 8,
+            'unit' => 'pcs',
+            'is_active' => true,
+        ]);
+
+        CashierTransaction::query()->create([
+            'invoice' => 'PRD-DETAIL-001',
+            'product_id' => $product->id,
+            'customer_name' => 'Bima Santoso',
+            'transaction_group' => 'product_sale',
+            'transaction_type' => $product->name,
+            'amount' => 250000,
+            'quantity' => 2,
+            'payment_method' => 'cash',
+            'payment_status' => 'verified',
+            'receipt_status' => 'ready',
+            'transaction_at' => now()->startOfMonth()->addDays(2)->setTime(13, 30),
+        ]);
+
+        $session = [
+            'auth' => [
+                'role' => 'admin',
+                'login' => 'admin',
+            ],
+        ];
+
+        $this->withSession($session)
+            ->get(route('admin.reports.show', [
+                'reportSlug' => 'laporan-stok-barang',
+                'detail_month' => now()->format('Y-m'),
+            ]))
+            ->assertOk()
+            ->assertSee('Rincian Barang Terjual')
+            ->assertSee('PRD-DETAIL-001')
+            ->assertSee('Bima Santoso')
+            ->assertSee('Whey Protein Vanilla')
+            ->assertSee('FitFuel')
+            ->assertSee('WF-001')
+            ->assertSee('2 pcs')
+            ->assertSee('Rp125.000')
+            ->assertSee('Rp250.000');
+
+        $this->withSession($session)
+            ->get(route('admin.reports.show', [
+                'reportSlug' => 'laporan-stok-barang',
+                'detail_month' => now()->format('Y-m'),
+                'export' => 1,
+            ]))
+            ->assertOk()
+            ->assertSee('Rincian Barang Terjual')
+            ->assertSee('PRD-DETAIL-001')
+            ->assertSee('Bima Santoso');
     }
 }

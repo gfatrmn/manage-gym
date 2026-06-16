@@ -1,0 +1,169 @@
+html,
+body {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+img,
+iframe,
+svg,
+canvas {
+    max-width: 100%;
+}
+
+@media (min-width: 1024px) and (max-width: 1279px) {
+    body > header nav {
+        gap: 24px !important;
+    }
+
+    body > header nav a {
+        font-size: 12px !important;
+        line-height: 18px !important;
+    }
+}
+
+@media (max-width: 1023px) {
+    body > header > div {
+        display: flex !important;
+        flex-direction: column;
+        align-items: stretch !important;
+        justify-content: center !important;
+        height: auto !important;
+        min-height: 104px;
+        gap: 10px;
+        padding-top: 12px;
+        padding-bottom: 10px;
+    }
+
+    body > header a.font-display-xl {
+        align-self: flex-start;
+        font-size: 26px !important;
+        line-height: 30px !important;
+        white-space: nowrap;
+    }
+
+    body > header nav {
+        display: flex !important;
+        width: 100%;
+        max-width: 100%;
+        justify-content: flex-start !important;
+        gap: 18px !important;
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding-bottom: 4px;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    body > header nav::-webkit-scrollbar {
+        display: none;
+    }
+
+    body > header nav a {
+        flex: 0 0 auto;
+        white-space: nowrap;
+        font-size: 12px !important;
+        line-height: 18px !important;
+    }
+
+    body > header > div > .justify-self-end {
+        display: none;
+    }
+
+    body > main {
+        padding-top: 112px !important;
+    }
+
+    .text-display-xl {
+        font-size: 52px !important;
+        line-height: 58px !important;
+        letter-spacing: 0 !important;
+    }
+
+    .text-headline-lg {
+        font-size: 38px !important;
+        line-height: 44px !important;
+    }
+
+    .py-section-padding {
+        padding-top: 80px !important;
+        padding-bottom: 80px !important;
+    }
+
+    table {
+        min-width: 760px;
+    }
+}
+
+@media (max-width: 767px) {
+    body > header > div {
+        min-height: 108px;
+    }
+
+    body > main {
+        padding-top: 116px !important;
+    }
+
+    body > header a.font-display-xl {
+        font-size: 24px !important;
+        line-height: 28px !important;
+    }
+
+    .text-display-xl {
+        font-size: 40px !important;
+        line-height: 46px !important;
+    }
+
+    .text-headline-lg,
+    .text-headline-md {
+        font-size: 30px !important;
+        line-height: 36px !important;
+    }
+
+    .font-body-lg,
+    .text-body-lg {
+        font-size: 16px !important;
+        line-height: 24px !important;
+    }
+
+    .px-margin-mobile,
+    .md\:px-margin-desktop {
+        padding-left: 20px !important;
+        padding-right: 20px !important;
+    }
+
+    .py-section-padding {
+        padding-top: 64px !important;
+        padding-bottom: 64px !important;
+    }
+
+    .gap-gutter {
+        gap: 20px !important;
+    }
+
+    .space-y-gutter > :not([hidden]) ~ :not([hidden]) {
+        margin-top: 20px !important;
+    }
+}
+
+@media (max-width: 420px) {
+    body > header nav {
+        gap: 14px !important;
+    }
+
+    body > header a.font-display-xl {
+        font-size: 22px !important;
+        line-height: 26px !important;
+    }
+
+    .text-display-xl {
+        font-size: 34px !important;
+        line-height: 40px !important;
+    }
+
+    .text-headline-lg,
+    .text-headline-md {
+        font-size: 26px !important;
+        line-height: 32px !important;
+    }
+}

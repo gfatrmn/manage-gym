@@ -9,16 +9,26 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('cashier_transactions', function (Blueprint $table) {
-            $table->foreignId('product_id')->nullable()->after('gym_member_id')->constrained('products')->nullOnDelete();
-            $table->unsignedInteger('quantity')->default(1)->after('amount');
+            if (! Schema::hasColumn('cashier_transactions', 'product_id')) {
+                $table->foreignId('product_id')->nullable()->after('gym_member_id')->constrained('products')->nullOnDelete();
+            }
+
+            if (! Schema::hasColumn('cashier_transactions', 'quantity')) {
+                $table->unsignedInteger('quantity')->default(1)->after('amount');
+            }
         });
     }
 
     public function down(): void
     {
         Schema::table('cashier_transactions', function (Blueprint $table) {
-            $table->dropConstrainedForeignId('product_id');
-            $table->dropColumn('quantity');
+            if (Schema::hasColumn('cashier_transactions', 'product_id')) {
+                $table->dropConstrainedForeignId('product_id');
+            }
+
+            if (Schema::hasColumn('cashier_transactions', 'quantity')) {
+                $table->dropColumn('quantity');
+            }
         });
     }
 };

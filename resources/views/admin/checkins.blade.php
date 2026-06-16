@@ -185,7 +185,7 @@
 
         .ci-btn-submit:hover { background: #b91c2c; }
 
-        .ci-btn-guest {
+        .ci-btn-daily-pass {
             width: 100%;
             background: rgba(59,130,246,0.12);
             border: 1px solid rgba(59,130,246,0.25);
@@ -199,7 +199,7 @@
             margin-top: auto;
         }
 
-        .ci-btn-guest:hover {
+        .ci-btn-daily-pass:hover {
             background: rgba(59,130,246,0.2);
             border-color: rgba(59,130,246,0.45);
         }
@@ -379,7 +379,7 @@
             border: 1px solid rgba(52,211,153,0.2);
         }
 
-        .badge-guest {
+        .badge-daily-pass {
             font-size: 10px;
             padding: 3px 10px;
             border-radius: 6px;
@@ -521,7 +521,7 @@
         <div class="ci-header">
             <div>
                 <div class="ci-section-label">Arena Gym · Management Check-in</div>
-                <h1 class="ci-title">Check-in Member &amp; Guest</h1>
+                <h1 class="ci-title">Check-in Member &amp; Daily Pass</h1>
             </div>
             <div class="ci-clock-wrap">
                 <div class="ci-date">{{ now()->translatedFormat('l, d F Y') }}</div>
@@ -545,18 +545,18 @@
             </div>
             <div class="ci-stat ci-stat-blue">
                 <div class="ci-stat-label">Tamu Harian Hari Ini</div>
-                <div class="ci-stat-val">{{ $todayGuestsCount }}</div>
-                <div class="ci-stat-note">Daily Guest</div>
+                <div class="ci-stat-val">{{ $todayDailyPassCount }}</div>
+                <div class="ci-stat-note">Daily Pass</div>
             </div>
             <div class="ci-stat ci-stat-purple">
                 <div class="ci-stat-label">Total Kunjungan Hari Ini</div>
-                <div class="ci-stat-val">{{ $todayCheckinsCount + $todayGuestsCount }}</div>
-                <div class="ci-stat-note">Member + Guest</div>
+                <div class="ci-stat-val">{{ $todayCheckinsCount + $todayDailyPassCount }}</div>
+                <div class="ci-stat-note">Member + Daily Pass</div>
             </div>
             <div class="ci-stat ci-stat-amber">
-                <div class="ci-stat-label">Pemasukan Guest Hari Ini</div>
+                <div class="ci-stat-label">Pemasukan Daily Pass Hari Ini</div>
                 <div class="ci-stat-val" style="font-size: 1.25rem;">
-                    Rp {{ number_format($todayGuestRevenue ?? 0, 0, ',', '.') }}
+                    Rp {{ number_format($todayDailyPassRevenue ?? 0, 0, ',', '.') }}
                 </div>
                 <div class="ci-stat-note">Dari tamu harian</div>
             </div>
@@ -601,14 +601,14 @@
                 </form>
             </div>
 
-            {{-- Daily Guest --}}
+            {{-- Daily Pass --}}
             <div class="ci-panel d-flex flex-column">
                 <div class="ci-panel-title">
-                    <i class="fas fa-user-plus text-info"></i> Daily Guest (Tamu Harian)
+                    <i class="fas fa-user-plus text-info"></i> Daily Pass (Tamu Harian)
                 </div>
                 <div class="ci-panel-desc">Input tamu yang membayar kunjungan harian.</div>
-                <button class="ci-btn-guest mt-auto" data-bs-toggle="modal" data-bs-target="#addGuestModal">
-                    <i class="fas fa-ticket-alt me-2"></i> Input Tamu Harian
+                <button class="ci-btn-daily-pass mt-auto" data-bs-toggle="modal" data-bs-target="#addDailyPassModal">
+                    <i class="fas fa-ticket-alt me-2"></i> Input Daily Pass
                 </button>
             </div>
         </div>
@@ -618,7 +618,7 @@
             <div class="ci-log-head">
                 <div class="ci-log-head-left">
                     <i class="fas fa-list-ul text-warning"></i>
-                    <span class="ci-log-title">Riwayat Check-in &amp; Guest</span>
+                    <span class="ci-log-title">Riwayat Check-in &amp; Daily Pass</span>
                 </div>
 
                 {{-- Filter Form --}}
@@ -637,7 +637,7 @@
                     <select name="type" class="ci-filter-select">
                         <option value="">Semua Tipe</option>
                         <option value="member" {{ request('type') === 'member' ? 'selected' : '' }}>Member</option>
-                        <option value="guest"  {{ request('type') === 'guest'  ? 'selected' : '' }}>Guest</option>
+                        <option value="daily_pass"  {{ request('type') === 'daily_pass'  ? 'selected' : '' }}>Daily Pass</option>
                     </select>
 
                     <button type="submit" class="ci-filter-btn">
@@ -655,7 +655,7 @@
                 <div class="ci-tabs" id="ciTabGroup">
                     <button class="ci-tab-btn active" data-tab="all">Semua</button>
                     <button class="ci-tab-btn" data-tab="member">Member</button>
-                    <button class="ci-tab-btn" data-tab="guest">Guest</button>
+                    <button class="ci-tab-btn" data-tab="daily_pass">Daily Pass</button>
                 </div>
             </div>
 
@@ -688,7 +688,7 @@
                                     @if ($log['type'] === 'member')
                                         <span class="badge-member">Member</span>
                                     @else
-                                        <span class="badge-guest">Guest</span>
+                                        <span class="badge-daily-pass">Daily Pass</span>
                                     @endif
                                 </td>
                                 <td class="hide-mobile" style="color: rgba(255,255,255,0.5); font-size: 12px;">
@@ -702,7 +702,7 @@
                                     @endif
                                 </td>
                                 <td class="hide-mobile fw-bold" style="font-size: 13px; color: rgba(255,255,255,0.7);">
-                                    @if ($log['type'] === 'guest' && isset($log['amount']))
+                                    @if ($log['type'] === 'daily_pass' && isset($log['amount']))
                                         <span style="color: #60a5fa;">Rp {{ number_format($log['amount'], 0, ',', '.') }}</span>
                                     @else
                                         <span style="color: rgba(255,255,255,0.2);">—</span>
@@ -748,21 +748,21 @@
         </div>
     </div>
 
-    {{-- ── MODAL: Add Guest ──────────────────────────── --}}
-    <div class="modal fade" id="addGuestModal" tabindex="-1" aria-hidden="true">
+    {{-- Modal: Add Daily Pass --}}
+    <div class="modal fade" id="addDailyPassModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content bg-dark text-white border-0 shadow-lg" style="border-radius: 1.5rem;">
                 <div class="modal-header border-bottom border-white border-opacity-10 p-4">
                     <h5 class="modal-title fw-bold">
-                        <i class="fas fa-user-plus me-2 text-info"></i>Input Tamu Harian
+                        <i class="fas fa-user-plus me-2 text-info"></i>Input Daily Pass
                     </h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
-                <form action="{{ url('/admin/checkins/guest') }}" method="POST">
+                <form action="{{ route('admin.checkins.daily-pass.store') }}" method="POST">
                     @csrf
                     <div class="modal-body p-4">
                         <div class="mb-3">
-                            <label class="form-label small text-uppercase fw-bold opacity-50">Nama Tamu</label>
+                            <label class="form-label small text-uppercase fw-bold opacity-50">Nama Pengunjung</label>
                             <input type="text" name="name"
                                 class="form-control bg-white bg-opacity-10 border-0 text-white p-3"
                                 style="border-radius: 0.8rem;" required>
@@ -873,7 +873,7 @@
     </script>
 
     <script>
-        // Client-side Tab filter (Semua / Member / Guest)
+        // Client-side Tab filter (Semua / Member / Daily Pass)
         (function () {
             const btns = document.querySelectorAll('#ciTabGroup .ci-tab-btn');
             const rows = document.querySelectorAll('#ciTableBody .ci-row');

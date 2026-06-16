@@ -20,8 +20,8 @@ class CashierQrCheckinTest extends TestCase
             ],
         ])->get(route('cashier.checkins'))
             ->assertOk()
-            ->assertSee('QR check-in member di kasir')
-            ->assertSee(route('member.checkin'));
+            ->assertSee('Manual')
+            ->assertSee('Scan QR');
     }
 
     public function test_member_can_submit_self_service_qr_checkin(): void

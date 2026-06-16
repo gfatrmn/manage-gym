@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('password')->nullable();
             $table->string('profile_photo_path')->nullable();
             $table->string('checkin_code', 40)->unique()->nullable();
-            $table->enum('status', ['active', 'inactive'])->default('active');
+            $table->enum('status', ['member', 'daily_pass'])->default('member');
             $table->date('joined_at')->nullable();
             $table->date('expires_at')->nullable();
             $table->timestamps();

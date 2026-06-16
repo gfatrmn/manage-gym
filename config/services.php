@@ -35,4 +35,13 @@ return [
         ],
     ],
 
+    'whatsapp' => [
+        'driver' => env('WHATSAPP_DRIVER', 'evolution'),
+        'base_url' => env('WHATSAPP_BASE_URL'),
+        'instance' => env('WHATSAPP_INSTANCE'),
+        'api_key' => env('WHATSAPP_API_KEY'),
+        'timeout' => env('WHATSAPP_TIMEOUT', 15),
+        'channel_url' => env('WHATSAPP_CHANNEL_URL', 'https://whatsapp.com/channel/0029Vb7ysaX30LKV0mIDbu2t'),
+    ],
+
 ];

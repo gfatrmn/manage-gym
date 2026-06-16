@@ -28,12 +28,10 @@ class AdminNonMemberTest extends TestCase
 
         $response->assertRedirect(route('admin.non-members'));
 
-        $this->assertDatabaseHas('gym_members', [
+        $this->assertDatabaseHas('daily_guests', [
             'full_name' => 'Tamu Harian',
-            'member_status' => 'non_member',
             'payment_method' => 'qris',
             'payment_amount' => 30000,
-            'can_check_in' => false,
         ]);
 
         $this->get(route('admin.non-members'))
@@ -66,10 +64,9 @@ class AdminNonMemberTest extends TestCase
             'payment_method' => 'qris',
         ])->assertRedirect(route('admin.non-members'));
 
-        $this->assertDatabaseCount('gym_members', 2);
-        $this->assertDatabaseHas('gym_members', [
+        $this->assertDatabaseCount('daily_guests', 2);
+        $this->assertDatabaseHas('daily_guests', [
             'full_name' => 'Tamu Kedua',
-            'member_status' => 'non_member',
             'payment_method' => 'qris',
             'payment_amount' => 30000,
         ]);

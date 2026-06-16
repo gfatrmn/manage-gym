@@ -12,8 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('gym_members', function (Blueprint $table) {
-            // Menambahkan kolom metode pembayaran
-            $table->string('payment_method')->nullable()->after('expires_at');
+            if (! Schema::hasColumn('gym_members', 'payment_method')) {
+                $table->string('payment_method')->nullable()->after('expires_at');
+            }
         });
     }
 
@@ -22,8 +23,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('gym_members', function (Blueprint $table) {
-            //
-        });
+        if (Schema::hasColumn('gym_members', 'payment_method')) {
+            Schema::table('gym_members', function (Blueprint $table) {
+                $table->dropColumn('payment_method');
+            });
+        }
     }
 };

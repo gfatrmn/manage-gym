@@ -40,6 +40,7 @@ class CashierProductTransactionTest extends TestCase
                     $product->id => 2,
                 ],
                 'payment_method' => 'cash',
+                'paid_amount' => 200000,
                 'notes' => 'Pembelian vitamin',
             ])
             ->assertRedirect(route('cashier.transactions.products'));
@@ -47,9 +48,11 @@ class CashierProductTransactionTest extends TestCase
         $this->assertDatabaseHas('cashier_transactions', [
             'product_id' => $product->id,
             'customer_name' => 'Budi',
-            'transaction_group' => 'other',
+            'transaction_group' => 'product_sale',
             'transaction_type' => 'Vitamin C 1000',
             'amount' => 190000,
+            'paid_amount' => 200000,
+            'change_amount' => 10000,
             'quantity' => 2,
             'payment_status' => 'verified',
         ]);
@@ -62,7 +65,7 @@ class CashierProductTransactionTest extends TestCase
         $this->withSession($session)
             ->get(route('cashier.transactions.products'))
             ->assertOk()
-            ->assertSee('Cari produk')
+            ->assertSee('Cari')
             ->assertSee('Vitamin C 1000')
             ->assertSee('Budi')
             ->assertSee('Rp190.000');

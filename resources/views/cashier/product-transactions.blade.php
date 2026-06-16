@@ -85,7 +85,6 @@
             border-color: rgba(255, 59, 59, 0.32);
             background: linear-gradient(135deg, rgba(255, 59, 59, 0.9), rgba(166, 15, 31, 0.95));
             box-shadow: 0 12px 24px rgba(166, 15, 31, 0.28);
-            transform: translateY(-1px);
         }
 
         .product-check-button:disabled {
@@ -149,95 +148,190 @@
         }
 
         .selected-product-empty {
-            border: 1px dashed rgba(255,255,255,0.12);
+            display: grid;
+            gap: .35rem;
+            border: 1px dashed rgba(255,59,59,0.28);
             border-radius: 1rem;
-            padding: 1rem;
+            padding: 1.1rem;
             color: var(--text-muted);
             text-align: center;
+            background: rgba(255,59,59,.045);
+        }
+
+        .selected-product-empty strong {
+            color: #fff;
+            font-size: .95rem;
         }
 
         .product-search-box {
             max-width: 320px;
         }
+
+        .checkout-helper-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: .85rem;
+        }
+
+        .checkout-helper-card {
+            min-height: 86px;
+            padding: 1rem;
+            border: 1px solid rgba(255,255,255,.1);
+            border-radius: 1rem;
+            background: rgba(255,255,255,.035);
+        }
+
+        .checkout-helper-card strong {
+            display: block;
+            color: #fff;
+            margin-bottom: .25rem;
+        }
+
+        .checkout-product-shell {
+            display: grid;
+            grid-template-columns: minmax(0, 1.35fr) minmax(360px, .65fr);
+            gap: 1rem;
+            align-items: start;
+        }
+
+        .checkout-method-group {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: .75rem;
+        }
+
+        .checkout-method-option {
+            min-height: 54px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: .55rem;
+            border: 1px solid rgba(255,255,255,.14);
+            border-radius: 1rem;
+            color: var(--text-main);
+            background: rgba(255,255,255,.045);
+            cursor: pointer;
+            font-weight: 800;
+            transition: border-color .2s ease, background-color .2s ease, box-shadow .2s ease;
+        }
+
+        .btn-check:checked + .checkout-method-option {
+            border-color: rgba(255,59,59,.48);
+            background: linear-gradient(135deg, #ff3b3b, #b80f24);
+            color: #fff;
+            box-shadow: 0 16px 34px rgba(255,59,59,.2);
+        }
+
+        .product-checkout-button:disabled {
+            opacity: .55;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .product-flow-note {
+            display: flex;
+            align-items: center;
+            gap: .8rem;
+            padding: .9rem 1rem;
+            border: 1px solid rgba(255,255,255,.08);
+            border-radius: 1rem;
+            background: rgba(255,255,255,.035);
+            color: var(--text-muted);
+        }
+
+        .product-flow-note i {
+            width: 2.35rem;
+            height: 2.35rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: .85rem;
+            color: #fff;
+            background: linear-gradient(135deg, #ff3b3b, #b80f24);
+            box-shadow: 0 14px 30px rgba(255,59,59,.18);
+        }
+
+        @media (max-width: 1199.98px) {
+            .checkout-product-shell,
+            .checkout-helper-grid {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 
     <div class="topbar-card p-4 mb-4">
-        <div class="section-label">Transaksi Produk</div>
-        <h1 class="display-6 fw-bold mt-2 mb-2">Ambil produk dulu, bayar kemudian</h1>
-        <p class="muted-copy mb-0">Konsep hotel-style: pelanggan member atau non-member dapat memilih produk terlebih dahulu, lalu bayar setelah selesai latihan. Produk yang dicatat akan masuk ke riwayat transaksi member apabila dipilih.</p>
+        <div class="d-flex justify-content-between align-items-center gap-3">
+            <div>
+                <div class="section-label">Checkout</div>
+                <h1 class="display-6 fw-bold mt-2 mb-0">Checkout Barang</h1>
+            </div>
+        </div>
     </div>
 
-    <div class="panel-card p-4 mb-4">
+    <!-- <div class="panel-card p-4 mb-4">
         <div class="d-flex flex-column flex-md-row justify-content-between gap-3">
             <div>
-                <div class="section-label">Pelanggan terpilih</div>
+                <div class="section-label">Pelanggan</div>
                 <h2 class="h5 fw-bold mb-1">{{ $selectedMember ? $selectedMember->full_name : ($selectedCustomerName ? $selectedCustomerName : 'Belum ada pelanggan') }}</h2>
-                <div class="small muted-copy">
-                    {{ $selectedMember ? 'Member terpilih untuk pencatatan checkout produk.' : ($selectedCustomerName ? 'Nama pelanggan non-member untuk transaksi produk.' : 'Kembali ke halaman check-in untuk memilih nama pelanggan terlebih dahulu.') }}
-                </div>
+                <div class="small muted-copy">Checkout tetap bisa dibuat langsung dengan mengisi nama pembeli di form kanan.</div>
             </div>
             <div class="text-md-end">
                 @if ($selectedMember)
                     <div class="small text-muted mb-1">ID Member: {{ $selectedMember->id }}</div>
                     <span class="badge text-bg-success">Member</span>
                 @elseif($selectedCustomerName)
-                    <span class="badge text-bg-secondary">Non-member</span>
+                    <span class="badge text-bg-secondary">Daily Pass</span>
                 @else
                     <span class="badge text-bg-warning">Belum dipilih</span>
                 @endif
             </div>
         </div>
-    </div>
-
-    <div class="row g-4 mb-4">
-        <div class="col-12 col-md-4">
-            <div class="panel-card p-4 h-100">
-                <div class="section-label">Master Produk</div>
-                <div class="fs-3 fw-bold mt-2">{{ number_format($products->count(), 0, ',', '.') }}</div>
-                <div class="muted-copy">Total produk dari input admin.</div>
-            </div>
-        </div>
-        <div class="col-12 col-md-4">
-            <div class="panel-card p-4 h-100">
-                <div class="section-label">Siap Dijual</div>
-                <div class="fs-3 fw-bold mt-2">{{ number_format($availableProducts->count(), 0, ',', '.') }}</div>
-                <div class="muted-copy">Produk aktif dengan stok tersedia untuk checkout.</div>
-            </div>
-        </div>
-        <div class="col-12 col-md-4">
-            <div class="panel-card p-4 h-100">
-                <div class="section-label">Terjual Hari Ini</div>
-                <div class="fs-3 fw-bold mt-2">{{ number_format($productTransactions->filter(fn ($item) => $item->transaction_at->isToday())->count(), 0, ',', '.') }}</div>
-                <div class="muted-copy">Jumlah transaksi produk yang tercatat hari ini.</div>
+        <div class="product-flow-note mt-3">
+            <i class="fas fa-receipt"></i>
+            <div>
+                <div class="fw-semibold text-white">Alur checkout barang</div>
+                <div class="small">Pilih produk, isi nama pembeli bila belum dari check-in, lalu pilih Cash untuk langsung cetak atau QRIS untuk masuk verifikasi.</div>
             </div>
         </div>
     </div>
 
-    <div class="row g-4 mb-4">
-        <div class="col-12 col-xl-7">
+    <div class="checkout-helper-grid mb-4">
+        <div class="checkout-helper-card">
+            <strong>1. Isi pelanggan</strong>
+            <span class="small muted-copy">Pilih dari alur member/daily pass atau isi nama pembeli langsung.</span>
+        </div>
+        <div class="checkout-helper-card">
+            <strong>2. Pilih barang</strong>
+            <span class="small muted-copy">Klik tombol + pada produk, lalu atur jumlah barang.</span>
+        </div>
+        <div class="checkout-helper-card">
+            <strong>3. Checkout</strong>
+            <span class="small muted-copy">Cash langsung cetak struk, QRIS masuk verifikasi dulu.</span>
+        </div>
+    </div> -->
+
+    <div class="checkout-product-shell mb-4">
+        <div>
             <div class="panel-card p-4 h-100">
                 <div class="d-flex justify-content-between align-items-center mb-3 gap-3 flex-wrap">
                     <div>
-                        <h2 class="h4 fw-bold mb-1">Tabel produk dari admin</h2>
-                        <div class="small muted-copy">Klik tombol centang untuk menandai produk lalu lanjut checkout di panel sebelah kanan.</div>
+                        <h2 class="h4 fw-bold mb-1">Produk</h2>
                     </div>
                     <span class="badge text-bg-light border text-dark">{{ $products->count() }} produk</span>
                 </div>
 
                 <div class="d-flex justify-content-between align-items-center gap-3 mb-3 flex-wrap">
                     <div class="product-search-box w-100">
-                        <label for="cashierProductSearch" class="form-label fw-semibold mb-2">Cari produk</label>
+                        <label for="cashierProductSearch" class="form-label fw-semibold mb-2">Cari</label>
                         <input
                             type="search"
                             id="cashierProductSearch"
                             class="form-control"
-                            placeholder="Cari nama, brand, SKU, atau kategori"
+                            placeholder="Nama, brand, SKU, kategori"
                             autocomplete="off"
                             data-product-search>
                     </div>
-                    <div class="small muted-copy" data-product-search-summary>
-                        Menampilkan {{ $products->count() }} dari {{ $products->count() }} produk.
-                    </div>
+                    <div class="small muted-copy" data-product-search-summary>{{ $products->count() }} produk</div>
                 </div>
 
                 <div class="table-responsive">
@@ -277,7 +371,7 @@
                                             data-product-unit="{{ $product->unit }}"
                                             data-product-brand="{{ $product->brand ?: 'Tanpa brand' }}"
                                             @disabled(! $canCheckout)>
-                                            {{ $isSelected ? 'check' : '+' }}
+                                            {{ $isSelected ? '✓' : '+' }}
                                         </button>
                                     </td>
                                     <td class="product-name-cell">
@@ -324,18 +418,16 @@
             </div>
         </div>
 
-        <div class="col-12 col-xl-5">
+        <div>
             <div class="panel-card p-4 h-100">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <div>
-                        <h2 class="h4 fw-bold mb-1">Checkout produk</h2>
-                        <div class="small muted-copy">Pilih produk dari tabel, isi data pembeli, lalu catat sebagai bayar sekarang atau bayar nanti.</div>
+                        <h2 class="h4 fw-bold mb-1">Checkout</h2>
                     </div>
-                    <span class="badge text-bg-light border text-dark">Kasir</span>
                 </div>
 
                 <div class="list-card p-3 mb-3">
-                    <div class="small muted-copy mb-2">Produk dipilih</div>
+                    <div class="small muted-copy mb-2">Dipilih</div>
                     <div class="selected-product-list" data-selected-product-list>
                         @forelse ($preselectedProducts as $product)
                             <div class="selected-product-item">
@@ -350,11 +442,13 @@
                             </div>
                         @empty
                             <div class="selected-product-empty" data-selected-product-empty>
+                                <strong>Belum ada barang dipilih</strong>
+                                <span>Klik tombol + pada daftar produk untuk menambahkan barang ke checkout.</span>
                             </div>
                         @endforelse
                     </div>
                     <div class="mt-3">
-                        <div class="small muted-copy">Subtotal checkout</div>
+                        <div class="small muted-copy">Subtotal</div>
                         <div class="fs-4 fw-bold" data-selected-product-total>Rp{{ number_format($selectedTotal, 0, ',', '.') }}</div>
                     </div>
                 </div>
@@ -372,7 +466,7 @@
                     @if ($selectedMember)
                         <div class="col-12">
                             <div class="alert alert-secondary p-3">
-                                Produk akan dicatat untuk member <strong>{{ $selectedMember->full_name }}</strong>.
+                                Member: <strong>{{ $selectedMember->full_name }}</strong>
                             </div>
                             <input type="hidden" name="gym_member_id" value="{{ $selectedMember->id }}">
                             <input type="hidden" name="customer_name" value="{{ $selectedCustomerName }}">
@@ -380,15 +474,14 @@
                     @elseif ($selectedCustomerName)
                         <div class="col-12">
                             <div class="alert alert-secondary p-3">
-                                Produk akan dicatat untuk non member <strong>{{ $selectedCustomerName }}</strong>.
+                                Daily pass: <strong>{{ $selectedCustomerName }}</strong>
                             </div>
                             <input type="hidden" name="customer_name" value="{{ $selectedCustomerName }}">
                         </div>
                     @else
                         <div class="col-12">
-                            <label class="form-label fw-semibold">Nama pembeli</label>
-                            <input name="customer_name" class="form-control @error('customer_name') is-invalid @enderror" value="{{ old('customer_name') }}" placeholder="Nama pembeli jika bukan member atau untuk catatan" required>
-                            <div class="form-text">Pilih member dari halaman check-in bila pelanggan adalah member. Jika non-member, isi nama pembeli.</div>
+                            <label class="form-label fw-semibold">Nama</label>
+                            <input name="customer_name" class="form-control @error('customer_name') is-invalid @enderror" value="{{ old('customer_name') }}" placeholder="Nama pembeli" required>
                             @error('customer_name')
                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                             @enderror
@@ -397,14 +490,14 @@
 
                     <div class="col-12">
                         <label class="form-label fw-semibold">Metode Pembayaran</label>
-                        <div class="d-flex gap-3 flex-wrap">
-                            <label class="btn btn-outline-secondary rounded-pill mb-0">
-                                <input type="radio" name="payment_method" value="cash" class="btn-check" autocomplete="off" {{ old('payment_method', 'cash') === 'cash' ? 'checked' : '' }}>
-                                Cash
+                        <div class="checkout-method-group">
+                            <input type="radio" name="payment_method" value="cash" class="btn-check" id="product_payment_cash" autocomplete="off" {{ old('payment_method', 'cash') === 'cash' ? 'checked' : '' }}>
+                            <label class="checkout-method-option" for="product_payment_cash">
+                                <i class="fas fa-money-bill"></i> Tunai
                             </label>
-                            <label class="btn btn-outline-secondary rounded-pill mb-0">
-                                <input type="radio" name="payment_method" value="qris" class="btn-check" autocomplete="off" {{ old('payment_method') === 'qris' ? 'checked' : '' }}>
-                                QRIS
+                            <input type="radio" name="payment_method" value="qris" class="btn-check" id="product_payment_qris" autocomplete="off" {{ old('payment_method') === 'qris' ? 'checked' : '' }}>
+                            <label class="checkout-method-option" for="product_payment_qris">
+                                <i class="fas fa-qrcode"></i> QRIS
                             </label>
                         </div>
                         @error('payment_method')
@@ -413,16 +506,25 @@
                     </div>
 
                     <div class="col-12">
-                        <label class="form-label fw-semibold">Catatan produk</label>
-                        <textarea name="notes" class="form-control @error('notes') is-invalid @enderror" rows="3" placeholder="Isi rasa, qty, atau detail penjualan">{{ old('notes') }}</textarea>
+                        <label class="form-label fw-semibold">Uang diterima</label>
+                        <input name="paid_amount" type="number" min="0" class="form-control @error('paid_amount') is-invalid @enderror" value="{{ old('paid_amount') }}" placeholder="Uang dari pelanggan" required data-product-paid>
+                        <div class="form-text text-white-50">Kembalian: <strong data-product-change>Rp0</strong></div>
+                        @error('paid_amount')
+                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">Catatan</label>
+                        <textarea name="notes" class="form-control @error('notes') is-invalid @enderror" rows="3" placeholder="Opsional">{{ old('notes') }}</textarea>
                         @error('notes')
                             <div class="invalid-feedback d-block">{{ $message }}</div>
                         @enderror
                     </div>
 
                     <div class="col-12 d-flex justify-content-end gap-2">
-                        <button type="reset" class="btn btn-outline-secondary rounded-pill px-4" data-product-reset>Reset</button>
-                        <button type="submit" class="btn btn-dark rounded-pill px-4">Checkout</button>
+                        <button type="reset" class="btn btn-outline-secondary rounded-pill px-4" data-product-reset>Bersihkan</button>
+                        <button type="submit" class="btn btn-dark rounded-pill px-4 product-checkout-button" data-product-submit @disabled($preselectedProducts->isEmpty())>Lanjutkan Checkout</button>
                     </div>
                 </form>
             </div>
@@ -430,20 +532,61 @@
     </div>
 
     <div class="panel-card p-4">
-        <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 mb-3">
+        <div class="d-flex flex-column justify-content-between gap-3 mb-4">
             <div>
-                <h2 class="h4 fw-bold mb-1">Daftar penjualan produk</h2>
-                <p class="muted-copy mb-0">Menampilkan transaksi produk untuk bulan {{ \Illuminate\Support\Carbon::createFromFormat('Y-m', $selectedMonth)->translatedFormat('F Y') }}.</p>
+                <h2 class="h4 fw-bold mb-1">Riwayat Transaksi</h2>
             </div>
-            <form method="GET" action="{{ route('cashier.transactions.products') }}" class="d-flex flex-wrap gap-2 align-items-center">
-                <input type="month" name="month" class="form-control form-control-sm" value="{{ $selectedMonth }}">
-                @if($selectedMember)
-                    <input type="hidden" name="gym_member_id" value="{{ $selectedMember->id }}">
-                @endif
-                @if($selectedCustomerName)
-                    <input type="hidden" name="customer_name" value="{{ $selectedCustomerName }}">
-                @endif
-                <button type="submit" class="btn btn-outline-dark rounded-pill btn-sm">Filter Bulan</button>
+            <form method="GET" action="{{ route('cashier.transactions.products') }}" class="row g-2 g-md-3 align-items-end">
+                <div class="col-12 col-sm-6 col-lg-2">
+                    <label class="form-label fw-semibold small mb-2">Bulan</label>
+                    <input type="month" name="month" class="form-control form-control-sm" value="{{ $selectedMonth }}">
+                </div>
+
+                <div class="col-12 col-sm-6 col-lg-2">
+                    <label class="form-label fw-semibold small mb-2">Status Pembayaran</label>
+                    <select name="payment_status" class="form-select form-select-sm">
+                        <option value="">Semua Status</option>
+                        <option value="verified" {{ request('payment_status') === 'verified' ? 'selected' : '' }}>Lunas</option>
+                        <option value="pending" {{ request('payment_status') === 'pending' ? 'selected' : '' }}>Menunggu</option>
+                    </select>
+                </div>
+
+                <div class="col-12 col-sm-6 col-lg-2">
+                    <label class="form-label fw-semibold small mb-2">Metode Pembayaran</label>
+                    <select name="payment_method" class="form-select form-select-sm">
+                        <option value="">Semua Metode</option>
+                        <option value="cash" {{ request('payment_method') === 'cash' ? 'selected' : '' }}>Tunai</option>
+                        <option value="qris" {{ request('payment_method') === 'qris' ? 'selected' : '' }}>QRIS</option>
+                        <option value="later" {{ request('payment_method') === 'later' ? 'selected' : '' }}>Bayar Nanti</option>
+                    </select>
+                </div>
+
+                <div class="col-12 col-sm-6 col-lg-2">
+                    <label class="form-label fw-semibold small mb-2">Urutkan</label>
+                    <select name="sort_by" class="form-select form-select-sm">
+                        <option value="terbaru" {{ request('sort_by', 'terbaru') === 'terbaru' ? 'selected' : '' }}>Terbaru</option>
+                        <option value="terlama" {{ request('sort_by') === 'terlama' ? 'selected' : '' }}>Terlama</option>
+                        <option value="nominal_tinggi" {{ request('sort_by') === 'nominal_tinggi' ? 'selected' : '' }}>Nominal Tinggi</option>
+                        <option value="nominal_rendah" {{ request('sort_by') === 'nominal_rendah' ? 'selected' : '' }}>Nominal Rendah</option>
+                    </select>
+                </div>
+
+                <div class="col-12 col-sm-6 col-lg-auto d-flex gap-2">
+                    @if($selectedMember)
+                        <input type="hidden" name="gym_member_id" value="{{ $selectedMember->id }}">
+                    @endif
+                    @if($selectedCustomerName)
+                        <input type="hidden" name="customer_name" value="{{ $selectedCustomerName }}">
+                    @endif
+                    <button type="submit" class="btn btn-dark rounded-pill btn-sm px-4 flex-grow-1 flex-lg-grow-0">
+                        <i class="fas fa-filter"></i> Terapkan Filter
+                    </button>
+                    @if(request()->hasAny(['month', 'payment_status', 'payment_method', 'sort_by']))
+                        <a href="{{ route('cashier.transactions.products', array_filter(['gym_member_id' => $selectedMember?->id, 'customer_name' => $selectedCustomerName])) }}" class="btn btn-outline-secondary rounded-pill btn-sm px-3">
+                            <i class="fas fa-redo"></i> Reset
+                        </a>
+                    @endif
+                </div>
             </form>
         </div>
         <div class="table-responsive">
@@ -458,7 +601,10 @@
                         <th>Qty</th>
                         <th>Pembayaran</th>
                         <th>Nominal</th>
+                        <th>Diterima</th>
+                        <th>Kembali</th>
                         <th>Status</th>
+                        <th class="text-end">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -470,13 +616,40 @@
                             <td>{{ $item->customer_name }}</td>
                             <td>{{ $item->product?->name ?? $item->transaction_type }}</td>
                             <td>{{ $item->quantity }}</td>
-                            <td>{{ in_array($item->payment_method, ['later', null], true) ? 'Bayar Nanti' : strtoupper($item->payment_method) }}</td>
+                            <td>
+                                @if(in_array($item->payment_method, ['later', null], true))
+                                    Bayar Nanti
+                                @elseif($item->payment_method === 'cash')
+                                    Tunai
+                                @elseif($item->payment_method === 'qris')
+                                    QRIS
+                                @else
+                                    {{ strtoupper($item->payment_method) }}
+                                @endif
+                            </td>
                             <td>Rp{{ number_format($item->amount, 0, ',', '.') }}</td>
-                            <td><span class="badge text-bg-{{ $item->payment_status === 'verified' ? 'success' : 'warning' }}">{{ $item->payment_status === 'verified' ? 'Lunas' : 'Pending' }}</span></td>
+                            <td>Rp{{ number_format($item->paid_amount ?? $item->amount, 0, ',', '.') }}</td>
+                            <td>Rp{{ number_format($item->change_amount ?? 0, 0, ',', '.') }}</td>
+                            <td>
+                                @if($item->payment_status === 'verified')
+                                    <span class="badge text-bg-success"><i class="fas fa-check-circle"></i> Lunas</span>
+                                @else
+                                    <span class="badge text-bg-warning"><i class="fas fa-hourglass-half"></i> Menunggu</span>
+                                @endif
+                            </td>
+                            <td class="text-end">
+                                @if ($item->payment_status === 'verified')
+                                    <a href="{{ route('cashier.receipts.print', $item->invoice) }}" class="btn btn-sm btn-outline-light rounded-pill px-3" target="_blank">
+                                        <i class="fas fa-print"></i> Cetak
+                                    </a>
+                                @else
+                                    <span class="badge text-bg-warning">Menunggu</span>
+                                @endif
+                            </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="9" class="text-center py-4 text-secondary">Belum ada transaksi penjualan produk.</td>
+                            <td colspan="12" class="text-center py-4 text-secondary">Belum ada transaksi penjualan produk.</td>
                         </tr>
                     @endforelse
                 </tbody>
@@ -495,6 +668,12 @@
             const productSearchInput = document.querySelector('[data-product-search]');
             const productSearchSummary = document.querySelector('[data-product-search-summary]');
             const emptySearchRow = document.querySelector('[data-product-empty-search]');
+            const checkoutForm = document.getElementById('productCheckoutForm');
+            const checkoutSubmit = document.querySelector('[data-product-submit]');
+            const paidInput = document.querySelector('[data-product-paid]');
+            const changeText = document.querySelector('[data-product-change]');
+            const paymentMethodInputs = document.querySelectorAll('input[name="payment_method"]');
+            let currentTotal = {{ (int) $selectedTotal }};
 
             if (!selectedList || !selectedTotal || !selectedInputs) {
                 return;
@@ -520,7 +699,7 @@
                 catalogButtons.forEach((button) => {
                     const isSelected = selectedProducts.has(button.dataset.productId);
                     button.classList.toggle('is-selected', isSelected);
-                    button.textContent = isSelected ? 'check' : '+';
+                    button.textContent = isSelected ? '✓' : '+';
                 });
             };
 
@@ -539,7 +718,7 @@
                 });
 
                 if (productSearchSummary) {
-                    productSearchSummary.textContent = `Menampilkan ${visibleCount} dari ${productRows.length} produk.`;
+                    productSearchSummary.textContent = `${visibleCount} / ${productRows.length}`;
                 }
 
                 emptySearchRow?.classList.toggle('d-none', visibleCount !== 0);
@@ -547,11 +726,22 @@
 
             const renderSelectedProducts = () => {
                 selectedInputs.innerHTML = '';
+                if (checkoutSubmit) {
+                    checkoutSubmit.disabled = selectedProducts.size === 0;
+                    checkoutSubmit.textContent = selectedProducts.size === 0 ? 'Pilih barang dulu' : 'Lanjutkan Checkout';
+                }
 
                 if (selectedProducts.size === 0) {
-                    selectedList.innerHTML = '<div class="selected-product-empty"></div>';
+                    currentTotal = 0;
+                    selectedList.innerHTML = `
+                        <div class="selected-product-empty">
+                            <strong>Belum ada barang dipilih</strong>
+                            <span>Klik tombol + pada daftar produk untuk menambahkan barang ke checkout.</span>
+                        </div>
+                    `;
                     selectedTotal.textContent = formatCurrency(0);
                     syncCatalogState();
+                    syncPaymentAmount();
                     return;
                 }
 
@@ -583,7 +773,25 @@
                 });
 
                 selectedTotal.textContent = formatCurrency(total);
+                currentTotal = total;
                 syncCatalogState();
+                syncPaymentAmount();
+            };
+
+            const syncPaymentAmount = () => {
+                if (!paidInput || !changeText) {
+                    return;
+                }
+
+                const method = document.querySelector('input[name="payment_method"]:checked')?.value || 'cash';
+                if (method === 'qris') {
+                    paidInput.value = currentTotal || '';
+                    paidInput.readOnly = true;
+                } else {
+                    paidInput.readOnly = false;
+                }
+
+                changeText.textContent = formatCurrency((Number(paidInput.value) || 0) - currentTotal);
             };
 
             catalogButtons.forEach((button) => {
@@ -612,7 +820,7 @@
                     });
 
                     renderSelectedProducts();
-                    document.getElementById('productCheckoutForm')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    checkoutForm?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 });
             });
 
@@ -678,7 +886,19 @@
                 }, 0);
             });
 
+            checkoutForm?.addEventListener('submit', function (event) {
+                if (selectedProducts.size > 0) {
+                    return;
+                }
+
+                event.preventDefault();
+                renderSelectedProducts();
+                selectedList.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            });
+
             productSearchInput?.addEventListener('input', applyProductSearch);
+            paidInput?.addEventListener('input', syncPaymentAmount);
+            paymentMethodInputs.forEach((input) => input.addEventListener('change', syncPaymentAmount));
 
             renderSelectedProducts();
             applyProductSearch();

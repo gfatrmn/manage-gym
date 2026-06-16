@@ -5,10 +5,12 @@ namespace App\Helpers;
 use App\Models\CashierTransaction;
 use App\Models\GymCheckin;
 use App\Models\GymMember;
+use App\Models\MemberHistory;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Schema;
 
 /**
  * Kumpulan helper function yang dipakai bersama-sama di seluruh route
@@ -25,6 +27,7 @@ class RouteHelpers
             'admin'        => redirect()->route('admin.dashboard'),
             'cashier'      => redirect()->route('cashier.dashboard'),
             'master_admin' => redirect()->route('admin.dashboard'),
+            'member'       => redirect()->route('member.dashboard'),
             default        => redirect()->route('login'),
         };
     }
@@ -42,6 +45,15 @@ class RouteHelpers
     {
         if (! in_array(session('auth.role'), ['cashier', 'master_admin'], true)) {
             return redirect()->route('cashier.login');
+        }
+
+        return null;
+    }
+
+    public static function ensureMember(): ?\Illuminate\Http\RedirectResponse
+    {
+        if (session('auth.role') !== 'member') {
+            return redirect()->route('member.login');
         }
 
         return null;
@@ -176,40 +188,57 @@ class RouteHelpers
         }
 
         $isQrMemberCheckin = $actor === 'qr_member';
+        // Scan QR di kasir langsung dianggap valid (tanpa langkah validasi manual).
+        $verificationStatus = 'verified';
 
-        if ($isQrMemberCheckin) {
+        if ($isQrMemberCheckin && empty($resolvedCheckinCode)) {
             $request->validate([
                 'submitted_name'  => ['required', 'string', 'max:255'],
                 'submitted_phone' => ['required', 'string', 'max:30'],
             ]);
         }
 
-        GymCheckin::create([
+        $successLabel = match ($actor) {
+            'cashier'    => 'kasir',
+            'qr_member'  => 'QR',
+            default      => 'admin',
+        };
+
+        $checkinPayload = [
             'gym_member_id'       => $member->id,
             'checked_in_at'       => (! empty($validated['checkin_date']) && ! empty($validated['checkin_time']))
                 ? Carbon::parse($validated['checkin_date'] . ' ' . $validated['checkin_time'])
                 : now(),
             'checkin_method'      => $actor,
-            'verification_status' => $isQrMemberCheckin ? 'pending' : 'verified',
+            'verification_status' => $verificationStatus,
             'submitted_name'      => $validated['submitted_name'] ?? null,
             'submitted_phone'     => $validated['submitted_phone'] ?? null,
-            'verified_at'         => $isQrMemberCheckin ? null : now(),
-            'verified_by'         => $isQrMemberCheckin ? null : (string) (session('auth.name') ?? session('auth.login') ?? $actor),
-        ]);
-
-        if ($isQrMemberCheckin) {
-            return redirect()->route($redirectRoute, $redirectParams)
-                ->with('status', "Pengajuan check-in untuk {$member->full_name} sudah dikirim. Tunggu kasir memvalidasi sebelum masuk.");
+            'verified_at'         => $verificationStatus === 'verified' ? now() : null,
+            'verified_by'         => $verificationStatus === 'verified' ? (string) (session('auth.name') ?? session('auth.login') ?? $actor) : null,
+        ];
+        if (Schema::hasColumn('gym_checkins', 'notes')) {
+            $checkinPayload['notes'] = $validated['notes'] ?? null;
         }
 
-        $successLabel = match ($actor) {
-            'cashier'    => 'kasir',
-            'qr_member'  => 'mandiri',
-            default      => 'admin',
-        };
+        $checkin = GymCheckin::create($checkinPayload);
 
-        return redirect()->route($redirectRoute, $redirectParams)
-            ->with('status', "Check-in {$successLabel} untuk {$member->full_name} berhasil dicatat.");
+        if ($verificationStatus === 'verified') {
+            MemberHistory::create([
+                'gym_member_id' => $member->id,
+                'history_type'  => 'checkin',
+                'occurred_at'   => $checkin->checked_in_at,
+                'title'         => 'Check-in member',
+                'description'   => 'Check-in melalui ' . $successLabel,
+                'source_type'   => GymCheckin::class,
+                'source_id'     => $checkin->id,
+            ]);
+        }
+
+        $redirect = redirect()->route($redirectRoute, $redirectParams)
+            ->with('status', "Check-in {$successLabel} untuk {$member->full_name} berhasil dicatat.")
+            ->with('welcome_name', $member->full_name);
+
+        return $redirect;
     }
 
     // ─── Page meta ───────────────────────────────────────────────────────────
@@ -233,11 +262,11 @@ class RouteHelpers
                 'icon'               => 'users',
                 'heroImage'          => 'https://images.unsplash.com/photo-1571012281386-7a0c1645b252?auto=format&fit=crop&q=80&w=1200',
             ],
-            'non-members' => [
-                'pageTitle'          => 'Non Member - Arena Gym',
-                'activePage'         => 'non-members',
-                'sidebarStatusTitle' => 'Data Tamu',
-                'sidebarStatusNote'  => 'Pantau tamu bayar sekali dan trial secara terpisah.',
+            'daily-passes' => [
+                'pageTitle'          => 'Daily Pass - Arena Gym',
+                'activePage'         => 'daily-passes',
+                'sidebarStatusTitle' => 'Data Daily Pass',
+                'sidebarStatusNote'  => 'Pantau kunjungan daily pass dan pembayaran harian.',
                 'icon'               => 'user-plus',
                 'heroImage'          => 'https://images.unsplash.com/photo-1540497077202-7c8a3999166f?auto=format&fit=crop&q=80&w=1200',
             ],
@@ -304,6 +333,12 @@ class RouteHelpers
 
         $memberPayments = $transactions->where('transaction_group', 'member_payment')->values();
         $dailyPayments  = $transactions->where('transaction_group', 'daily_pass')->values();
+        $todayMemberPayments = $memberPayments
+            ->filter(fn (CashierTransaction $t) => $t->transaction_at->isToday())
+            ->values();
+        $todayDailyPayments = $dailyPayments
+            ->filter(fn (CashierTransaction $t) => $t->transaction_at->isToday())
+            ->values();
 
         $verifiedTransactions     = $transactions->filter(fn (CashierTransaction $t) => $t->payment_status === 'verified')->values();
         $todayTransactions        = $transactions->filter(fn (CashierTransaction $t) => $t->transaction_at->isToday())->values();
@@ -312,8 +347,8 @@ class RouteHelpers
         $todayRevenue              = $todayVerifiedTransactions->sum('amount');
 
         $paymentMethodSummary = collect(['cash', 'qris'])
-            ->map(function (string $method) use ($verifiedTransactions) {
-                $amount = $verifiedTransactions->where('payment_method', $method)->sum('amount');
+            ->map(function (string $method) use ($todayVerifiedTransactions) {
+                $amount = $todayVerifiedTransactions->where('payment_method', $method)->sum('amount');
 
                 return [
                     'label'  => strtoupper($method),
@@ -344,6 +379,7 @@ class RouteHelpers
             'cashierShift'        => ['start' => '08:00', 'end' => '16:00', 'label' => '08:00 - 16:00'],
             // PERBAIKAN: Hapus filter member_status, cukup tampilkan member yang aktif
             'cashierCheckinMembers' => GymMember::query()
+                ->where('status', 'member')
                 ->whereDate('expires_at', '>=', $today)
                 ->orderBy('full_name')
                 ->get(),
@@ -355,8 +391,8 @@ class RouteHelpers
                 ->latest('checked_in_at')
                 ->first(),
             'cashierStats' => [
-                ['label' => 'Pembayaran Member',        'value' => number_format($memberPayments->count(), 0, ',', '.'), 'change' => $memberPayments->where('payment_status', 'verified')->count() . ' terverifikasi'],
-                ['label' => 'Pembayaran Daily Pass',    'value' => number_format($dailyPayments->count(), 0, ',', '.'),  'change' => $dailyPayments->where('payment_status', 'verified')->count() . ' terverifikasi'],
+                ['label' => 'Pembayaran Member',        'value' => number_format($todayMemberPayments->count(), 0, ',', '.'), 'change' => $todayMemberPayments->where('payment_status', 'verified')->count() . ' terverifikasi'],
+                ['label' => 'Pembayaran Daily Pass',    'value' => number_format($todayDailyPayments->count(), 0, ',', '.'),  'change' => $todayDailyPayments->where('payment_status', 'verified')->count() . ' terverifikasi'],
                 ['label' => 'Total Transaksi Hari Ini', 'value' => number_format($todayTransactions->count(), 0, ',', '.'), 'change' => $todayPendingTransactions->count() . ' pending'],
                 ['label' => 'Pendapatan Hari Ini',      'value' => self::formatCurrency($todayRevenue), 'change' => $todayVerifiedTransactions->count() . ' transaksi lunas'],
             ],

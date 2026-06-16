@@ -4,8 +4,10 @@ use App\Helpers\RouteHelpers;
 use App\Models\CashierTransaction;
 use App\Models\GymMember;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Schema;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,7 +25,7 @@ Route::get('/verifications', function () {
 })->name('verifications');
 
 // ── Verifikasi QRIS ───────────────────────────────────────────────────────────
-Route::post('/verifications/{paymentId}', function (int $paymentId) {
+Route::post('/verifications/{paymentId}', function (Request $request, int $paymentId) {
     if ($redirect = RouteHelpers::ensureCashier()) {
         return $redirect;
     }
@@ -33,6 +35,8 @@ Route::post('/verifications/{paymentId}', function (int $paymentId) {
     $transaction->update([
         'payment_status' => 'verified',
         'receipt_status' => 'ready',
+        'paid_amount' => $transaction->paid_amount ?? $transaction->amount,
+        'change_amount' => $transaction->change_amount ?? 0,
     ]);
 
     // Jika pembayaran membership → perpanjang masa aktif member
@@ -40,18 +44,34 @@ Route::post('/verifications/{paymentId}', function (int $paymentId) {
         $member = GymMember::query()->find($transaction->gym_member_id);
 
         if ($member) {
-            $member->update([
-                'membership_plan' => $transaction->transaction_type,
+            $memberUpdate = [
                 'payment_method'  => $transaction->payment_method,
-                'payment_amount'  => $transaction->amount,
                 'joined_at'       => $member->joined_at ?? Carbon::today()->toDateString(),
                 'expires_at'      => RouteHelpers::calculateMembershipRenewalExpiry($member, Carbon::today()),
-                'package_status'  => 'active',
-            ]);
+                'status'          => 'member',
+            ];
+
+            if (Schema::hasColumn('gym_members', 'membership_plan')) {
+                $memberUpdate['membership_plan'] = $transaction->transaction_type;
+            }
+
+            if (Schema::hasColumn('gym_members', 'payment_amount')) {
+                $memberUpdate['payment_amount'] = $transaction->amount;
+            }
+
+            if (Schema::hasColumn('gym_members', 'package_status')) {
+                $memberUpdate['package_status'] = 'active';
+            }
+
+            $member->update($memberUpdate);
         }
     }
 
-    return redirect()->route('cashier.receipts')
+    $redirectRoute = $request->input('return_to') === 'dashboard'
+        ? 'cashier.dashboard'
+        : 'cashier.receipts';
+
+    return redirect()->route($redirectRoute)
         ->with('status', "Pembayaran {$transaction->invoice} berhasil diverifikasi.");
 })->name('verifications.confirm');
 
@@ -67,20 +87,39 @@ Route::get('/receipts', function (Request $request) {
     ]);
 
     $search = trim((string) $request->query('q', ''));
+    $perPage = 10;
+    $receiptPage = max(1, (int) $request->query('receipt_page', 1));
+    $receiptQuery = $request->query();
+    unset($receiptQuery['receipt_page']);
 
-    return view('cashier.receipts', array_merge($viewData, [
-        'receiptSearch' => $search,
-        'receiptQueue'  => collect($viewData['receiptQueue'])
-            ->when(
-                $search !== '',
-                fn ($col) => $col->filter(
-                    fn (CashierTransaction $t) => str_contains(
-                        str()->lower($t->customer_name),
-                        str()->lower($search)
-                    )
+    $receiptItems = collect($viewData['receiptQueue'])
+        ->filter(fn (CashierTransaction $t) => $t->payment_method === 'qris')
+        ->when(
+            $search !== '',
+            fn ($col) => $col->filter(
+                fn (CashierTransaction $t) => str_contains(
+                    str()->lower($t->customer_name),
+                    str()->lower($search)
                 )
             )
-            ->values(),
+        )
+        ->values();
+
+    $receiptQueue = new LengthAwarePaginator(
+        $receiptItems->forPage($receiptPage, $perPage)->values(),
+        $receiptItems->count(),
+        $perPage,
+        $receiptPage,
+        [
+            'path' => $request->url(),
+            'pageName' => 'receipt_page',
+            'query' => $receiptQuery,
+        ]
+    );
+
+    return view('cashier.receipts', array_merge($viewData, [
+        'receiptSearch'        => $search,
+        'receiptQueue'         => $receiptQueue,
     ]));
 })->name('receipts');
 

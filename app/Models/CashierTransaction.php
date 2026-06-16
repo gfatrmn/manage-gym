@@ -18,6 +18,8 @@ class CashierTransaction extends Model
         'transaction_group',
         'transaction_type',
         'amount',
+        'paid_amount',
+        'change_amount',
         'quantity',
         'payment_method',
         'payment_status',
@@ -30,6 +32,8 @@ class CashierTransaction extends Model
     {
         return [
             'amount' => 'integer',
+            'paid_amount' => 'integer',
+            'change_amount' => 'integer',
             'quantity' => 'integer',
             'transaction_at' => 'datetime',
         ];

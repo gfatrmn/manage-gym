@@ -36,9 +36,10 @@ class CashierMemberPaymentTest extends TestCase
             'gym_member_id' => $member->id,
             'transaction_type' => 'Perpanjangan Membership',
             'amount' => 50000,
+            'paid_amount' => 100000,
             'payment_method' => 'cash',
             'notes' => 'Renew lebih awal',
-        ])->assertRedirect(route('cashier.member-payments'));
+        ])->assertRedirect(route('cashier.transactions', ['section' => 'member']));
 
         $member->refresh();
 
@@ -47,6 +48,9 @@ class CashierMemberPaymentTest extends TestCase
         $this->assertDatabaseHas('cashier_transactions', [
             'gym_member_id' => $member->id,
             'transaction_group' => 'member_payment',
+            'amount' => 90000,
+            'paid_amount' => 100000,
+            'change_amount' => 10000,
             'payment_status' => 'verified',
         ]);
 
