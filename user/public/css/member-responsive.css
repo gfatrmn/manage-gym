@@ -24,10 +24,10 @@ canvas {
 
 @media (max-width: 1023px) {
     body > header > div {
-        display: grid !important;
-        grid-template-columns: 1fr auto !important;
-        grid-template-rows: auto auto !important;
+        display: flex !important;
+        flex-flow: row wrap !important;
         align-items: center !important;
+        justify-content: space-between !important;
         height: auto !important;
         min-height: 104px;
         gap: 12px 10px;
@@ -36,9 +36,8 @@ canvas {
     }
 
     body > header > div > a:first-child {
-        grid-column: 1 !important;
-        grid-row: 1 !important;
-        justify-self: start !important;
+        order: 1 !important;
+        flex: 0 0 auto !important;
     }
 
     body > header a.font-display-xl {
@@ -49,11 +48,10 @@ canvas {
     }
 
     body > header nav {
-        grid-column: 1 / span 2 !important;
-        grid-row: 2 !important;
-        display: flex !important;
+        order: 3 !important;
         width: 100% !important;
-        max-width: 100% !important;
+        flex: 0 0 100% !important;
+        display: flex !important;
         justify-content: flex-start !important;
         gap: 18px !important;
         overflow-x: auto !important;
@@ -76,11 +74,11 @@ canvas {
 
     body > header > div > .justify-self-end {
         display: flex !important;
-        grid-column: 2 !important;
-        grid-row: 1 !important;
-        justify-self: end !important;
+        order: 2 !important;
+        flex: 0 0 auto !important;
         align-items: center !important;
         gap: 12px !important;
+        margin-left: auto !important;
     }
 
     body > main {
