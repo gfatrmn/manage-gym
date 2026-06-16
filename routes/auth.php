@@ -54,7 +54,7 @@ Route::get('/login', function () {
 })->name('login');
 
 // ── Role-specific login shortcuts (redirect ke /login dengan ?role=xxx) ───────
-Route::get('/login/member',        fn () => redirect()->route('member.login'))->name('member.login');
+Route::get('/login/member',        fn () => redirect()->route('member.login'))->name('login.member');
 Route::get('/login/admin',         fn () => redirect()->route('login', ['role' => 'admin']))->name('admin.login');
 Route::post('/login/admin',        fn () => redirect()->route('login', ['role' => 'admin']))->name('admin.login.submit');
 
