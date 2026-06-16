@@ -23,7 +23,7 @@
         .btn-primary { background: #ff5540; color: #080808; display: inline-flex; align-items: center; justify-content: center; gap: .65rem; padding: 1rem 1.35rem; font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: .18em; text-transform: uppercase; font-weight: 700; transition: all .25s ease; }
         .btn-primary:hover { background: #fff; color: #ff5540; transform: translateY(-2px); }
     </style>
-    <link href="{{ asset('css/member-responsive.css') }}" rel="stylesheet"/>
+    <link href="{{ asset('css/member-responsive.css') }}?v={{ file_exists(public_path('css/member-responsive.css')) ? filemtime(public_path('css/member-responsive.css')) : time() }}" rel="stylesheet"/>
 </head>
 <body class="bg-[#131313] text-[#e2e2e2] font-body selection:bg-brand-red selection:text-black">
 @include('member.partials.page-loader')

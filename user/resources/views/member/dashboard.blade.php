@@ -194,7 +194,7 @@
             .md\:px-margin-desktop { padding-left: 64px; padding-right: 64px; }
         }
     </style>
-    <link href="{{ asset('css/member-responsive.css') }}" rel="stylesheet"/>
+    <link href="{{ asset('css/member-responsive.css') }}?v={{ file_exists(public_path('css/member-responsive.css')) ? filemtime(public_path('css/member-responsive.css')) : time() }}" rel="stylesheet"/>
 </head>
 <body class="bg-background text-on-background font-body-md selection:bg-brand-red selection:text-white">
 @include('member.partials.page-loader')

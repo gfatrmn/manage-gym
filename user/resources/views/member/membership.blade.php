@@ -110,7 +110,7 @@
             width: 100%;
         }
     </style>
-    <link href="{{ asset('css/member-responsive.css') }}" rel="stylesheet"/>
+    <link href="{{ asset('css/member-responsive.css') }}?v={{ file_exists(public_path('css/member-responsive.css')) ? filemtime(public_path('css/member-responsive.css')) : time() }}" rel="stylesheet"/>
 </head>
 <body class="bg-[#131313] text-[#e2e2e2] font-body selection:bg-brand-red selection:text-black">
 @include('member.partials.page-loader')
