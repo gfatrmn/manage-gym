@@ -82,4 +82,52 @@ class AdminProductTest extends TestCase
             'id' => $product->id,
         ]);
     }
+
+    public function test_admin_can_crud_categories(): void
+    {
+        $session = [
+            'auth' => [
+                'role' => 'admin',
+                'login' => 'admin',
+            ],
+        ];
+
+        // Store category
+        $this->withSession($session)
+            ->post(route('admin.categories.store'), [
+                'name' => 'Aksesoris',
+                'description' => 'Barang kelengkapan gym',
+            ])
+            ->assertRedirect(route('admin.products'));
+
+        $this->assertDatabaseHas('categories', [
+            'name' => 'Aksesoris',
+            'description' => 'Barang kelengkapan gym',
+        ]);
+
+        $category = \App\Models\Category::where('name', 'Aksesoris')->firstOrFail();
+
+        // Update category
+        $this->withSession($session)
+            ->put(route('admin.categories.update', $category), [
+                'name' => 'Aksesoris Gym',
+                'description' => 'Barang aksesoris latihan',
+            ])
+            ->assertRedirect(route('admin.products'));
+
+        $this->assertDatabaseHas('categories', [
+            'id' => $category->id,
+            'name' => 'Aksesoris Gym',
+            'description' => 'Barang aksesoris latihan',
+        ]);
+
+        // Destroy category
+        $this->withSession($session)
+            ->delete(route('admin.categories.destroy', $category))
+            ->assertRedirect(route('admin.products'));
+
+        $this->assertDatabaseMissing('categories', [
+            'id' => $category->id,
+        ]);
+    }
 }

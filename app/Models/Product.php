@@ -12,6 +12,7 @@ class Product extends Model
     protected $fillable = [
         'name',
         'category',
+        'category_id',
         'brand',
         'sku',
         'price',
@@ -20,6 +21,11 @@ class Product extends Model
         'description',
         'is_active',
     ];
+
+    public function categoryRelation()
+    {
+        return $this->belongsTo(Category::class, 'category_id');
+    }
 
     protected function casts(): array
     {
