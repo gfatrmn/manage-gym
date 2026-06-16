@@ -24,35 +24,43 @@ canvas {
 
 @media (max-width: 1023px) {
     body > header > div {
-        display: flex !important;
-        flex-direction: column;
-        align-items: stretch !important;
-        justify-content: center !important;
+        display: grid !important;
+        grid-template-columns: 1fr auto !important;
+        grid-template-rows: auto auto !important;
+        align-items: center !important;
         height: auto !important;
         min-height: 104px;
-        gap: 10px;
+        gap: 12px 10px;
         padding-top: 12px;
         padding-bottom: 10px;
     }
 
+    body > header > div > a:first-child {
+        grid-column: 1 !important;
+        grid-row: 1 !important;
+        justify-self: start !important;
+    }
+
     body > header a.font-display-xl {
-        align-self: flex-start;
+        align-self: center;
         font-size: 26px !important;
         line-height: 30px !important;
         white-space: nowrap;
     }
 
     body > header nav {
+        grid-column: 1 / span 2 !important;
+        grid-row: 2 !important;
         display: flex !important;
-        width: 100%;
-        max-width: 100%;
+        width: 100% !important;
+        max-width: 100% !important;
         justify-content: flex-start !important;
         gap: 18px !important;
-        overflow-x: auto;
-        overflow-y: hidden;
-        padding-bottom: 4px;
-        scrollbar-width: none;
-        -webkit-overflow-scrolling: touch;
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+        padding-bottom: 4px !important;
+        scrollbar-width: none !important;
+        -webkit-overflow-scrolling: touch !important;
     }
 
     body > header nav::-webkit-scrollbar {
@@ -67,7 +75,12 @@ canvas {
     }
 
     body > header > div > .justify-self-end {
-        display: none;
+        display: flex !important;
+        grid-column: 2 !important;
+        grid-row: 1 !important;
+        justify-self: end !important;
+        align-items: center !important;
+        gap: 12px !important;
     }
 
     body > main {

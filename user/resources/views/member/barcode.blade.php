@@ -110,7 +110,10 @@
 @include('member.partials.page-loader')
 <header class="fixed top-0 w-full z-50 bg-background border-b border-surface-variant">
     <div class="grid grid-cols-[1fr_auto_1fr] items-center h-20 px-margin-mobile md:px-margin-desktop w-full max-w-screen-2xl mx-auto">
-        <div></div>
+        <a class="justify-self-start inline-flex items-center gap-3" href="{{ route('dashboard') }}" aria-label="Arena Fitness Home">
+            <img src="{{ asset('images/arena-fitness-logo.jpg') }}" alt="Arena Fitness" style="display:block;width:3.8rem;max-width:3.8rem;height:3rem;max-height:3rem;object-fit:contain;border-radius:1rem;box-shadow:0 18px 32px rgba(255,59,59,.18);background:rgba(255,255,255,.04);flex:0 0 auto;">
+            <span class="font-display-xl text-white uppercase italic text-2xl tracking-tighter leading-none hidden sm:inline">Arena <span class="text-brand-red">Fitness</span></span>
+        </a>
         <nav class="hidden lg:flex items-center justify-center gap-10 justify-self-center">
             <a class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors duration-300" href="{{ route('dashboard') }}">Home</a>
             <a class="font-label-caps text-label-caps text-primary border-b-2 border-primary pb-1 transition-colors duration-300" href="{{ route('barcode') }}">QR Code</a>
