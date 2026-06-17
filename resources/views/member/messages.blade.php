@@ -93,7 +93,7 @@
                 </div>
                 <div class="flex items-center gap-3">
                     @include('member.partials.notifications')
-                    <a href="{{ route('dashboard') }}" class="font-label-caps text-xs uppercase tracking-[0.2em] border border-brand-red px-4 py-2 text-brand-red hover:bg-brand-red hover:text-black transition-colors">Home</a>
+                    <a href="{{ route('member.dashboard') }}" class="font-label-caps text-xs uppercase tracking-[0.2em] border border-brand-red px-4 py-2 text-brand-red hover:bg-brand-red hover:text-black transition-colors">Home</a>
                 </div>
             </div>
             @if($channelUrl)

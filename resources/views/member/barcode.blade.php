@@ -110,20 +110,20 @@
 @include('member.partials.page-loader')
 <header class="fixed top-0 w-full z-50 bg-background border-b border-surface-variant">
     <div class="grid grid-cols-[1fr_auto_1fr] items-center h-20 px-margin-mobile md:px-margin-desktop w-full max-w-screen-2xl mx-auto">
-        <a class="justify-self-start inline-flex items-center gap-3" href="{{ route('dashboard') }}" aria-label="Arena Fitness Home">
+        <a class="justify-self-start inline-flex items-center gap-3" href="{{ route('member.dashboard') }}" aria-label="Arena Fitness Home">
             <img src="{{ asset('images/arena-fitness-logo.jpg') }}" alt="Arena Fitness" style="display:block;width:3.8rem;max-width:3.8rem;height:3rem;max-height:3rem;object-fit:contain;border-radius:1rem;box-shadow:0 18px 32px rgba(255,59,59,.18);background:rgba(255,255,255,.04);flex:0 0 auto;">
             <span class="font-display-xl text-white uppercase italic text-2xl tracking-tighter leading-none hidden sm:inline">Arena <span class="text-brand-red">Fitness</span></span>
         </a>
         <nav class="hidden lg:flex items-center justify-center gap-10 justify-self-center">
-            <a class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors duration-300" href="{{ route('dashboard') }}">Home</a>
-            <a class="font-label-caps text-label-caps text-primary border-b-2 border-primary pb-1 transition-colors duration-300" href="{{ route('barcode') }}">QR Code</a>
-            <a class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors duration-300" href="{{ route('membership') }}">Membership</a>
-            <a class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors duration-300" href="{{ route('profile') }}">Profil</a>
-            <a class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors duration-300" href="{{ route('history') }}">Riwayat</a>
+            <a class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors duration-300" href="{{ route('member.dashboard') }}">Home</a>
+            <a class="font-label-caps text-label-caps text-primary border-b-2 border-primary pb-1 transition-colors duration-300" href="{{ route('member.barcode') }}">QR Code</a>
+            <a class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors duration-300" href="{{ route('member.membership') }}">Membership</a>
+            <a class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors duration-300" href="{{ route('member.profile') }}">Profil</a>
+            <a class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors duration-300" href="{{ route('member.history') }}">Riwayat</a>
         </nav>
         <div class="flex items-center gap-3 justify-self-end">
         @include('member.partials.notifications')
-        <form method="POST" action="{{ route('logout') }}">
+        <form method="POST" action="{{ route('member.logout') }}">
             @csrf
             <button type="submit" class="font-label-caps text-label-caps bg-[#ff5540] text-black px-5 py-2 uppercase tracking-widest hover:bg-white hover:text-[#ff5540] transition-colors duration-300">LOGOUT</button>
         </form>
@@ -184,7 +184,7 @@
         </div>
 
         <div class="mt-12">
-            <a class="inline-flex items-center gap-3 border-2 border-on-surface text-on-surface hover:bg-on-surface hover:text-black transition-all duration-300 px-8 py-4 font-label-caps text-label-caps group" href="{{ route('dashboard') }}">
+            <a class="inline-flex items-center gap-3 border-2 border-on-surface text-on-surface hover:bg-on-surface hover:text-black transition-all duration-300 px-8 py-4 font-label-caps text-label-caps group" href="{{ route('member.dashboard') }}">
                 <span class="material-symbols-outlined group-hover:-translate-x-1 transition-transform">arrow_back</span>
                 KEMBALI KE DASHBOARD
             </a>

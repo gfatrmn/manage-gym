@@ -41,20 +41,20 @@
 
 <header class="fixed top-0 w-full z-50 bg-black/55 backdrop-blur-xl border-b border-white/10">
     <div class="grid grid-cols-[1fr_auto_1fr] items-center h-20 px-5 md:px-16 w-full max-w-screen-2xl mx-auto">
-        <a class="justify-self-start inline-flex items-center gap-3" href="{{ route('dashboard') }}" aria-label="Arena Fitness Home">
+        <a class="justify-self-start inline-flex items-center gap-3" href="{{ route('member.dashboard') }}" aria-label="Arena Fitness Home">
             <img src="{{ asset('images/arena-fitness-logo.jpg') }}" alt="Arena Fitness" style="display:block;width:3.8rem;max-width:3.8rem;height:3rem;max-height:3rem;object-fit:contain;border-radius:1rem;box-shadow:0 18px 32px rgba(255,59,59,.18);background:rgba(255,255,255,.04);flex:0 0 auto;">
             <span class="font-display text-white uppercase italic text-2xl leading-none hidden sm:inline">Arena <span class="text-brand-red">Fitness</span></span>
         </a>
         <nav class="hidden lg:flex items-center justify-center gap-8 justify-self-center font-mono text-sm tracking-[0.1em]">
-            <a class="nav-link text-[#ebbbb4] hover:text-brand-red" href="{{ route('dashboard') }}">Home</a>
-            <a class="nav-link text-[#ebbbb4] hover:text-brand-red" href="{{ route('barcode') }}">QR Code</a>
-            <a class="nav-link text-[#ebbbb4] hover:text-brand-red" href="{{ route('membership') }}">Membership</a>
-            <a class="nav-link active text-brand-red" href="{{ route('profile') }}">Profil</a>
-            <a class="nav-link text-[#ebbbb4] hover:text-brand-red" href="{{ route('history') }}">Riwayat</a>
+            <a class="nav-link text-[#ebbbb4] hover:text-brand-red" href="{{ route('member.dashboard') }}">Home</a>
+            <a class="nav-link text-[#ebbbb4] hover:text-brand-red" href="{{ route('member.barcode') }}">QR Code</a>
+            <a class="nav-link text-[#ebbbb4] hover:text-brand-red" href="{{ route('member.membership') }}">Membership</a>
+            <a class="nav-link active text-brand-red" href="{{ route('member.profile') }}">Profil</a>
+            <a class="nav-link text-[#ebbbb4] hover:text-brand-red" href="{{ route('member.history') }}">Riwayat</a>
         </nav>
         <div class="flex items-center gap-3 justify-self-end">
             @include('member.partials.notifications')
-            <form method="POST" action="{{ route('logout') }}">
+            <form method="POST" action="{{ route('member.logout') }}">
                 @csrf
                 <button type="submit" class="inline-flex items-center gap-2 font-mono text-xs border border-white/10 bg-white/5 text-white px-4 py-3 uppercase tracking-[0.18em] hover:border-brand-red hover:text-brand-red transition-colors"><span class="material-symbols-outlined text-[16px]">logout</span>Logout</button>
             </form>
@@ -93,7 +93,7 @@
                         <h1 class="font-display text-4xl md:text-5xl uppercase italic text-white mt-6 leading-none">{{ $memberName }}</h1>
                         <p class="font-mono text-xs uppercase tracking-[0.22em] text-brand-red mt-3">{{ $statusLabel }}</p>
 
-                        <form method="POST" action="{{ route('profile.photo.update') }}" enctype="multipart/form-data" class="mt-6 w-full">
+                        <form method="POST" action="{{ route('member.profile.photo.update') }}" enctype="multipart/form-data" class="mt-6 w-full">
                             @csrf
                             @if($pendingPhotoRequest)
                                 <button type="button" class="w-full border border-yellow-500/30 bg-yellow-500/10 px-5 py-4 font-mono text-xs uppercase tracking-[0.18em] text-yellow-300 cursor-not-allowed" disabled>
@@ -118,11 +118,11 @@
                             @endif
                         </div>
                         <div class="mt-4 w-full grid grid-cols-2 gap-3">
-                            <a href="{{ route('barcode') }}" class="glass-tile p-4 text-left text-white hover:text-brand-red">
+                            <a href="{{ route('member.barcode') }}" class="glass-tile p-4 text-left text-white hover:text-brand-red">
                                 <span class="material-symbols-outlined text-brand-red mb-3">qr_code_scanner</span>
                                 <p class="font-mono text-[10px] uppercase tracking-[0.16em]">Check-In Gym</p>
                             </a>
-                            <a href="{{ route('history') }}" class="glass-tile p-4 text-left text-white hover:text-brand-red">
+                            <a href="{{ route('member.history') }}" class="glass-tile p-4 text-left text-white hover:text-brand-red">
                                 <span class="material-symbols-outlined text-brand-red mb-3">fitness_center</span>
                                 <p class="font-mono text-[10px] uppercase tracking-[0.16em]">Log Latihan</p>
                             </a>
@@ -144,7 +144,7 @@
                                 <span class="font-mono text-[10px] uppercase tracking-[0.24em] text-brand-red">Data Akun Member</span>
                                 <h2 class="font-display text-4xl uppercase italic text-white mt-2">Identitas & Kontak</h2>
                             </div>
-                            <a href="{{ route('membership') }}" class="glass-tile inline-flex items-center justify-center gap-3 px-5 py-3 font-mono text-xs uppercase tracking-[0.16em] text-white hover:text-brand-red"><span class="material-symbols-outlined text-[18px]">workspace_premium</span>Membership</a>
+                            <a href="{{ route('member.membership') }}" class="glass-tile inline-flex items-center justify-center gap-3 px-5 py-3 font-mono text-xs uppercase tracking-[0.16em] text-white hover:text-brand-red"><span class="material-symbols-outlined text-[18px]">workspace_premium</span>Membership</a>
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">

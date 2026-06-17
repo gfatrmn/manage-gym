@@ -3,103 +3,73 @@
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>IRON ELITE | DOMINASI SETIAP LIMIT</title>
-    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=JetBrains+Mono:wght=400;500;700&family=Hanken+Grotesk:wght=400;600&display=swap" rel="stylesheet"/>
+    <title>Arena Fitness | DOMINASI SETIAP LIMIT</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=JetBrains+Mono:wght@400;500;700&family=Hanken+Grotesk:wght@400;600&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-    <script>
+    <script id="tailwind-config">
         tailwind.config = {
-            darkMode: "class",
+            darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
-                        "surface-dim": "#131313",
-                        "on-surface-variant": "#ebbbb4",
-                        "on-surface": "#e2e2e2",
-                        "background": "#131313",
-                        "primary-fixed": "#ffdad4",
-                        "on-primary-fixed-variant": "#930100",
-                        "error-container": "#93000a",
-                        "primary-fixed-dim": "#ffb4a8",
-                        "primary": "#ffb4a8",
-                        "surface-container": "#1f1f1f",
-                        "tertiary-fixed-dim": "#c6c6c7",
-                        "tertiary": "#c6c6c7",
-                        "on-secondary-fixed-variant": "#474746",
-                        "on-tertiary-fixed-variant": "#454747",
-                        "secondary-fixed-dim": "#c8c6c5",
-                        "on-primary": "#690100",
-                        "surface-container-highest": "#353535",
-                        "on-background": "#e2e2e2",
-                        "tertiary-fixed": "#e2e2e2",
-                        "secondary-fixed": "#e5e2e1",
-                        "on-secondary-fixed": "#1c1b1b",
-                        "on-primary-fixed": "#410000",
-                        "on-tertiary-fixed": "#1a1c1c",
-                        "on-error": "#690005",
-                        "surface-container-high": "#2a2a2a",
-                        "surface-variant": "#353535",
-                        "surface-bright": "#393939",
-                        "inverse-on-surface": "#303030",
-                        "on-tertiary-container": "#282a2a",
-                        "outline": "#b18780",
-                        "surface-container-low": "#1b1b1b",
-                        "error": "#ffb4ab",
-                        "on-tertiary": "#2f3131",
-                        "inverse-primary": "#c00100",
-                        "tertiary-container": "#909191",
-                        "surface-tint": "#ffb4a8",
-                        "inverse-surface": "#e2e2e2",
-                        "surface-container-lowest": "#0e0e0e",
-                        "on-secondary": "#313030",
-                        "surface": "#131313",
-                        "secondary": "#c8c6c5",
-                        "outline-variant": "#603e39",
-                        "on-error-container": "#ffdad6",
-                        "on-primary-container": "#5c0000",
-                        "on-secondary-container": "#b7b5b4",
-                        "secondary-container": "#474746",
-                        "primary-container": "#ff5540",
-                        "brand-red": "#FF0000"
+                        primary: '#ffb4a8',
+                        secondary: '#c8c6c5',
+                        error: '#ffb4ab',
+                        background: '#131313',
+                        surface: '#131313',
+                        'surface-dim': '#131313',
+                        'surface-container': '#1f1f1f',
+                        'surface-container-low': '#1b1b1b',
+                        'surface-container-high': '#2a2a2a',
+                        'surface-container-highest': '#353535',
+                        'surface-container-lowest': '#0e0e0e',
+                        'surface-variant': '#353535',
+                        'on-background': '#e2e2e2',
+                        'on-surface': '#e2e2e2',
+                        'on-surface-variant': '#ebbbb4',
+                        'primary-container': '#ff5540',
+                        'on-primary-container': '#5c0000',
+                        'brand-red': '#ff5540',
                     },
                     borderRadius: {
-                        DEFAULT: "0.25rem",
-                        lg: "0.5rem",
-                        xl: "0.75rem",
-                        full: "9999px"
+                        DEFAULT: '0.25rem',
+                        lg: '0.5rem',
+                        xl: '0.75rem',
+                        full: '9999px',
                     },
                     spacing: {
-                        gutter: "32px",
-                        unit: "8px",
-                        margin-desktop: "64px",
-                        section-padding: "120px",
-                        margin-mobile: "20px"
+                        'margin-desktop': '64px',
+                        'margin-mobile': '20px',
+                        unit: '8px',
+                        'section-padding': '120px',
+                        gutter: '32px',
                     },
                     fontFamily: {
-                        "label-caps": ["JetBrains Mono"],
-                        "body-md": ["Hanken Grotesk"],
-                        "body-lg": ["Hanken Grotesk"],
-                        "headline-lg-mobile": ["Oswald"],
-                        "display-xl": ["Oswald"],
-                        "headline-md": ["Oswald"],
-                        "headline-lg": ["Oswald"]
+                        'headline-md': ['Oswald'],
+                        'body-md': ['Hanken Grotesk'],
+                        'headline-lg-mobile': ['Oswald'],
+                        'headline-lg': ['Oswald'],
+                        'display-xl': ['Oswald'],
+                        'label-caps': ['JetBrains Mono'],
+                        'body-lg': ['Hanken Grotesk'],
                     },
                     fontSize: {
-                        "label-caps": ["14px", {"lineHeight": "20px", "letterSpacing": "0.1em", "fontWeight": "500"}],
-                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
-                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
-                        "headline-lg-mobile": ["36px", {"lineHeight": "40px", "fontWeight": "600"}],
-                        "display-xl": ["80px", {"lineHeight": "90px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
-                        "headline-md": ["32px", {"lineHeight": "38px", "fontWeight": "600"}],
-                        "headline-lg": ["48px", {"lineHeight": "56px", "fontWeight": "600"}]
-                    }
-                }
-            }
+                        'headline-md': ['32px', {lineHeight: '38px', fontWeight: '600'}],
+                        'body-md': ['16px', {lineHeight: '24px', fontWeight: '400'}],
+                        'headline-lg-mobile': ['36px', {lineHeight: '40px', fontWeight: '600'}],
+                        'headline-lg': ['48px', {lineHeight: '56px', fontWeight: '600'}],
+                        'display-xl': ['80px', {lineHeight: '90px', letterSpacing: '0', fontWeight: '700'}],
+                        'label-caps': ['14px', {lineHeight: '20px', letterSpacing: '0.1em', fontWeight: '500'}],
+                        'body-lg': ['18px', {lineHeight: '28px', fontWeight: '400'}],
+                    },
+                },
+            },
         };
     </script>
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <style>
         .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'OPSZ' 24;
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
             display: inline-block;
             line-height: 1;
             text-transform: none;
@@ -109,325 +79,509 @@
             direction: ltr;
         }
 
-        .metallic-gradient {
-            background: linear-gradient(135deg, #222222 0%, #111111 100%);
-        }
-
-        .red-accent-bar {
-            height: 4px;
-            background-color: #FF0000;
-            width: 100%;
-            position: absolute;
-            bottom: 0;
-            left: 0;
-        }
-
         .btn-primary {
-            background-color: #FF0000;
-            color: black;
+            background-color: #ff5540;
+            color: #000;
             text-transform: uppercase;
             font-family: 'Oswald', sans-serif;
+            font-weight: 600;
+            letter-spacing: 0.1em;
             transition: all 0.3s ease;
-            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem 2.5rem;
         }
 
         .btn-primary:hover {
-            background-color: white;
-            color: #FF0000;
-            box-shadow: 4px 4px 0px white;
-            transform: translate(-2px, -2px);
+            background-color: #fff;
+            color: #ff5540;
+            box-shadow: 0 0 20px rgba(255, 85, 64, 0.4);
+            transform: translateY(-2px);
         }
 
-        @keyframes marquee {
-            0% { transform: translateX(100%); }
-            100% { transform: translateX(-100%); }
-        }
-        .animate-marquee {
-            animation: marquee 30s linear infinite;
-        }
-
-        .glitch-hover:hover {
-            animation: glitch 0.3s cubic-bezier(.25,.46,.45,.94) both infinite;
-        }
-        @keyframes glitch {
-            0% { transform: translate(0); }
-            20% { transform: translate(-2px, 2px); }
-            40% { transform: translate(-2px, -2px); }
-            60% { transform: translate(2px, 2px); }
-            80% { transform: translate(2px, -2px); }
-            100% { transform: translate(0); }
+        .glass-panel {
+            background: linear-gradient(135deg, rgba(31,31,31,.72), rgba(14,14,14,.48));
+            border: 1px solid rgba(255,255,255,.14);
+            box-shadow: 0 24px 80px rgba(0,0,0,.48);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
         }
 
-        @keyframes pulse-red {
-            0%, 100% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.1); opacity: 0.8; }
-        }
-        .animate-pulse-red {
-            animation: pulse-red 1s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        .glass-tile {
+            background: rgba(255,255,255,.055);
+            border: 1px solid rgba(255,255,255,.12);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            transition: border-color .25s ease, background .25s ease, transform .25s ease;
         }
 
-        .glass-card {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+        .glass-tile:hover {
+            background: rgba(255,255,255,.085);
+            border-color: rgba(255,85,64,.52);
+            transform: translateY(-2px);
+        }
+
+        .metal-grid {
+            background-image:
+                linear-gradient(rgba(255,255,255,.045) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,.045) 1px, transparent 1px);
+            background-size: 48px 48px;
+        }
+
+        .hero-vignette {
+            background:
+                linear-gradient(90deg, rgba(0,0,0,.96) 0%, rgba(0,0,0,.78) 42%, rgba(0,0,0,.30) 100%),
+                linear-gradient(0deg, #131313 0%, rgba(19,19,19,0) 42%);
+        }
+
+        .nav-link {
+            position: relative;
+            padding-bottom: 6px;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 0;
+            height: 2px;
+            background: #ff5540;
+            transition: width .25s ease;
+        }
+
+        .nav-link:hover::after,
+        .nav-link.active::after {
+            width: 100%;
+        }
+
+        .scan-line {
+            height: 2px;
+            background: linear-gradient(to right, transparent, #ff5540, transparent);
+            position: absolute;
+            width: 100%;
+            z-index: 20;
+            animation: scan 3s linear infinite;
+        }
+
+        @keyframes scan {
+            0% { top: 0%; }
+            100% { top: 100%; }
+        }
+
+        .bg-background { background-color: #131313; }
+        .bg-surface-container { background-color: #1f1f1f; }
+        .bg-surface-container-low { background-color: #1b1b1b; }
+        .bg-surface-container-high { background-color: #2a2a2a; }
+        .bg-surface-container-lowest { background-color: #0e0e0e; }
+        .bg-surface-dim { background-color: #131313; }
+        .bg-brand-red { background-color: #ff5540; }
+        .border-surface-variant { border-color: #353535; }
+        .text-brand-red { color: #ff5540; }
+        .text-on-background, .text-on-surface { color: #e2e2e2; }
+        .text-on-surface-variant { color: #ebbbb4; }
+        .text-primary { color: #ffb4a8; }
+        .font-body-md, .font-body-lg { font-family: 'Hanken Grotesk', sans-serif; }
+        .font-label-caps { font-family: 'JetBrains Mono', monospace; }
+        .font-display-xl, .font-headline-lg, .font-headline-md { font-family: 'Oswald', sans-serif; }
+        .text-label-caps { font-size: 14px; line-height: 20px; letter-spacing: 0.1em; font-weight: 500; }
+        .text-headline-lg { font-size: 48px; line-height: 56px; font-weight: 600; }
+        .text-display-xl { font-size: 80px; line-height: 90px; letter-spacing: 0; font-weight: 700; }
+        .px-margin-mobile { padding-left: 20px; padding-right: 20px; }
+        .py-section-padding { padding-top: 120px; padding-bottom: 120px; }
+        @media (min-width: 768px) {
+            .md\:px-margin-desktop { padding-left: 64px; padding-right: 64px; }
         }
     </style>
+    <link href="{{ asset('css/member-responsive.css') }}?v={{ file_exists(public_path('css/member-responsive.css')) ? filemtime(public_path('css/member-responsive.css')) : time() }}" rel="stylesheet"/>
 </head>
 <body class="bg-background text-on-background font-body-md selection:bg-brand-red selection:text-white">
-<!-- Top Navigation Bar -->
-<header class="fixed top-0 w-full z-50 bg-background border-b border-surface-variant">
-    <div class="flex justify-between items-center h-20 px-margin-mobile md:px-margin-desktop w-full max-w-screen-2xl mx-auto">
-        <a class="inline-flex items-center gap-3" href="{{ route('member.dashboard') }}">
-            <img src="{{ asset('images/arena-fitness-logo.jpg') }}" alt="Arena Fitness" style="width: 110px; height: auto;">
+@include('member.partials.page-loader')
+@php
+    $channelUrl = config('services.whatsapp.channel_url');
+    $memberAnnouncements = $announcements ?? collect();
+    $hasMembershipWarning = filled($membershipWarning ?? null);
+    $shouldShowChannelPrompt = ($showWhatsAppChannelPrompt ?? false) && filled($channelUrl);
+    $notificationCount = $memberAnnouncements->count() + ($hasMembershipWarning ? 1 : 0) + ($shouldShowChannelPrompt ? 1 : 0);
+@endphp
+<header class="fixed top-0 w-full z-50 bg-black/55 backdrop-blur-xl border-b border-white/10">
+    <div class="grid grid-cols-[1fr_auto_1fr] items-center h-20 px-margin-mobile md:px-margin-desktop w-full max-w-screen-2xl mx-auto">
+        <a class="justify-self-start inline-flex items-center gap-3" href="{{ route('member.dashboard') }}" aria-label="Arena Fitness Home">
+            <img src="{{ asset('images/arena-fitness-logo.jpg') }}" alt="Arena Fitness" style="display:block;width:3.8rem;max-width:3.8rem;height:3rem;max-height:3rem;object-fit:contain;border-radius:1rem;box-shadow:0 18px 32px rgba(255,59,59,.18);background:rgba(255,255,255,.04);flex:0 0 auto;">
+            <span class="font-display-xl text-white uppercase italic text-2xl tracking-tighter leading-none hidden sm:inline">Arena <span class="text-brand-red">Fitness</span></span>
         </a>
-        <nav class="hidden lg:flex items-center gap-8">
-            <a class="font-label-caps text-label-caps text-primary border-b-2 border-primary pb-1 transition-colors duration-300" href="{{ route('member.dashboard') }}">Home</a>
-            <a class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors duration-300" href="{{ route('member.statistics') }}">Statistik</a>
-            <a class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors duration-300" href="#">Barcode</a>
-            <a class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors duration-300" href="#">Informasi Membership</a>
-            <a class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors duration-300" href="#">Profil</a>
-            <a class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors duration-300" href="{{ route('member.history') }}">Riwayat</a>
+        <nav class="hidden lg:flex items-center justify-center gap-8 justify-self-center">
+            <a class="nav-link active font-label-caps text-label-caps text-brand-red" href="{{ route('member.dashboard') }}">Home</a>
+            <a class="nav-link font-label-caps text-label-caps text-on-surface-variant hover:text-brand-red transition-colors" href="{{ route('member.barcode') }}">QR Code</a>
+            <a class="nav-link font-label-caps text-label-caps text-on-surface-variant hover:text-brand-red transition-colors" href="{{ route('member.membership') }}">Membership</a>
+            <a class="nav-link font-label-caps text-label-caps text-on-surface-variant hover:text-brand-red transition-colors" href="{{ route('member.profile') }}">Profil</a>
+            <a class="nav-link font-label-caps text-label-caps text-on-surface-variant hover:text-brand-red transition-colors" href="{{ route('member.history') }}">Riwayat</a>
         </nav>
-        <div class="flex items-center gap-3 relative">
-            <button id="notifBtn" type="button" class="w-10 h-10 rounded-full border border-surface-variant flex items-center justify-center text-primary">
-                <span class="material-symbols-outlined">notifications</span>
-            </button>
-            <div id="notifPopup" class="hidden absolute right-0 top-12 w-80 bg-surface-container border border-surface-variant rounded-lg p-3 z-50">
-                <div class="text-sm font-bold mb-2">Pengumuman Admin</div>
-                @forelse($announcements->take(5) as $announcement)
-                    <div class="mb-2 pb-2 border-b border-surface-variant/40 last:border-0">
-                        <div class="text-xs text-primary font-semibold">{{ $announcement->title }}</div>
-                        <div class="text-xs text-on-surface-variant">{{ $announcement->body }}</div>
-                    </div>
-                @empty
-                    <div class="text-xs text-on-surface-variant">Belum ada pengumuman.</div>
-                @endforelse
-            </div>
-            <form method="POST" action="{{ route('member.logout') }}" style="display:inline;">
+        <div class="justify-self-end flex items-center gap-3 relative">
+            @include('member.partials.notifications')
+            <form method="POST" action="{{ route('member.logout') }}">
                 @csrf
-                <button type="submit" class="bg-brand-red text-black font-label-caps px-6 py-2 uppercase tracking-widest active:scale-95 transition-transform">Logout</button>
+                <button type="submit" class="inline-flex items-center gap-2 font-label-caps text-xs border border-white/10 bg-white/5 text-white px-4 py-3 uppercase tracking-[0.18em] hover:border-brand-red hover:text-brand-red transition-colors">
+                    <span class="material-symbols-outlined text-[16px]">logout</span>
+                    Logout
+                </button>
             </form>
         </div>
     </div>
 </header>
-<!-- Gym Announcement Ticker -->
-@if($announcements->count() > 0)
-<div class="fixed top-20 w-full bg-brand-red text-black z-40 overflow-hidden py-1 border-y border-black">
-    <div class="whitespace-nowrap flex animate-marquee font-label-caps text-xs uppercase font-bold">
-        @foreach($announcements as $index => $announcement)
-            @if($index > 0)
-                <span class="mx-4 italic">•</span>
-            @endif
-            <span class="mx-4 italic">{{ $announcement->title }}: {{ $announcement->body }}</span>
-        @endforeach
-    </div>
-</div>
-@endif
-<main class="pt-[112px]">
-    <!-- Hero Section -->
-    <section class="relative h-[850px] min-h-[600px] flex items-center overflow-hidden">
-        <div class="absolute inset-0 z-0">
-            <img class="w-full h-full object-cover grayscale brightness-50" src="https://lh3.googleusercontent.com/aida/ADBb0uhiXhdMIfRnlL-HktO1jI6P-9rb78dysKtUZRDwlgBppANNsODy-3TrM8TQL2pXykabTxDv9URUCIG7ecCGflC6gUjXMppgjbUTdANJf1jtq1bHcfm6-YsMaJnNloBueUwNplfvy7JcibQ0CX59Cbykm63wjq9PRMlb6-AqgiQrJwa10ileUK3LYt9gLCW4aoj7_-Gr9laA5JhojMZmUhB2yKoaZRyHNc2pQFFaTDhXvTBPvU0K4SkDKOU" alt=""/>
-            <div class="absolute inset-0 bg-gradient-to-r from-black via-black/70 to-transparent"></div>
+
+<main class="pt-20">
+    @if(session('status'))
+        <div class="max-w-screen-2xl mx-auto px-margin-mobile md:px-margin-desktop pt-4">
+            <div class="border border-brand-red/30 bg-brand-red/10 text-[#ffb4a8] px-4 py-3">
+                {{ session('status') }}
+            </div>
         </div>
-        <div class="relative z-10 w-full max-w-screen-2xl mx-auto px-margin-mobile md:px-margin-desktop">
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-                <div class="lg:col-span-7">
-                    <h1 class="font-display-xl text-display-xl uppercase italic leading-none mb-4 drop-shadow-2xl">
-                        SELAMAT DATANG KEMBALI,<br/>
-                        <span class="text-brand-red">{{ strtoupper(explode(' ', $user->name)[0]) }}!</span>
+    @endif
+    <section class="relative min-h-[760px] flex items-center overflow-hidden metal-grid">
+        @php
+            $firstName = strtoupper(explode(' ', trim($user->name))[0] ?? 'MEMBER');
+            $expiresAt = $member?->expires_at;
+            $remainingDays = $expiresAt ? max(0, now()->startOfDay()->diffInDays($expiresAt->copy()->startOfDay(), false)) : null;
+        @endphp
+        <div class="absolute inset-0 z-0">
+            <img alt="Arena Fitness training floor" class="w-full h-full object-cover grayscale brightness-[0.42] contrast-125" onerror="this.style.display='none'" src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=2200&q=85"/>
+            <div class="absolute inset-0 hero-vignette"></div>
+        </div>
+        <div class="relative z-10 w-full max-w-screen-2xl mx-auto px-margin-mobile md:px-margin-desktop py-16">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+                <div class="lg:col-span-7 xl:col-span-8">
+                    <div class="inline-flex items-center gap-3 glass-tile px-4 py-2 mb-6">
+                        <span class="h-2 w-2 bg-brand-red shadow-[0_0_14px_#ff5540]"></span>
+                        <span class="font-label-caps text-[11px] uppercase tracking-[0.28em] text-[#ffb4a8]">Member Training Portal</span>
+                    </div>
+                    <h1 class="font-display-xl text-[56px] md:text-[86px] lg:text-[100px] uppercase italic leading-[0.9] mb-6 drop-shadow-2xl">
+                        PUSH HARDER,<br/><span class="text-brand-red">{{ $firstName }}</span>
                     </h1>
-                    <p class="font-label-caps text-primary uppercase tracking-widest mb-6 border-l-4 border-brand-red pl-6">
-                        STATUS: {{ $member ? strtoupper($member->member_status) : 'MEMBER' }} | BERLAKU HINGGA: {{ $member && $member->expires_at ? $member->expires_at->format('d M Y') : 'N/A' }}
+                    <p class="font-body-lg text-lg md:text-xl text-on-surface-variant max-w-2xl mb-8">
+                        Akses QR check-in, pantau masa aktif membership, dan lanjutkan progres latihan Anda dari satu dashboard yang lebih cepat dan terpusat.
                     </p>
-                    <!-- Level Progress Visual -->
-                    <div class="grid grid-cols-1 gap-4 max-w-md">
-                        <div class="bg-black/40 backdrop-blur-md p-6 border border-surface-variant/30 flex flex-col">
-                            <span class="font-label-caps text-on-surface-variant text-[10px] uppercase mb-1">Total Kunjungan</span>
-                            <span class="font-display-xl text-4xl">{{ $totalCheckins }}</span>
+
+                    <div class="flex flex-col sm:flex-row gap-4 mb-8">
+                        <a class="btn-primary gap-3 w-full sm:w-auto" href="{{ route('member.barcode') }}">
+                            <span class="material-symbols-outlined text-[22px]">qr_code_2</span>
+                            Buka QR Check-In
+                        </a>
+                        <a href="{{ route('member.history') }}" class="inline-flex items-center justify-center gap-3 w-full sm:w-auto glass-tile px-6 py-4 font-label-caps text-xs uppercase tracking-[0.22em] text-white hover:text-brand-red">
+                            <span class="material-symbols-outlined text-[18px]">monitoring</span>
+                            Riwayat Latihan
+                        </a>
+                        @if($channelUrl)
+                            <a href="{{ $channelUrl }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-3 w-full sm:w-auto border border-brand-red/60 bg-brand-red/10 px-6 py-4 font-label-caps text-xs uppercase tracking-[0.22em] text-brand-red hover:bg-brand-red hover:text-black transition-colors">
+                                <span class="material-symbols-outlined text-[18px]">open_in_new</span>
+                                WhatsApp
+                            </a>
+                        @endif
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-3xl">
+                        <div class="glass-tile p-4">
+                            <span class="font-label-caps text-[10px] uppercase tracking-[0.18em] text-on-surface-variant">Check-In</span>
+                            <span class="block font-display-xl text-4xl text-white mt-1">{{ $totalCheckins }}</span>
+                        </div>
+                        <div class="glass-tile p-4">
+                            <span class="font-label-caps text-[10px] uppercase tracking-[0.18em] text-on-surface-variant">Sisa Aktif</span>
+                            <span class="block font-display-xl text-4xl text-white mt-1">{{ $remainingDays ?? '-' }}<span class="text-lg text-brand-red">H</span></span>
+                        </div>
+                        <div class="glass-tile p-4">
+                            <span class="font-label-caps text-[10px] uppercase tracking-[0.18em] text-on-surface-variant">Status</span>
+                            <span class="block font-display-xl text-2xl text-brand-red uppercase mt-2">{{ str_replace('_', ' ', $membershipStatus ?? 'member') }}</span>
                         </div>
                     </div>
                 </div>
-                <div class="lg:col-span-5 space-y-6">
-                    <!-- Daily Tip Card -->
-                    <div class="bg-brand-red p-6 border border-white/20 relative group overflow-hidden">
-                        <div class="absolute -right-4 -bottom-4 opacity-10 group-hover:rotate-12 transition-transform">
-                            <span class="material-symbols-outlined text-8xl text-black">tips_and_updates</span>
+
+                <div class="lg:col-span-5 xl:col-span-4">
+                    <div class="glass-panel p-6 md:p-7 relative overflow-hidden">
+                        <div class="absolute top-0 left-0 right-0 h-[3px] bg-brand-red"></div>
+                        <div class="flex items-start justify-between gap-4 mb-8">
+                            <div>
+                                <p class="font-label-caps text-[10px] uppercase tracking-[0.24em] text-on-surface-variant">Membership Card</p>
+                                <h2 class="font-headline-md text-3xl uppercase italic text-white mt-2">Arena Access</h2>
+                            </div>
+                            <span class="inline-flex h-12 w-12 items-center justify-center border border-brand-red/40 bg-brand-red/10 text-brand-red">
+                                <span class="material-symbols-outlined">verified</span>
+                            </span>
                         </div>
-                        <div class="relative z-10 text-black">
-                            <span class="font-label-caps text-[10px] border-b border-black/30 pb-1 mb-3 inline-block font-bold">TIPS HARI INI</span>
-                            <h4 class="font-headline-md text-lg uppercase mb-2">PENTINGNYA HIDRASI</h4>
-                            <p class="font-body-md text-sm leading-tight italic font-semibold">"Minum setidaknya 500ml air 30 menit sebelum latihan untuk performa otot yang optimal."</p>
+
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between gap-4 border-b border-white/10 pb-4">
+                                <span class="font-label-caps text-[10px] uppercase tracking-[0.18em] text-on-surface-variant">Nama</span>
+                                <span class="text-white font-semibold text-right">{{ $user->name }}</span>
+                            </div>
+                            <div class="flex items-center justify-between gap-4 border-b border-white/10 pb-4">
+                                <span class="font-label-caps text-[10px] uppercase tracking-[0.18em] text-on-surface-variant">Berlaku</span>
+                                <span class="text-white font-semibold">{{ $expiresAt ? $expiresAt->format('d M Y') : 'N/A' }}</span>
+                            </div>
+                            <div class="flex items-center justify-between gap-4">
+                                <span class="font-label-caps text-[10px] uppercase tracking-[0.18em] text-on-surface-variant">Mode</span>
+                                <span class="text-brand-red font-label-caps text-xs uppercase tracking-[0.18em]">Ready To Train</span>
+                            </div>
+                        </div>
+
+                        <div class="mt-8 grid grid-cols-2 gap-3">
+                            <a href="{{ route('member.membership') }}" class="glass-tile p-4 flex items-center gap-3 text-white hover:text-brand-red">
+                                <span class="material-symbols-outlined text-brand-red">workspace_premium</span>
+                                <span class="font-label-caps text-[10px] uppercase tracking-[0.16em]">Membership</span>
+                            </a>
+                            <a href="{{ route('member.profile') }}" class="glass-tile p-4 flex items-center gap-3 text-white hover:text-brand-red">
+                                <span class="material-symbols-outlined text-brand-red">person</span>
+                                <span class="font-label-caps text-[10px] uppercase tracking-[0.16em]">Profil</span>
+                            </a>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
-    <!-- ARENA PERFORMANCE DASHBOARD SECTION -->
-    <section class="relative h-[700px] flex items-center overflow-hidden">
+
+    <section class="relative bg-[#0e0e0e] overflow-hidden py-20 md:py-28 border-y border-white/10">
         <div class="absolute inset-0 z-0">
-            <img alt="Gym Interior Hero" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBjMMY9hC5ccpxsymIOq7eUHxIqmatGm0jJUFAix_ILHp-m1bUgHv7eThY-FrwrQ3qJkSCELN64_gYIv8waUEad460uSVGZBfKOq08AyzbBIQs3I9NG-0ta65eX2lBKQux_m6Z8M4no_Tg4mhYB1p3jtBdTzLWShK7kduLnPNqUblVOVW6Mx6bFVcFZLA3Z9MDm_Ez8VmSgmZml3vsAoWUToRCdp4GS4KbJke-tRGNUge-_iMVAuK4XCLHOZUltLimxCzQTCVFwppX" alt=""/>
-            <div class="absolute inset-0 bg-gradient-to-r from-black/90 via-black/40 to-transparent"></div>
+            <img alt="High-tech Gym" class="w-full h-full object-cover opacity-20 grayscale contrast-125" onerror="this.style.display='none'" src="https://images.unsplash.com/photo-1540497077202-7c8a3999166f?auto=format&fit=crop&w=1920&q=80"/>
+            <div class="absolute inset-0 bg-black/70 metal-grid"></div>
+            <div class="scan-line"></div>
         </div>
         <div class="relative z-10 w-full max-w-screen-2xl mx-auto px-margin-mobile md:px-margin-desktop">
-            <div class="max-w-3xl">
-                <span class="font-label-caps text-brand-red tracking-[0.3em] uppercase block mb-4">Arena Elit</span>
-                <h2 class="font-display-xl text-6xl md:text-7xl uppercase italic leading-none mb-6 text-white">
-                    DIBANGUN UNTUK <br/>
-                    <span class="text-brand-red">KEUNGGULAN</span>
-                </h2>
-                <p class="font-body-lg text-on-surface-variant max-w-xl mb-8">
-                    Rasakan pengalaman latihan di fasilitas industri modern dengan peralatan standar kompetisi dunia. Setiap sudut dirancang untuk memacu limit Anda.
-                </p>
-                <button class="bg-brand-red text-black font-label-caps px-10 py-4 uppercase tracking-widest hover:bg-white transition-colors duration-300">
-                    Lihat Fasilitas
-                </button>
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+                <div class="lg:col-span-5 glass-panel p-6 md:p-8 flex flex-col justify-between">
+                    <div>
+                        <span class="font-label-caps text-brand-red tracking-[0.4em] uppercase block mb-4">Training Command</span>
+                        <h2 class="font-display-xl text-5xl md:text-6xl uppercase italic leading-[0.92] mb-6 text-white">
+                            SIAPKAN<br/><span class="text-brand-red">SESI HARI INI</span>
+                        </h2>
+                        <p class="font-body-lg text-on-surface-variant text-lg leading-relaxed">
+                            Mulai dari QR check-in, pantau status aktif, lalu cek progres latihan tanpa harus berpindah alur terlalu jauh.
+                        </p>
+                    </div>
+                    <div class="mt-8 flex flex-col sm:flex-row lg:flex-col xl:flex-row gap-3">
+                        <a class="btn-primary gap-3 flex-1" href="{{ route('member.barcode') }}">
+                            <span class="material-symbols-outlined text-[20px]">qr_code_scanner</span>
+                            Check-In
+                        </a>
+                        <a class="glass-tile px-5 py-4 flex items-center justify-center gap-3 font-label-caps text-xs uppercase tracking-[0.2em] text-white hover:text-brand-red flex-1" href="{{ route('member.statistics') }}">
+                            <span class="material-symbols-outlined text-[18px]">query_stats</span>
+                            Statistik
+                        </a>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-7 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="glass-tile p-6 min-h-[190px] flex flex-col justify-between">
+                        <div class="flex justify-between items-start">
+                            <span class="inline-flex h-12 w-12 items-center justify-center bg-brand-red/10 border border-brand-red/35 text-brand-red">
+                                <span class="material-symbols-outlined">monitoring</span>
+                            </span>
+                            <span class="font-label-caps text-[10px] text-on-surface-variant uppercase tracking-[0.18em]">Performa</span>
+                        </div>
+                        <div>
+                            <span class="block font-display-xl text-5xl text-white">{{ min(100, ($totalCheckins * 4) + 20) }}%</span>
+                            <span class="font-label-caps text-[10px] text-brand-red uppercase tracking-[0.18em]">Kapasitas Aktivitas</span>
+                        </div>
+                    </div>
+                    <div class="glass-tile p-6 min-h-[190px] flex flex-col justify-between">
+                        <div class="flex justify-between items-start">
+                            <span class="inline-flex h-12 w-12 items-center justify-center bg-brand-red/10 border border-brand-red/35 text-brand-red">
+                                <span class="material-symbols-outlined">timer</span>
+                            </span>
+                            <span class="font-label-caps text-[10px] text-on-surface-variant uppercase tracking-[0.18em]">Aktivitas</span>
+                        </div>
+                        <div>
+                            <span class="block font-display-xl text-5xl text-white">{{ number_format($totalCheckins * 1.5, 1) }}H</span>
+                            <span class="font-label-caps text-[10px] text-brand-red uppercase tracking-[0.18em]">Estimasi Total Latihan</span>
+                        </div>
+                    </div>
+                    <div class="glass-tile p-6 md:col-span-2 flex flex-col md:flex-row md:items-center justify-between gap-5">
+                        <div>
+                            <span class="font-label-caps text-[10px] text-on-surface-variant uppercase tracking-[0.18em]">Tips Performa</span>
+                            <h3 class="font-headline-md text-3xl uppercase italic text-white mt-2">Hidrasi sebelum latihan</h3>
+                            <p class="text-on-surface-variant mt-2 max-w-2xl">Minum air sebelum latihan membantu fokus, tenaga, dan pemulihan setelah sesi.</p>
+                        </div>
+                        <div class="shrink-0 inline-flex h-16 w-16 items-center justify-center bg-brand-red text-black">
+                            <span class="material-symbols-outlined text-[34px]">bolt</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
-    <!-- Membership Info Snippet -->
-    <section class="py-section-padding bg-black relative overflow-hidden">
-        <div class="absolute top-0 right-0 w-1/2 h-full bg-brand-red/5 skew-x-[-20deg] translate-x-24"></div>
-        <div class="max-w-screen-2xl mx-auto px-margin-mobile md:px-margin-desktop relative z-10">
-            <div class="grid grid-cols-1 gap-16 items-center max-w-2xl mx-auto">
+
+    <section class="py-20 md:py-28 bg-[#131313] metal-grid">
+        <div class="max-w-screen-2xl mx-auto px-margin-mobile md:px-margin-desktop">
+            <div class="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div>
-                    <span class="font-label-caps text-brand-red text-label-caps uppercase tracking-[0.3em] mb-4 block">Your Progress</span>
-                    <h2 class="font-headline-lg text-headline-lg uppercase mb-8 leading-tight">STATUS MEMBERSHIP<br/>ANDA</h2>
-                    <div class="space-y-8">
-                        <div>
-                            <div class="flex justify-between font-label-caps mb-2 text-sm uppercase">
-                                <span>Menuju Tier Berikutnya</span>
-                                <span class="text-brand-red">85%</span>
-                            </div>
-                            <div class="w-full h-2 bg-surface-container-high overflow-hidden">
-                                <div class="h-full bg-brand-red" style="width: 85%"></div>
-                            </div>
+                    <span class="font-label-caps text-brand-red tracking-[0.3em] uppercase block mb-4">Premium Gear</span>
+                    <h2 class="font-headline-lg text-headline-lg uppercase italic mb-4">FASILITAS ELITE</h2>
+                    <p class="font-body-lg text-on-surface-variant max-w-xl">
+                        Peralatan kelas dunia dengan spesifikasi kompetisi, dirancang untuk keamanan maksimal dan hasil yang optimal.
+                    </p>
+                </div>
+                <div class="h-[1px] flex-grow bg-surface-variant mx-8 hidden md:block"></div>
+                <span class="font-label-caps text-brand-red uppercase tracking-widest border border-brand-red/40 bg-brand-red/10 px-4 py-2 shrink-0">Training Floor</span>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                @foreach([
+                    ['Treadmill', 'Kardio Performa Tinggi', 'https://images.unsplash.com/photo-1576678927484-cc907957088c?auto=format&fit=crop&w=900&q=80'],
+                    ['Smith Machine', 'Latihan Beban Terpadu', 'https://images.unsplash.com/photo-1534258936925-c58bed479fcb?auto=format&fit=crop&w=900&q=80'],
+                    ['Pec Deck', 'Isolasi Otot Dada', 'https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=900&q=80'],
+                    ['Leg Press', 'Power Majemuk Kaki', 'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?auto=format&fit=crop&w=900&q=80'],
+                    ['Leg Extension', 'Definisi Quadriceps', 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=900&q=80'],
+                    ['Mesin Sit Up', 'Core & Abs Station', 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=900&q=80'],
+                    ['Twister Core', 'Stabilitas Rotasi', 'https://images.unsplash.com/photo-1593079831268-3381b0db4a77?auto=format&fit=crop&w=900&q=80'],
+                    ['Preacher Curl', 'Fokus Bicep Maksimal', 'https://images.unsplash.com/photo-1584863231364-2edc166de576?auto=format&fit=crop&w=900&q=80'],
+                    ['Barbel & Dumbbell', 'Free Weights Elite', 'https://images.unsplash.com/photo-1586401100295-7a8096fd231a?auto=format&fit=crop&w=900&q=80'],
+                    ['Lat Pulldown', 'Lebar Punggung Superior', 'https://images.unsplash.com/photo-1549060279-7e168fcee0c2?auto=format&fit=crop&w=900&q=80'],
+                    ['Dip Machine', 'Triceps & Chest Power', 'https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?auto=format&fit=crop&w=900&q=80'],
+                ] as [$title, $desc, $image])
+                    <div class="group relative overflow-hidden aspect-square border border-white/10 bg-white/5 backdrop-blur-md shadow-[0_18px_60px_rgba(0,0,0,.28)]">
+                        <img alt="{{ $title }}" class="absolute inset-0 w-full h-full object-cover grayscale opacity-50 group-hover:opacity-100 group-hover:scale-110 group-hover:grayscale-0 transition-all duration-700" onerror="this.style.display='none'" src="{{ $image }}"/>
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent opacity-80"></div>
+                        <div class="absolute top-4 left-4 inline-flex h-9 w-9 items-center justify-center bg-brand-red text-black opacity-0 group-hover:opacity-100 transition-opacity">
+                            <span class="material-symbols-outlined text-[20px]">fitness_center</span>
                         </div>
-                        <div class="flex gap-4 items-start">
-                            <div class="bg-surface-container-high p-3 border border-brand-red/30">
-                                <span class="material-symbols-outlined text-brand-red">military_tech</span>
+                        <div class="absolute bottom-0 left-0 p-5 md:p-6 w-full translate-y-2 group-hover:translate-y-0 transition-transform">
+                            <h3 class="font-headline-md text-xl uppercase text-white">{{ $title }}</h3>
+                            <p class="text-[10px] font-label-caps text-brand-red opacity-0 group-hover:opacity-100 transition-opacity">{{ $desc }}</p>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    </section>
+
+    <section class="py-20 md:py-28 bg-black border-t border-white/10">
+        <div class="max-w-screen-2xl mx-auto px-margin-mobile md:px-margin-desktop">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                <div class="lg:col-span-4 glass-panel p-6 md:p-8">
+                    <span class="font-label-caps text-brand-red tracking-[0.4em] uppercase block mb-4">Base Operations</span>
+                    <h2 class="font-headline-lg text-headline-lg uppercase italic mb-8 leading-tight text-white">LOKASI KAMI</h2>
+                    <div class="space-y-10">
+                        <div class="flex gap-5">
+                            <div class="bg-brand-red/10 p-3 h-fit border border-brand-red/30 text-brand-red">
+                                <span class="material-symbols-outlined text-brand-red">location_on</span>
                             </div>
                             <div>
-                                <h4 class="font-headline-md text-xl uppercase mb-1">Keuntungan Member Anda</h4>
-                                <p class="text-on-surface-variant font-body-md">Akses penuh ke semua fasilitas beban, sauna, dan locker room premium.</p>
+                                <p class="font-headline-md text-xl uppercase text-white mb-2">Arena Fitness</p>
+                                <p class="text-on-surface-variant font-body-md leading-relaxed">
+                                    Jl. Wilis Mukti III No.59, Campurejo,<br/>
+                                    Kec. Mojoroto, Kabupaten Kediri,<br/>
+                                    Jawa Timur 64116, Indonesia
+                                </p>
+                            </div>
+                        </div>
+                        <div class="flex gap-5">
+                            <div class="bg-brand-red/10 p-3 h-fit border border-brand-red/30 text-brand-red">
+                                <span class="material-symbols-outlined text-brand-red">schedule</span>
+                            </div>
+                            <div>
+                                <p class="font-headline-md text-xl uppercase text-white mb-2">Jam Operasional</p>
+                                <p class="text-on-surface-variant font-body-md">Senin - Minggu: <span class="text-brand-red font-bold">24 JAM</span></p>
+                                <p class="text-[10px] font-label-caps text-on-surface-variant/50 mt-1 uppercase italic">Selalu Siap Saat Anda Butuhkan</p>
                             </div>
                         </div>
                     </div>
+                    <a class="mt-10 btn-primary w-full" href="https://www.google.com/maps/search/?api=1&query=-7.816346388525824,111.9867116109346" target="_blank" rel="noopener">
+                        <span class="material-symbols-outlined text-[20px] mr-2">near_me</span>
+                        Petunjuk Jalan
+                    </a>
+                </div>
+                <div class="lg:col-span-8">
+                    <div class="relative group">
+                        <div class="relative border border-white/10 overflow-hidden bg-white/5 backdrop-blur-md shadow-[0_24px_80px_rgba(0,0,0,.42)]">
+                            <iframe
+                                class="w-full h-[360px] md:h-[520px] grayscale invert brightness-[0.7] contrast-[1.1] hover:grayscale-0 hover:invert-0 transition-all duration-700"
+                                src="https://maps.google.com/maps?q=-7.816346388525824,111.9867116109346&z=17&output=embed"
+                                title="Lokasi Arena Fitness"
+                                loading="lazy"
+                                referrerpolicy="no-referrer-when-downgrade"></iframe>
+                            <a class="absolute inset-0" href="https://www.google.com/maps/search/?api=1&query=-7.816346388525824,111.9867116109346" target="_blank" rel="noopener" aria-label="Buka detail lokasi di Google Maps"></a>
+                            <div class="absolute top-6 left-6 glass-panel p-4 flex items-center gap-4">
+                                <div class="w-3 h-3 bg-brand-red rounded-full animate-pulse shadow-[0_0_10px_#ff5540]"></div>
+                                <span class="font-label-caps text-xs uppercase tracking-[0.2em] text-white">Arena Location</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-20 md:py-28 bg-[#0e0e0e] border-t border-white/10">
+        <div class="max-w-screen-2xl mx-auto px-margin-mobile md:px-margin-desktop">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                <div>
+                    <span class="font-label-caps text-brand-red tracking-[0.3em] uppercase block mb-4">Feedback Portal</span>
+                    <h2 class="font-headline-lg text-headline-lg uppercase italic mb-6 leading-tight">KRITIK &amp; SARAN</h2>
+                    <p class="text-on-surface-variant font-body-lg max-w-md mb-8">
+                        Visi kami adalah kesempurnaan. Bantu kami mencapainya dengan memberikan masukan Anda mengenai fasilitas dan layanan Arena Fitness.
+                    </p>
+                    <div class="flex gap-8">
+                        <div class="flex flex-col">
+                            <span class="font-display-xl text-3xl text-white">4.9/5</span>
+                            <span class="font-label-caps text-[10px] text-on-surface-variant uppercase mt-1">Kepuasan Member</span>
+                        </div>
+                        <div class="w-[1px] h-12 bg-surface-variant"></div>
+                        <div class="flex flex-col">
+                            <span class="font-display-xl text-3xl text-white">10k+</span>
+                            <span class="font-label-caps text-[10px] text-on-surface-variant uppercase mt-1">Komunitas Elit</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="glass-panel p-6 md:p-10 relative">
+                    <form method="POST" action="{{ route('member.feedback.submit') }}" class="space-y-6 relative z-10">
+                        @csrf
+                        <div>
+                            <label class="font-label-caps text-[10px] text-on-surface-variant uppercase mb-2 block tracking-widest">Kategori Masukan</label>
+                            <select name="category" class="w-full bg-black/40 border border-white/10 p-4 text-on-surface focus:border-brand-red focus:ring-1 focus:ring-brand-red transition-all font-body-md outline-none" required>
+                                <option value="Fasilitas Peralatan">Fasilitas Peralatan</option>
+                                <option value="Layanan Personal Trainer">Layanan Personal Trainer</option>
+                                <option value="Kebersihan Area">Kebersihan Area</option>
+                                <option value="Lainnya">Lainnya</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="font-label-caps text-[10px] text-on-surface-variant uppercase mb-2 block tracking-widest">Pesan Anda</label>
+                            <textarea name="message" class="w-full bg-black/40 border border-white/10 p-4 text-on-surface focus:border-brand-red focus:ring-1 focus:ring-brand-red transition-all min-h-[150px] font-body-md outline-none" placeholder="Bagaimana kami bisa menjadi lebih baik untuk Anda?" required>{{ old('message') }}</textarea>
+                        </div>
+                        <button class="btn-primary w-full text-lg tracking-widest gap-3" type="submit">
+                            <span class="material-symbols-outlined text-[20px]">send</span>
+                            KIRIM MASUKAN
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
     </section>
 </main>
-<!-- Footer -->
-<section class="py-section-padding bg-surface-container-lowest border-t border-surface-variant/30">
-    <div class="max-w-screen-2xl mx-auto px-margin-mobile md:px-margin-desktop">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-16">
-            <div>
-                <span class="font-label-caps text-brand-red text-label-caps uppercase tracking-[0.3em] mb-4 block">Your Feedback</span>
-                <h2 class="font-headline-lg text-headline-lg uppercase mb-4 leading-tight">KRITIK &amp; SARAN</h2>
-                <p class="text-on-surface-variant font-body-lg max-w-md">Bantu kami menjadi lebih baik. Sampaikan masukan atau saran Anda mengenai fasilitas dan layanan Iron Elite Gym.</p>
-            </div>
-            <div class="bg-surface-container p-8 border border-surface-variant">
-                @if (session('status'))
-                    <div class="mb-4 p-3 bg-green-900/40 border border-green-500 text-green-100 rounded">{{ session('status') }}</div>
-                @endif
-                <form class="space-y-6" method="POST" action="{{ route('member.feedback.store') }}">
-                    @csrf
-                    <div>
-                        <label class="font-label-caps text-xs text-on-surface-variant uppercase mb-2 block">Subjek</label>
-                        <input name="subject" class="w-full bg-black/40 border border-surface-variant p-4 text-on-surface focus:border-brand-red focus:ring-1 focus:ring-brand-red transition-all font-body-md" placeholder="Contoh: Saran fasilitas" required>
-                    </div>
-                    <div>
-                        <label class="font-label-caps text-xs text-on-surface-variant uppercase mb-2 block">Pesan Anda</label>
-                        <textarea name="message" class="w-full bg-black/40 border border-surface-variant p-4 text-on-surface focus:border-brand-red focus:ring-1 focus:ring-brand-red transition-all min-h-[150px] font-body-md" placeholder="Tulis masukan Anda di sini..." required></textarea>
-                    </div>
-                    <button class="w-full py-4 bg-brand-red text-black hover:bg-white transition-all uppercase font-headline-md tracking-wider text-lg" type="submit">
-                        KIRIM
-                    </button>
-                </form>
-            </div>
+
+<footer class="bg-black border-t border-surface-variant/30 w-full py-20">
+    <div class="flex flex-col items-center justify-center gap-10 px-margin-mobile md:px-margin-desktop max-w-screen-2xl mx-auto text-center">
+        <div class="font-display-xl text-brand-red text-4xl uppercase italic tracking-tighter">Arena Fitness</div>
+        <div class="flex flex-wrap justify-center gap-x-12 gap-y-6">
+            <a class="font-label-caps text-xs text-on-surface-variant hover:text-brand-red transition-all uppercase tracking-widest" href="#">Privacy Policy</a>
+            <a class="font-label-caps text-xs text-on-surface-variant hover:text-brand-red transition-all uppercase tracking-widest" href="#">Terms of Service</a>
+            <a class="font-label-caps text-xs text-on-surface-variant hover:text-brand-red transition-all uppercase tracking-widest" href="#">Support Center</a>
+            <a class="font-label-caps text-xs text-on-surface-variant hover:text-brand-red transition-all uppercase tracking-widest" href="#">Careers</a>
         </div>
+        <p class="font-label-caps text-[10px] text-on-surface-variant/40 tracking-[0.2em]">&copy; 2024 Arena Fitness. ALL RIGHTS RESERVED. DOMINASI SETIAP LIMIT.</p>
     </div>
-</section>
-<section class="py-section-padding bg-background">
-    <div class="max-w-screen-2xl mx-auto px-margin-mobile md:px-margin-desktop">
-        <div class="mb-16">
-            <h2 class="font-headline-lg text-headline-lg uppercase mb-2">FASILITAS ELIT</h2>
-            <div class="w-24 h-1 bg-brand-red mb-4"></div>
-            <p class="font-body-lg text-body-lg text-on-surface-variant">Peralatan kelas dunia untuk performa tanpa batas.</p>
-        </div>
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            <!-- Treadmill -->
-            <div class="group relative overflow-hidden bg-surface-container aspect-square border border-surface-variant">
-                <img alt="Treadmill" class="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500" src="https://lh3.googleusercontent.com/aida/ADBb0ujDW0G6B84XN476Wj5oeTol7ZRhCMRZQFUTf9Jz8kuDKHKIyno660TXzg3WiQPGDuBIi43EU0MySQH50OVOWjj53C4KfqeRLankicLdIMUDPf18rfzmwqyo-OzwaiAgzoXdchKRszgMara5PZ7_nIFszcEzmdste0J0dWc_nPiq3DMJqZr6HAebTqnknVpVu5D1XUUyErYELjdEk6QOOwxUObJdOKnazLvXfR5L_fX-YqbGrvMUhrYlKLt" alt=""/>
-                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
-                <div class="absolute bottom-0 left-0 p-4 w-full">
-                    <h3 class="font-headline-md text-base uppercase">Treadmill</h3>
-                    <div class="h-1 w-0 group-hover:w-full bg-brand-red transition-all duration-300 mt-1"></div>
-                </div>
-            </div>
-            <!-- Smith Machine -->
-            <div class="group relative overflow-hidden bg-surface-container aspect-square border border-surface-variant">
-                <img alt="Smith Machine" class="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC0s96lgIYpjlghzJOorhhQAizkLaTjsotpKPBWIfqqce6Vgp81yWQZCAE9ly8_U8Ux5AMuT_YKUStBgv-68aTo3DyNvp2PM-ZMGr1_9nBbF4H-C5kFEVafxdVgCva9guuBrj-Yr53V7h49R5Ko0PfSxXpiIKO4uAfhY8zBDN_Ab84SLwlcSF_9SqJEGTNM2c7tNsd1gP0yKoKx4rpjPGEi-0UEzlVQGZQQtbvXOcVNQjbLIEry8pN1sdEYIwbj-QZ4WI9QtuERYH0-j" alt=""/>
-                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
-                <div class="absolute bottom-0 left-0 p-4 w-full">
-                    <h3 class="font-headline-md text-base uppercase">Smith Machine</h3>
-                    <div class="h-1 w-0 group-hover:w-full bg-brand-red transition-all duration-300 mt-1"></div>
-                </div>
-            </div>
-            <!-- Pec Deck -->
-            <div class="group relative overflow-hidden bg-surface-container aspect-square border border-surface-variant">
-                <img alt="Pec Deck" class="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC6331HSGLaijkAjEkNi7vSiv6WV6S6CQ8dY-DCw78Pwa9FuXCNpKE4Tac3ANl9lOJ_JlTpWNbTsid0oG7smFpygam6hu2DmUV_p4C64Qdx18GjDdtOOKsww9CG_8TG1exBtIGFwqE6Xf_xjsDPOuCvlmTP-8nXcZJu8_3QhgK4bhbkdI4mshzo3MbZIat7dZSmmvwYQV_JnFxR4Y1bdh1kzeCNlA3HE9qX4MHc7dZGP7YKQzljVvQjUnRiC0PcKcRFGss83R-PUhLC" alt=""/>
-                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
-                <div class="absolute bottom-0 left-0 p-4 w-full">
-                    <h3 class="font-headline-md text-base uppercase">Pec Deck</h3>
-                    <div class="h-1 w-0 group-hover:w-full bg-brand-red transition-all duration-300 mt-1"></div>
-                </div>
-            </div>
-            <!-- Leg Press -->
-            <div class="group relative overflow-hidden bg-surface-container aspect-square border border-surface-variant">
-                <img alt="Leg Press" class="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCNpvVUC18EV6F1dBVNNBecGzpy3VfkenEY65uSXOxKNr9lLHJbOjrwH-k5DVm0M7rKZqH7l6qvaDAQ5kG4iorrnMobmAj6SGSdJu5Awt7c2cYwVr1MXn5tTB7-TSkRpDnYh2EcWOKzewazstvHF72BY6y1ywX1v3TCgD8bSjQrRTkrwxX5pxSjz7-xZbBgUxzLfozGvjcvUD4wL8x4PtokT-OwYa8J8ALiMDodsIZLXQCAeKnx10mV_2jvbJczsRHbBTauYVhM5RSc" alt=""/>
-                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
-                <div class="absolute bottom-0 left-0 p-4 w-full">
-                    <h3 class="font-headline-md text-base uppercase">Leg Press</h3>
-                    <div class="h-1 w-0 group-hover:w-full bg-brand-red transition-all duration-300 mt-1"></div>
-                </div>
-            </div>
-            <!-- Leg Extension -->
-            <div class="group relative overflow-hidden bg-surface-container aspect-square border border-surface-variant">
-                <img alt="Leg Extension" class="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCvvopvDjKkZEKf_qd02TSxMzypneQ0e5-AZtZlFZXtaj2LzJBWuiK3-ruwvjYd11I7GFtIzAwQTAIRMvzgB74yEK80eD1V7ecikhHxusZ3oBN4TgE0fi3BPE3UnIV9-EURY438yueaDopmMzs5L6UfuWsFqJSnVMnjMYhYG_DC8whDl75NgmRJNnte19WjyZIRZ3u_JwYD2dmhmhx6TdQdbbQ8BeoXNFB8wC_V7cyQGLo-uklSoe94dkwtDZSPT6siOrCzqABvfIxt" alt=""/>
-                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
-                <div class="absolute bottom-0 left-0 p-4 w-full">
-                    <h3 class="font-headline-md text-base uppercase">Leg Extension</h3>
-                    <div class="h-1 w-0 group-hover:w-full bg-brand-red transition-all duration-300 mt-1"></div>
-                </div>
-            </div>
-            <!-- Sit Up Machine -->
-            <div class="group relative overflow-hidden bg-surface-container aspect-square border border-surface-variant">
-                <img alt="Mesin Sit Up" class="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDLdp2LEHJ7ognSjgM-jVT7xyrM2waUqumXsVxw2zyVGCUbVvJThNqfuN23_DRl4I_jwYEFUyCLnfW37MOoJz0zUATSGV5Q6lvKsnBe1YcxwW_cvce3T-zVuZKxq7qh8qNB17vlbWXOla5zvK9ehoClhC6B9UsdW3vme3XL8OvPuYcXci4kUBsj0JR4YOeZEJEQ3Y0hfzMfobkhENjtXZ2_kGZ7NYm7Swx7MtNBGgA3s8bcstU912EKyTSuMkqCGP3TFKbwiNsEnr8t" alt=""/>
-                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
-                <div class="absolute bottom-0 left-0 p-4 w-full">
-                    <h3 class="font-headline-md text-base uppercase">Mesin Sit Up</h3>
-                    <div class="h-1 w-0 group-hover:w-full bg-brand-red transition-all duration-300 mt-1"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-</body>
+</footer>
 <script>
-    (() => {
-        const btn = document.getElementById('notifBtn');
-        const popup = document.getElementById('notifPopup');
-        if (!btn || !popup) return;
-        btn.addEventListener('click', () => popup.classList.toggle('hidden'));
-        document.addEventListener('click', (e) => {
-            if (!popup.contains(e.target) && e.target !== btn && !btn.contains(e.target)) {
-                popup.classList.add('hidden');
-            }
-        });
-    })();
+    window.addEventListener('scroll', () => {
+        const header = document.querySelector('header');
+        if (window.scrollY > 50) {
+            header.classList.add('bg-black/95', 'shadow-2xl');
+            header.classList.remove('bg-black/55');
+        } else {
+            header.classList.remove('bg-black/95', 'shadow-2xl');
+            header.classList.add('bg-black/55');
+        }
+    });
 </script>
+</body>
 </html>
+

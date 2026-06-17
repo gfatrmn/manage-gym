@@ -22,7 +22,7 @@ class CashierDailyPaymentTest extends TestCase
             'paid_amount' => 50000,
             'payment_method' => 'cash',
             'notes' => 'Tidak cetak dulu',
-        ])->assertRedirect(route('cashier.transactions', ['section' => 'non_member']));
+        ])->assertRedirect(route('cashier.transactions', ['section' => 'daily_pass']));
 
         $this->assertDatabaseHas('cashier_transactions', [
             'customer_name' => 'Tamu Tunai',
@@ -40,7 +40,7 @@ class CashierDailyPaymentTest extends TestCase
                 'role' => 'cashier',
                 'login' => 'kasir',
             ],
-        ])->get(route('cashier.transactions', ['section' => 'non_member']))
+        ])->get(route('cashier.transactions', ['section' => 'daily_pass']))
             ->assertOk()
             ->assertSee('Tamu Tunai')
             ->assertSee('Rp20.000');

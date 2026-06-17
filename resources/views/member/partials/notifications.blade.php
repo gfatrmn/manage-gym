@@ -34,7 +34,7 @@
 </style>
 
 <div class="relative" data-member-notifications data-notification-count="{{ $notificationCount }}" data-notification-key="{{ $notificationSignature }}">
-    <a id="memberNotifToggle" href="{{ route('messages') }}" class="relative inline-flex items-center justify-center w-10 h-10 border border-[#353535] text-[#ebbbb4] hover:border-[#ff5540] hover:text-[#ff5540] transition-colors" aria-label="Buka pemberitahuan member">
+    <a id="memberNotifToggle" href="{{ route('member.messages') }}" class="relative inline-flex items-center justify-center w-10 h-10 border border-[#353535] text-[#ebbbb4] hover:border-[#ff5540] hover:text-[#ff5540] transition-colors" aria-label="Buka pemberitahuan member">
         <span class="material-symbols-outlined text-[20px]">notifications</span>
         @if($notificationCount > 0)
             <span data-member-notif-badge class="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-[#ff5540] text-black text-[10px] leading-[18px] font-bold text-center">{{ min($notificationCount, 9) }}</span>
@@ -49,13 +49,13 @@
             <button id="memberNotifToastClose" type="button" class="text-[#ebbbb4] hover:text-white text-sm" aria-label="Tutup notifikasi">&times;</button>
         </div>
         @if($hasMembershipWarning)
-            <a href="{{ route('membership') }}" class="block p-3 border border-[#ff5540] bg-[#ff5540]/15 hover:bg-[#ff5540]/20 transition-colors">
+            <a href="{{ route('member.membership') }}" class="block p-3 border border-[#ff5540] bg-[#ff5540]/15 hover:bg-[#ff5540]/20 transition-colors">
                 <p class="text-sm text-white font-semibold">{{ $membershipWarning['title'] }}</p>
                 <p class="text-xs text-[#ebbbb4] mt-1">{{ $membershipWarning['message'] }}</p>
             </a>
         @elseif($memberAnnouncements->count() > 0)
             @php $latestNotice = $memberAnnouncements->first(); @endphp
-            <a href="{{ route('messages') }}#notice-{{ $latestNotice->id }}" class="block p-3 border border-[#353535] bg-[#1b1b1b] hover:border-[#ff5540] hover:bg-[#ff5540]/10 transition-colors">
+            <a href="{{ route('member.messages') }}#notice-{{ $latestNotice->id }}" class="block p-3 border border-[#353535] bg-[#1b1b1b] hover:border-[#ff5540] hover:bg-[#ff5540]/10 transition-colors">
                 <p class="text-sm text-white font-semibold">{{ $latestNotice->title }}</p>
                 <p class="text-xs text-[#ebbbb4] mt-1">{{ \Illuminate\Support\Str::limit(preg_replace('/^\[TARGET_MEMBER_ID:\d+\]\s*/', '', $latestNotice->body), 110) }}</p>
             </a>

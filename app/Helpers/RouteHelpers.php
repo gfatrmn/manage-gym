@@ -188,8 +188,9 @@ class RouteHelpers
         }
 
         $isQrMemberCheckin = $actor === 'qr_member';
-        // Scan QR di kasir langsung dianggap valid (tanpa langkah validasi manual).
-        $verificationStatus = 'verified';
+        // Scan QR di kasir langsung dianggap valid, tapi QR self-service (member-checkin) masuk sebagai pending.
+        $verificationStatus = ($isQrMemberCheckin && $redirectRoute === 'member.checkin') ? 'pending' : 'verified';
+
 
         if ($isQrMemberCheckin && empty($resolvedCheckinCode)) {
             $request->validate([
