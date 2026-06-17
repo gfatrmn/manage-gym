@@ -69,20 +69,23 @@ Route::post('/login', function (Request $request) {
     $validated = $request->validate([
         'role'     => ['required', 'in:member,admin,master_admin,cashier'],
         'login'    => ['required_if:role,admin,master_admin,cashier'],
-        'email'    => ['required_if:role,member', 'email'],
+        'email'    => ['required_if:role,member', 'string'],
         'password' => ['required'],
     ]);
 
     if ($validated['role'] === 'member') {
         // Handle member login
         $user = User::query()
-            ->where('email', $validated['email'])
+            ->where(function ($query) use ($validated) {
+                $query->where('email', $validated['email'])
+                      ->orWhere('login', $validated['email']);
+            })
             ->where('role', 'member')
             ->first();
 
         if (! $user || ! Hash::check($validated['password'], $user->password)) {
             return back()
-                ->withErrors(['email' => 'Email atau password tidak sesuai.'])
+                ->withErrors(['email' => 'Email/Username atau password tidak sesuai.'])
                 ->withInput();
         }
 

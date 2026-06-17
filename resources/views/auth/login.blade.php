@@ -497,9 +497,9 @@
 
                             @if($selectedRole === 'member')
                                 <div class="form-group" id="emailField">
-                                    <label for="email">Email Member</label>
+                                    <label for="email">Email / Username Member</label>
                                     <div class="input-wrap">
-                                        <input type="email" id="email" name="email" value="{{ $emailValue }}" placeholder="member@arena.id" required>
+                                        <input type="text" id="email" name="email" value="{{ $emailValue }}" placeholder="Masukkan email atau username" required>
                                         <i class="fas fa-envelope field-icon"></i>
                                     </div>
                                 </div>
