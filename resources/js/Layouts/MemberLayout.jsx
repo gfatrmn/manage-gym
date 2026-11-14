@@ -19,9 +19,11 @@ import { Button, FlashBanner, Modal, ThemeToggle } from '../Components/UI';
 import { cn } from '../lib/format';
 
 export default function MemberLayout({ title, active = 'dashboard', children }) {
-    const { auth = {}, memberNotifications = {} } = usePage().props;
+    const pageProps = usePage().props || {};
+    const auth = pageProps.auth || {};
+    const memberNotifications = pageProps.memberNotifications || {};
     const [showWaModal, setShowWaModal] = useState(
-        Boolean(memberNotifications.showWhatsAppPrompt && memberNotifications.whatsAppChannelUrl)
+        Boolean(memberNotifications?.showWhatsAppPrompt && memberNotifications?.whatsAppChannelUrl)
     );
 
     const navItems = [
@@ -37,7 +39,7 @@ export default function MemberLayout({ title, active = 'dashboard', children }) 
             label: 'Pesan',
             href: '/member/messages',
             icon: Bell,
-            badge: memberNotifications.unreadAnnouncementsCount || 0,
+            badge: memberNotifications?.unreadAnnouncementsCount || 0,
         },
         { key: 'profile', label: 'Profil', href: '/member/profile', icon: User },
     ];

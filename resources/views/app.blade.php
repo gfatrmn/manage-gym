@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="light" data-theme="light">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -7,24 +7,18 @@
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=outfit:400,500,600,700,800|space-grotesk:500,700" rel="stylesheet" />
         <script>
-            (() => {
-                let saved = localStorage.getItem('arena-gym-theme');
-                if (!localStorage.getItem('arena-theme-default-v2')) {
-                    localStorage.setItem('arena-theme-default-v2', '1');
-                    localStorage.setItem('arena-gym-theme', 'light');
-                    saved = 'light';
-                }
-                const isDark = saved === 'dark';
-                document.documentElement.classList.toggle('dark', isDark);
-                document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
-            })();
+            try {
+                localStorage.setItem('arena-gym-theme', 'light');
+                document.documentElement.classList.remove('dark');
+                document.documentElement.classList.add('light');
+                document.documentElement.setAttribute('data-theme', 'light');
+            } catch (e) {}
         </script>
         @viteReactRefresh
         @vite(['resources/css/app.css', 'resources/js/app.jsx'])
         @inertiaHead
     </head>
-    <body class="antialiased selection:bg-rose-500/30 selection:text-rose-900 dark:selection:text-rose-200">
+    <body class="antialiased bg-slate-50 text-slate-900 selection:bg-red-500/20 selection:text-red-900">
         @inertia
     </body>
 </html>
-

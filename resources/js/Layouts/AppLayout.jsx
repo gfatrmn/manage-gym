@@ -38,7 +38,9 @@ export default function AppLayout({
     active = 'dashboard',
     children,
 }) {
-    const { auth = {}, adminBadges = {} } = usePage().props;
+    const pageProps = usePage().props || {};
+    const auth = pageProps.auth || {};
+    const adminBadges = pageProps.adminBadges || {};
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
     const adminSections = [
@@ -83,14 +85,14 @@ export default function AppLayout({
                     label: 'Verifikasi Foto',
                     href: '/admin/profile-photo-requests',
                     icon: Camera,
-                    badge: adminBadges.pendingPhotoRequests || 0,
+                    badge: adminBadges?.pendingPhotoRequests || 0,
                 },
                 {
                     key: 'feedbacks',
                     label: 'Kritik & Saran',
                     href: '/admin/feedbacks',
                     icon: MessageSquare,
-                    badge: adminBadges.unreadFeedbacks || 0,
+                    badge: adminBadges?.unreadFeedbacks || 0,
                 },
                 { key: 'settings', label: 'Profil Gym', href: '/admin/settings', icon: Building2 },
                 { key: 'activity-logs', label: 'Activity Log', href: '/admin/activity-logs', icon: Activity },

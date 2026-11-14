@@ -37,7 +37,7 @@ class HandleInertiaRequests extends Middleware
         $auth = $request->session()->get('auth');
         $role = $auth['role'] ?? null;
 
-        $memberNotifications = null;
+        $memberNotifications = [];
         if ($role === 'member' && ! empty($auth['id']) && Schema::hasTable('users')) {
             $user = User::query()->with('gymMember')->where('id', $auth['id'])->where('role', 'member')->first();
             $member = $user?->gymMember;
@@ -83,7 +83,7 @@ class HandleInertiaRequests extends Middleware
             ];
         }
 
-        $adminBadges = null;
+        $adminBadges = [];
         if (in_array($role, ['admin', 'master_admin'], true)) {
             $adminBadges = [
                 'unreadFeedbacks' => Schema::hasTable('member_feedbacks')
