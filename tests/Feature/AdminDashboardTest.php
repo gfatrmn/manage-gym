@@ -53,12 +53,15 @@ class AdminDashboardTest extends TestCase
             ],
         ])->get(route('admin.dashboard'))
             ->assertOk()
-            ->assertSee('Pemasukan Hari Ini')
-            ->assertSee('Pengeluaran Hari Ini')
-            ->assertSee('Laba Bersih Hari Ini')
-            ->assertSee('Rp50.000')
-            ->assertSee('Rp15.000')
-            ->assertSee('Rp35.000');
+            ->assertInertia(fn (\Inertia\Testing\AssertableInertia $page) => $page
+                ->component('Admin/Dashboard')
+                ->where('stats.1.label', 'Pemasukan Hari Ini')
+                ->where('stats.1.value', 'Rp50.000')
+                ->where('stats.2.label', 'Pengeluaran Hari Ini')
+                ->where('stats.2.value', 'Rp15.000')
+                ->where('stats.3.label', 'Laba Bersih Hari Ini')
+                ->where('stats.3.value', 'Rp35.000')
+            );
     }
 
     public function test_recent_member_registrations_exclude_non_members(): void

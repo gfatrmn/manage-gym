@@ -69,10 +69,12 @@ class AdminProductTest extends TestCase
         $this->withSession($session)
             ->get(route('admin.products'))
             ->assertOk()
-            ->assertSee('Master Produk Suplemen')
-            ->assertSee('Daftar Produk')
-            ->assertSee('Vitamin C 1000')
-            ->assertSee('Rp95.000');
+            ->assertInertia(fn (\Inertia\Testing\AssertableInertia $page) => $page
+                ->component('Admin/Products')
+                ->where('pageTitle', 'Master Produk Suplemen - Arena Gym')
+                ->where('products.0.name', 'Vitamin C 1000')
+                ->where('products.0.price_formatted', 'Rp95.000')
+            );
 
         $this->withSession($session)
             ->delete(route('admin.products.destroy', $product))

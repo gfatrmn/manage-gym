@@ -65,9 +65,11 @@ class CashierProductTransactionTest extends TestCase
         $this->withSession($session)
             ->get(route('cashier.transactions.products'))
             ->assertOk()
-            ->assertSee('Cari')
-            ->assertSee('Vitamin C 1000')
-            ->assertSee('Budi')
-            ->assertSee('Rp190.000');
+            ->assertInertia(fn (\Inertia\Testing\AssertableInertia $page) => $page
+                ->component('Cashier/ProductTransactions')
+                ->where('products.0.name', 'Vitamin C 1000')
+                ->where('productTransactions.0.customer_name', 'Budi')
+                ->where('productTransactions.0.amount_formatted', 'Rp190.000')
+            );
     }
 }

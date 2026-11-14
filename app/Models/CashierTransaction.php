@@ -13,11 +13,14 @@ class CashierTransaction extends Model
     protected $fillable = [
         'invoice',
         'gym_member_id',
+        'cashier_id',
         'product_id',
+        'package_id',
         'customer_name',
         'transaction_group',
         'transaction_type',
         'amount',
+        'discount',
         'paid_amount',
         'change_amount',
         'quantity',
@@ -32,6 +35,7 @@ class CashierTransaction extends Model
     {
         return [
             'amount' => 'integer',
+            'discount' => 'integer',
             'paid_amount' => 'integer',
             'change_amount' => 'integer',
             'quantity' => 'integer',
@@ -42,6 +46,16 @@ class CashierTransaction extends Model
     public function member(): BelongsTo
     {
         return $this->belongsTo(GymMember::class, 'gym_member_id');
+    }
+
+    public function cashier(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'cashier_id');
+    }
+
+    public function package(): BelongsTo
+    {
+        return $this->belongsTo(MembershipPackage::class, 'package_id');
     }
 
     public function product(): BelongsTo

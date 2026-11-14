@@ -6,21 +6,18 @@ use App\Models\CashierTransaction;
 use App\Models\GymCheckin;
 use App\Models\GymMember;
 use App\Models\MemberHistory;
-use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 
 /**
- * Kumpulan helper function yang dipakai bersama-sama di seluruh route
- * admin maupun cashier. Semua method bersifat static agar mudah dipanggil
- * tanpa perlu instantiasi.
+ * Kumpulan helper function yang dipakai bersama-sama di seluruh modul
+ * admin, kasir, dan member.
  */
 class RouteHelpers
 {
-    // ─── Auth ────────────────────────────────────────────────────────────────
-
     public static function redirectByRole(): \Illuminate\Http\RedirectResponse
     {
         return match (session('auth.role')) {
@@ -59,49 +56,70 @@ class RouteHelpers
         return null;
     }
 
-    // ─── Formatting ──────────────────────────────────────────────────────────
-
     public static function formatCurrency(?int $amount): string
     {
         return 'Rp' . number_format((int) $amount, 0, ',', '.');
     }
 
-    public static function generateInvoice(string $prefix): string
+    public static function generateInvoice(string $prefix = 'INV'): string
     {
-        return strtoupper($prefix) . '-' . now()->format('YmdHis') . random_int(100, 999);
+        $prefix = strtoupper(trim($prefix));
+        return $prefix . '-' . now()->format('Ymd') . '-' . strtoupper(Str::random(4)) . random_int(10, 99);
     }
 
-    // ─── Membership expiry ───────────────────────────────────────────────────
+    public static function generateMemberId(): string
+    {
+        do {
+            $code = 'MBR-' . now()->format('ym') . '-' . strtoupper(Str::random(4));
+        } while (GymMember::query()->where('checkin_code', $code)->exists());
+
+        return $code;
+    }
 
     /**
-     * Hitung tanggal kadaluarsa 1 bulan dari $baseDate (atau hari ini).
+     * Menghitung tanggal mulai dan tanggal berakhir membership sesuai Business Rule BR-011:
+     * - Jika member masih aktif (expires_at >= today): start_date = 1 hari setelah expires_at saat ini.
+     * - Jika member expired atau belum pernah aktif: start_date = hari ini.
+     * - end_date dihitung: start_date + duration_days - 1 hari (inklusif).
      */
-    public static function calculateMonthlyExpiryDate(?Carbon $baseDate): string
+    public static function calculateMembershipDates(GymMember $member, int $durationDays = 30): array
+    {
+        $today = Carbon::today();
+        $durationDays = max(1, $durationDays);
+
+        if ($member->expires_at && $member->expires_at->copy()->startOfDay()->gte($today)) {
+            $startDate = $member->expires_at->copy()->startOfDay()->addDay();
+        } else {
+            $startDate = $today->copy();
+        }
+
+        $endDate = $startDate->copy()->addDays($durationDays - 1);
+
+        return [
+            'start_date' => $startDate->toDateString(),
+            'end_date'   => $endDate->toDateString(),
+        ];
+    }
+
+    public static function calculateMonthlyExpiryDate(?Carbon $baseDate, int $months = 1): string
     {
         return ($baseDate ?? Carbon::today())
             ->copy()
             ->startOfDay()
-            ->addMonthNoOverflow()
+            ->addMonthsNoOverflow(max(1, $months))
             ->toDateString();
     }
 
-    /**
-     * Hitung tanggal perpanjangan membership:
-     * - Jika membership masih aktif → perpanjang dari tanggal expire.
-     * - Jika sudah expire / belum punya → perpanjang dari hari ini.
-     */
-    public static function calculateMembershipRenewalExpiry(GymMember $member, ?Carbon $today = null): string
+    public static function calculateMembershipRenewalExpiry(GymMember $member, ?Carbon $today = null, int $months = 1): string
     {
         $today = ($today ?? Carbon::today())->copy()->startOfDay();
 
         if ($member->expires_at && $member->expires_at->copy()->startOfDay()->gte($today)) {
-            return self::calculateMonthlyExpiryDate($member->expires_at->copy());
+            return self::calculateMonthlyExpiryDate($member->expires_at->copy(), $months);
         }
 
-        return self::calculateMonthlyExpiryDate($today);
+        return self::calculateMonthlyExpiryDate($today, $months);
     }
-
-    // ─── Check-in code ───────────────────────────────────────────────────────
 
     public static function generateMemberCheckinCode(): string
     {
@@ -112,13 +130,11 @@ class RouteHelpers
         return $code;
     }
 
-    // ─── Member lifecycle status ──────────────────────────────────────────────
-
     public static function memberLifecycleStatus(?GymMember $member): array
     {
-        $today           = Carbon::today();
+        $today = Carbon::today();
         $sevenDaysFromNow = $today->copy()->addDays(7);
-        $expiresAt      = $member?->expires_at;
+        $expiresAt = $member?->expires_at?->copy()->startOfDay();
 
         if (! $expiresAt) {
             return ['key' => 'unknown', 'label' => 'Tidak diketahui', 'color' => 'secondary'];
@@ -135,8 +151,6 @@ class RouteHelpers
         return ['key' => 'active', 'label' => 'Aktif', 'color' => 'success'];
     }
 
-    // ─── Store check-in (dipakai admin, cashier, & QR self-service) ──────────
-
     public static function storeMemberCheckin(
         Request $request,
         string $actor = 'admin',
@@ -144,55 +158,52 @@ class RouteHelpers
         array $redirectParams = []
     ): \Illuminate\Http\RedirectResponse {
         $validated = $request->validate([
-            'gym_member_id'  => ['nullable', 'exists:gym_members,id', 'required_without_all:checkin_code,submitted_phone'],
-            'checkin_code'   => ['nullable', 'string', 'max:40', 'required_without_all:gym_member_id,submitted_phone'],
-            'submitted_name' => ['nullable', 'string', 'max:255'],
-            'submitted_phone'=> ['nullable', 'string', 'max:30', 'required_without_all:gym_member_id,checkin_code'],
-            'checkin_date'   => ['nullable', 'date'],
-            'checkin_time'   => ['nullable', 'date_format:H:i'],
-            'notes'          => ['nullable', 'string'],
+            'gym_member_id'   => ['nullable', 'exists:gym_members,id', 'required_without_all:checkin_code,submitted_phone'],
+            'checkin_code'    => ['nullable', 'string', 'max:40', 'required_without_all:gym_member_id,submitted_phone'],
+            'submitted_name'  => ['nullable', 'string', 'max:255'],
+            'submitted_phone' => ['nullable', 'string', 'max:30', 'required_without_all:gym_member_id,checkin_code'],
+            'checkin_date'    => ['nullable', 'date'],
+            'checkin_time'    => ['nullable', 'date_format:H:i'],
+            'notes'           => ['nullable', 'string'],
         ]);
 
         $resolvedCheckinCode = strtoupper(trim((string) ($validated['checkin_code'] ?? '')));
-        $resolvedPhone       = preg_replace('/\D+/', '', (string) ($validated['submitted_phone'] ?? ''));
+        $resolvedPhone = preg_replace('/\D+/', '', (string) ($validated['submitted_phone'] ?? ''));
 
         $member = null;
 
         if (! empty($validated['gym_member_id'])) {
             $member = GymMember::query()->find($validated['gym_member_id']);
-        } elseif (! empty($resolvedCheckinCode)) {
+        } elseif ($resolvedCheckinCode !== '') {
             $member = GymMember::query()->where('checkin_code', $resolvedCheckinCode)->first();
-        } elseif ($actor === 'qr_member' && ! empty($resolvedPhone)) {
-            // PERBAIKAN: Hapus filter member_status
+        } elseif ($actor === 'qr_member' && $resolvedPhone !== '') {
             $member = GymMember::query()
                 ->whereNotNull('phone')
-                ->get()
+                ->where('status', 'member')
+                ->get(['id', 'full_name', 'phone', 'expires_at', 'checkin_code', 'status'])
                 ->first(fn (GymMember $candidate) => preg_replace('/\D+/', '', (string) $candidate->phone) === $resolvedPhone);
         }
 
-        $errorKey = ! empty($resolvedCheckinCode)
+        $errorKey = $resolvedCheckinCode !== ''
             ? 'checkin_code'
             : (! empty($validated['gym_member_id']) ? 'gym_member_id' : 'submitted_phone');
 
-        // PERBAIKAN: Hapus pengecekan member_status
         if (! $member) {
             return redirect()->route($redirectRoute, $redirectParams)
                 ->withErrors([$errorKey => 'Member untuk check-in tidak ditemukan.'])
                 ->withInput();
         }
 
-        if (! $member->expires_at || $member->expires_at->lt(Carbon::today())) {
+        if (! $member->expires_at || $member->expires_at->copy()->startOfDay()->lt(Carbon::today())) {
             return redirect()->route($redirectRoute, $redirectParams)
                 ->withErrors([$errorKey => 'Membership member ini sudah expired dan tidak bisa check-in.'])
                 ->withInput();
         }
 
         $isQrMemberCheckin = $actor === 'qr_member';
-        // Scan QR di kasir langsung dianggap valid, tapi QR self-service (member-checkin) masuk sebagai pending.
         $verificationStatus = ($isQrMemberCheckin && $redirectRoute === 'member.checkin') ? 'pending' : 'verified';
 
-
-        if ($isQrMemberCheckin && empty($resolvedCheckinCode)) {
+        if ($isQrMemberCheckin && $resolvedCheckinCode === '') {
             $request->validate([
                 'submitted_name'  => ['required', 'string', 'max:255'],
                 'submitted_phone' => ['required', 'string', 'max:30'],
@@ -200,9 +211,9 @@ class RouteHelpers
         }
 
         $successLabel = match ($actor) {
-            'cashier'    => 'kasir',
-            'qr_member'  => 'QR',
-            default      => 'admin',
+            'cashier'   => 'kasir',
+            'qr_member' => 'QR',
+            default     => 'admin',
         };
 
         $checkinPayload = [
@@ -217,139 +228,61 @@ class RouteHelpers
             'verified_at'         => $verificationStatus === 'verified' ? now() : null,
             'verified_by'         => $verificationStatus === 'verified' ? (string) (session('auth.name') ?? session('auth.login') ?? $actor) : null,
         ];
+
         if (Schema::hasColumn('gym_checkins', 'notes')) {
             $checkinPayload['notes'] = $validated['notes'] ?? null;
         }
 
-        $checkin = GymCheckin::create($checkinPayload);
+        DB::transaction(function () use ($checkinPayload, $verificationStatus, $member, $successLabel) {
+            $checkin = GymCheckin::create($checkinPayload);
 
-        if ($verificationStatus === 'verified') {
-            MemberHistory::create([
-                'gym_member_id' => $member->id,
-                'history_type'  => 'checkin',
-                'occurred_at'   => $checkin->checked_in_at,
-                'title'         => 'Check-in member',
-                'description'   => 'Check-in melalui ' . $successLabel,
-                'source_type'   => GymCheckin::class,
-                'source_id'     => $checkin->id,
-            ]);
-        }
+            if ($verificationStatus === 'verified') {
+                MemberHistory::create([
+                    'gym_member_id' => $member->id,
+                    'history_type'  => 'checkin',
+                    'occurred_at'   => $checkin->checked_in_at,
+                    'title'         => 'Check-in member',
+                    'description'   => 'Check-in melalui ' . $successLabel,
+                    'source_type'   => GymCheckin::class,
+                    'source_id'     => $checkin->id,
+                ]);
+            }
+        });
 
-        $redirect = redirect()->route($redirectRoute, $redirectParams)
+        return redirect()->route($redirectRoute, $redirectParams)
             ->with('status', "Check-in {$successLabel} untuk {$member->full_name} berhasil dicatat.")
             ->with('welcome_name', $member->full_name);
-
-        return $redirect;
     }
-
-    // ─── Page meta ───────────────────────────────────────────────────────────
-
-    public static function pageMeta(string $key): array
-    {
-        $map = [
-            'dashboard' => [
-                'pageTitle'          => 'Dashboard Admin Arena Gym',
-                'activePage'         => 'dashboard',
-                'sidebarStatusTitle' => 'Operasional Stabil',
-                'sidebarStatusNote'  => 'Pantau semua modul admin dari halaman utama.',
-                'icon'               => 'layout-dashboard',
-                'heroImage'          => 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&q=80&w=1200',
-            ],
-            'members' => [
-                'pageTitle'          => 'Member - Arena Gym',
-                'activePage'         => 'members',
-                'sidebarStatusTitle' => 'Data Member',
-                'sidebarStatusNote'  => 'Fokus pada member dengan paket aktif atau expired.',
-                'icon'               => 'users',
-                'heroImage'          => 'https://images.unsplash.com/photo-1571012281386-7a0c1645b252?auto=format&fit=crop&q=80&w=1200',
-            ],
-            'daily-passes' => [
-                'pageTitle'          => 'Daily Pass - Arena Gym',
-                'activePage'         => 'daily-passes',
-                'sidebarStatusTitle' => 'Data Daily Pass',
-                'sidebarStatusNote'  => 'Pantau kunjungan daily pass dan pembayaran harian.',
-                'icon'               => 'user-plus',
-                'heroImage'          => 'https://images.unsplash.com/photo-1540497077202-7c8a3999166f?auto=format&fit=crop&q=80&w=1200',
-            ],
-            'products' => [
-                'pageTitle'          => 'Produk - Arena Gym',
-                'activePage'         => 'products',
-                'sidebarStatusTitle' => 'Master Produk',
-                'sidebarStatusNote'  => 'Kelola suplemen dan vitamin untuk kebutuhan penjualan kasir.',
-                'icon'               => 'package',
-                'heroImage'          => 'https://images.unsplash.com/photo-1583454110333-a006bb6d9894?auto=format&fit=crop&q=80&w=1200',
-            ],
-            'checkins' => [
-                'pageTitle'          => 'Check-in - Arena Gym',
-                'activePage'         => 'checkins',
-                'sidebarStatusTitle' => 'Check-in Aktif',
-                'sidebarStatusNote'  => 'Aktivitas kunjungan harian terus diperbarui.',
-                'icon'               => 'clipboard-check',
-                'heroImage'          => 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&q=80&w=1200',
-            ],
-            'announcements' => [
-                'pageTitle'          => 'Pengumuman - Arena Gym',
-                'activePage'         => 'announcements',
-                'sidebarStatusTitle' => 'Info Aktif',
-                'sidebarStatusNote'  => 'Pengumuman penting siap dipublikasikan ke member.',
-                'icon'               => 'megaphone',
-                'heroImage'          => 'https://images.unsplash.com/photo-1483721310020-03333e577078?auto=format&fit=crop&q=80&w=1200',
-            ],
-            'reports' => [
-                'pageTitle'          => 'Laporan - Arena Gym',
-                'activePage'         => 'reports',
-                'sidebarStatusTitle' => 'Laporan Siap',
-                'sidebarStatusNote'  => 'Ringkasan harian dapat diakses dan diunduh.',
-                'icon'               => 'bar-chart-3',
-                'heroImage'          => 'https://images.unsplash.com/photo-1554224158-b67a1c00983f?auto=format&fit=crop&q=80&w=1200',
-            ],
-        ];
-
-        return $map[$key] ?? [];
-    }
-
-    // ─── Cashier view data builder ────────────────────────────────────────────
 
     public static function buildCashierViewData(array $overrides = []): array
     {
         $today = Carbon::today();
+        $startOfToday = $today->copy()->startOfDay();
+        $endOfToday = $today->copy()->endOfDay();
 
-        $transactions = CashierTransaction::query()
-            ->with(['member', 'product'])
-            ->latest('transaction_at')
-            ->get();
+        $todayTransactionsQuery = CashierTransaction::query()
+            ->whereBetween('transaction_at', [$startOfToday, $endOfToday]);
 
-        $todayCheckins = GymCheckin::query()
-            ->with('member')
-            ->whereDate('checked_in_at', $today)
-            ->where('verification_status', 'verified')
-            ->latest('checked_in_at')
-            ->get();
+        $todayMemberCount = (clone $todayTransactionsQuery)->where('transaction_group', 'member_payment')->count();
+        $todayMemberVerifiedCount = (clone $todayTransactionsQuery)->where('transaction_group', 'member_payment')->where('payment_status', 'verified')->count();
+        $todayDailyCount = (clone $todayTransactionsQuery)->where('transaction_group', 'daily_pass')->count();
+        $todayDailyVerifiedCount = (clone $todayTransactionsQuery)->where('transaction_group', 'daily_pass')->where('payment_status', 'verified')->count();
+        $todayTotalCount = (clone $todayTransactionsQuery)->count();
+        $todayPendingCount = (clone $todayTransactionsQuery)->where('payment_status', '!=', 'verified')->count();
+        $todayVerifiedCount = (clone $todayTransactionsQuery)->where('payment_status', 'verified')->count();
+        $todayRevenue = (int) (clone $todayTransactionsQuery)->where('payment_status', 'verified')->sum('amount');
 
-        $pendingCheckins = GymCheckin::query()
-            ->with('member')
-            ->where('verification_status', 'pending')
-            ->latest('checked_in_at')
-            ->get();
-
-        $memberPayments = $transactions->where('transaction_group', 'member_payment')->values();
-        $dailyPayments  = $transactions->where('transaction_group', 'daily_pass')->values();
-        $todayMemberPayments = $memberPayments
-            ->filter(fn (CashierTransaction $t) => $t->transaction_at->isToday())
-            ->values();
-        $todayDailyPayments = $dailyPayments
-            ->filter(fn (CashierTransaction $t) => $t->transaction_at->isToday())
-            ->values();
-
-        $verifiedTransactions     = $transactions->filter(fn (CashierTransaction $t) => $t->payment_status === 'verified')->values();
-        $todayTransactions        = $transactions->filter(fn (CashierTransaction $t) => $t->transaction_at->isToday())->values();
-        $todayVerifiedTransactions = $todayTransactions->filter(fn (CashierTransaction $t) => $t->payment_status === 'verified')->values();
-        $todayPendingTransactions  = $todayTransactions->filter(fn (CashierTransaction $t) => $t->payment_status !== 'verified')->values();
-        $todayRevenue              = $todayVerifiedTransactions->sum('amount');
+        $paymentMethodBreakdown = CashierTransaction::query()
+            ->whereBetween('transaction_at', [$startOfToday, $endOfToday])
+            ->where('payment_status', 'verified')
+            ->whereIn('payment_method', ['cash', 'qris'])
+            ->selectRaw('payment_method, SUM(amount) as total_amount')
+            ->groupBy('payment_method')
+            ->pluck('total_amount', 'payment_method');
 
         $paymentMethodSummary = collect(['cash', 'qris'])
-            ->map(function (string $method) use ($todayVerifiedTransactions) {
-                $amount = $todayVerifiedTransactions->where('payment_method', $method)->sum('amount');
+            ->map(function (string $method) use ($paymentMethodBreakdown) {
+                $amount = (int) ($paymentMethodBreakdown[$method] ?? 0);
 
                 return [
                     'label'  => strtoupper($method),
@@ -372,18 +305,38 @@ class RouteHelpers
             ->values()
             ->all();
 
+        $todayCheckins = GymCheckin::query()
+            ->with('member')
+            ->whereDate('checked_in_at', $today)
+            ->where('verification_status', 'verified')
+            ->latest('checked_in_at')
+            ->get();
+
+        $pendingCheckins = GymCheckin::query()
+            ->with('member')
+            ->where('verification_status', 'pending')
+            ->latest('checked_in_at')
+            ->get();
+
+        $recentPendingQris = CashierTransaction::query()
+            ->with(['member', 'product'])
+            ->where('payment_method', 'qris')
+            ->where('payment_status', '!=', 'verified')
+            ->latest('transaction_at')
+            ->limit(15)
+            ->get();
+
         return array_merge([
-            'pageTitle'           => 'Dashboard Kasir Arena Gym',
-            'activePage'          => 'cashier.dashboard',
-            'sidebarStatusTitle'  => 'Shift Kasir Aktif',
-            'sidebarStatusNote'   => 'Pantau pembayaran, transaksi, dan bukti pembayaran harian.',
-            'cashierShift'        => ['start' => '08:00', 'end' => '16:00', 'label' => '08:00 - 16:00'],
-            // PERBAIKAN: Hapus filter member_status, cukup tampilkan member yang aktif
+            'pageTitle'          => 'Dashboard Kasir Arena Gym',
+            'activePage'         => 'cashier.dashboard',
+            'sidebarStatusTitle' => 'Shift Kasir Aktif',
+            'sidebarStatusNote'  => 'Pantau pembayaran, transaksi, dan bukti pembayaran harian.',
+            'cashierShift'       => ['start' => '08:00', 'end' => '16:00', 'label' => '08:00 - 16:00'],
             'cashierCheckinMembers' => GymMember::query()
                 ->where('status', 'member')
                 ->whereDate('expires_at', '>=', $today)
                 ->orderBy('full_name')
-                ->get(),
+                ->get(['id', 'full_name', 'phone', 'checkin_code', 'expires_at', 'profile_photo_path']),
             'cashierTodayCheckins'   => $todayCheckins,
             'cashierPendingCheckins' => $pendingCheckins,
             'cashierLatestCheckin'   => GymCheckin::query()
@@ -392,16 +345,13 @@ class RouteHelpers
                 ->latest('checked_in_at')
                 ->first(),
             'cashierStats' => [
-                ['label' => 'Pembayaran Member',        'value' => number_format($todayMemberPayments->count(), 0, ',', '.'), 'change' => $todayMemberPayments->where('payment_status', 'verified')->count() . ' terverifikasi'],
-                ['label' => 'Pembayaran Daily Pass',    'value' => number_format($todayDailyPayments->count(), 0, ',', '.'),  'change' => $todayDailyPayments->where('payment_status', 'verified')->count() . ' terverifikasi'],
-                ['label' => 'Total Transaksi Hari Ini', 'value' => number_format($todayTransactions->count(), 0, ',', '.'), 'change' => $todayPendingTransactions->count() . ' pending'],
-                ['label' => 'Pendapatan Hari Ini',      'value' => self::formatCurrency($todayRevenue), 'change' => $todayVerifiedTransactions->count() . ' transaksi lunas'],
+                ['label' => 'Pembayaran Member',        'value' => number_format($todayMemberCount, 0, ',', '.'), 'change' => $todayMemberVerifiedCount . ' terverifikasi'],
+                ['label' => 'Pembayaran Daily Pass',    'value' => number_format($todayDailyCount, 0, ',', '.'),  'change' => $todayDailyVerifiedCount . ' terverifikasi'],
+                ['label' => 'Total Transaksi Hari Ini', 'value' => number_format($todayTotalCount, 0, ',', '.'), 'change' => $todayPendingCount . ' pending'],
+                ['label' => 'Pendapatan Hari Ini',      'value' => self::formatCurrency($todayRevenue), 'change' => $todayVerifiedCount . ' transaksi lunas'],
             ],
-            'transactions'   => $transactions,
-            'memberPayments' => $memberPayments,
-            'dailyPayments'  => $dailyPayments,
-            'receiptQueue'   => $transactions->values(),
-            'paymentMethods' => $paymentMethods,
+            'recentPendingQris' => $recentPendingQris,
+            'paymentMethods'    => $paymentMethods,
         ], $overrides);
     }
 }

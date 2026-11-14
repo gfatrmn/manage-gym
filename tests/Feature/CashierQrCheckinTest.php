@@ -20,8 +20,11 @@ class CashierQrCheckinTest extends TestCase
             ],
         ])->get(route('cashier.checkins'))
             ->assertOk()
-            ->assertSee('Manual')
-            ->assertSee('Scan QR');
+            ->assertInertia(fn (\Inertia\Testing\AssertableInertia $page) => $page
+                ->component('Cashier/Checkins')
+                ->where('activePage', 'cashier.checkins')
+                ->has('cashierCheckinMembers')
+            );
     }
 
     public function test_member_can_submit_self_service_qr_checkin(): void

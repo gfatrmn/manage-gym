@@ -1,142 +1,21 @@
 <?php
 
-use App\Helpers\RouteHelpers;
-use App\Models\User;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
+use App\Http\Controllers\Auth\LoginController;
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| Auth Routes
-|--------------------------------------------------------------------------
-| Menangani seluruh alur login (multi-role) dan logout.
-*/
+Route::get('/', [LoginController::class, 'root']);
 
-// ── Root redirect ─────────────────────────────────────────────────────────────
-Route::get('/', fn () => RouteHelpers::redirectByRole());
+Route::get('/login', [LoginController::class, 'showLogin'])->name('login');
+Route::post('/login', [LoginController::class, 'submitLogin'])->name('login.submit');
 
-// ── Login page ────────────────────────────────────────────────────────────────
-Route::get('/login', function () {
-    return view('auth.login', [
-        'pageTitle' => 'Login Portal Arena Gym',
-        'roles'     => [
-            [
-                'value'       => 'member',
-                'label'       => 'Member',
-                'description' => 'Akses dashboard member dan informasi gym.',
-                'icon'        => 'user',
-                'img'         => 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&q=80&w=400',
-            ],
-            [
-                'value'       => 'admin',
-                'label'       => 'Admin',
-                'description' => 'Kelola member, check-in, dan operasional.',
-                'icon'        => 'shield-check',
-                'img'         => 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&q=80&w=400',
-            ],
-            [
-                'value'       => 'master_admin',
-                'label'       => 'Master Admin',
-                'description' => 'Akses penuh seluruh modul sistem.',
-                'icon'        => 'key',
-                'img'         => 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&q=80&w=400',
-            ],
-            [
-                'value'       => 'cashier',
-                'label'       => 'Kasir',
-                'description' => 'Kelola transaksi dan pembayaran harian.',
-                'icon'        => 'wallet',
-                'img'         => 'https://images.unsplash.com/photo-1556742044-3c52d6e88c62?auto=format&fit=crop&q=80&w=400',
-            ],
-        ],
-    ]);
-})->name('login');
+Route::get('/login/member', fn () => redirect()->route('login'))->name('login.member');
+Route::get('/login/admin', fn () => redirect()->route('login'))->name('admin.login');
+Route::post('/login/admin', [LoginController::class, 'submitLogin'])->name('admin.login.submit');
 
-// ── Role-specific login shortcuts (redirect ke /login dengan ?role=xxx) ───────
-Route::get('/login/member',        fn () => redirect()->route('member.login'))->name('login.member');
-Route::get('/login/admin',         fn () => redirect()->route('login', ['role' => 'admin']))->name('admin.login');
-Route::post('/login/admin',        fn () => redirect()->route('login', ['role' => 'admin']))->name('admin.login.submit');
+Route::get('/login/cashier', fn () => redirect()->route('login'))->name('cashier.login');
+Route::post('/login/cashier', [LoginController::class, 'submitLogin'])->name('cashier.login.submit');
 
-Route::get('/login/cashier',       fn () => redirect()->route('login', ['role' => 'cashier']))->name('cashier.login');
-Route::post('/login/cashier',      fn () => redirect()->route('login', ['role' => 'cashier']))->name('cashier.login.submit');
+Route::get('/login/master-admin', fn () => redirect()->route('login'))->name('master-admin.login');
+Route::post('/login/master-admin', [LoginController::class, 'submitLogin'])->name('master-admin.login.submit');
 
-Route::get('/login/master-admin',  fn () => redirect()->route('login', ['role' => 'master_admin']))->name('master-admin.login');
-Route::post('/login/master-admin', fn () => redirect()->route('login', ['role' => 'master_admin']))->name('master-admin.login.submit');
-
-// ── Login submit ──────────────────────────────────────────────────────────────
-Route::post('/login', function (Request $request) {
-    $validated = $request->validate([
-        'role'     => ['required', 'in:member,admin,master_admin,cashier'],
-        'login'    => ['required_if:role,admin,master_admin,cashier'],
-        'email'    => ['required_if:role,member', 'string'],
-        'password' => ['required'],
-    ]);
-
-    if ($validated['role'] === 'member') {
-        // Handle member login
-        $user = User::query()
-            ->where(function ($query) use ($validated) {
-                $query->where('email', $validated['email'])
-                      ->orWhere('login', $validated['email']);
-            })
-            ->where('role', 'member')
-            ->first();
-
-        if (! $user || ! Hash::check($validated['password'], $user->password)) {
-            return back()
-                ->withErrors(['email' => 'Email/Username atau password tidak sesuai.'])
-                ->withInput();
-        }
-
-        $request->session()->regenerate();
-        $request->session()->put('auth', [
-            'id'    => $user->id,
-            'name'  => $user->name,
-            'email' => $user->email,
-            'role'  => 'member',
-        ]);
-
-        return redirect()->route('member.dashboard');
-    }
-
-    // Handle admin/cashier login
-    $user = User::query()
-        ->where('login', $validated['login'])
-        ->where('role', $validated['role'])
-        ->first();
-
-    if (! $user) {
-        $user = User::query()->where('login', $validated['login'])->first();
-    }
-
-    if (
-        ! $user
-        || ! in_array($user->role, ['admin', 'master_admin', 'cashier'], true)
-        || ! Hash::check($validated['password'], $user->password)
-    ) {
-        return back()
-            ->withErrors(['login' => 'Username atau password tidak sesuai.'])
-            ->withInput();
-    }
-
-    $request->session()->regenerate();
-    $request->session()->put('auth', [
-        'role'    => $user->role,
-        'login'   => $user->login,
-        'user_id' => $user->id,
-        'name'    => $user->name,
-    ]);
-
-    return in_array($user->role, ['admin', 'master_admin'], true)
-        ? redirect()->route('admin.dashboard')
-        : redirect()->route('cashier.dashboard');
-})->name('login.submit');
-
-// ── Logout ────────────────────────────────────────────────────────────────────
-Route::post('/logout', function (Request $request) {
-    $request->session()->invalidate();
-    $request->session()->regenerateToken();
-
-    return redirect()->route('login');
-})->name('logout');
+Route::post('/logout', [LoginController::class, 'logout'])->name('logout');

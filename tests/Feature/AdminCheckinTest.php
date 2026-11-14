@@ -98,8 +98,10 @@ class AdminCheckinTest extends TestCase
             ],
         ])->get(route('admin.checkins'))
             ->assertOk()
-            ->assertSee('Check-in Member')
-            ->assertSee('Ketik nama atau kode member')
-            ->assertSee('Dewa Barcode');
+            ->assertInertia(fn (\Inertia\Testing\AssertableInertia $page) => $page
+                ->component('Admin/Checkins')
+                ->where('allLogs.data.0.nama', 'Dewa Barcode')
+                ->where('allLogs.data.0.sub', 'AGM-BARCODE01')
+            );
     }
 }

@@ -76,11 +76,11 @@ class AdminMemberTest extends TestCase
             ],
         ])->get(route('admin.members'))
             ->assertOk()
-            ->assertSee('Detail')
-            ->assertSee('QR Code Member')
-            ->assertSee('Riwayat Check-in')
-            ->assertSee('Raka Pradana')
-            ->assertSee('10 Apr 2026');
+            ->assertInertia(fn (\Inertia\Testing\AssertableInertia $page) => $page
+                ->component('Admin/Members')
+                ->where('members.data.0.full_name', 'Raka Pradana')
+                ->has('members.data.0.checkin_logs')
+            );
     }
 
     public function test_admin_can_search_member_data(): void
@@ -120,8 +120,11 @@ class AdminMemberTest extends TestCase
             ],
         ])->get(route('admin.members', ['q' => 'rina']))
             ->assertOk()
-            ->assertSee('Cari nama atau no. HP')
-            ->assertSee('Rina Saputri')
-            ->assertDontSee('Budi Hartono');
+            ->assertInertia(fn (\Inertia\Testing\AssertableInertia $page) => $page
+                ->component('Admin/Members')
+                ->where('memberSearch', 'rina')
+                ->has('members.data', 1)
+                ->where('members.data.0.full_name', 'Rina Saputri')
+            );
     }
 }

@@ -39,9 +39,14 @@ require __DIR__.'/member-checkin.php';
 require __DIR__.'/member.php';
 require __DIR__.'/member-profile-photos.php';
 
-Route::prefix('admin')->name('admin.')->group(function () {
+Route::prefix('admin')->name('admin.')->middleware('role:admin')->group(function () {
     require __DIR__.'/admin/dashboard.php';
     require __DIR__.'/admin/members.php';
+    require __DIR__.'/admin/packages.php';
+    require __DIR__.'/admin/cashier-accounts.php';
+    require __DIR__.'/admin/memberships.php';
+    require __DIR__.'/admin/transactions.php';
+    require __DIR__.'/admin/expenses.php';
     require __DIR__.'/admin/daily-passes.php';
     require __DIR__.'/admin/products.php';
     require __DIR__.'/admin/checkins.php';
@@ -49,10 +54,15 @@ Route::prefix('admin')->name('admin.')->group(function () {
     require __DIR__.'/admin/profile-photo-requests.php';
     require __DIR__.'/admin/feedbacks.php';
     require __DIR__.'/admin/reports.php';
+    require __DIR__.'/admin/settings.php';
+    require __DIR__.'/admin/activity-logs.php';
 });
 
-Route::prefix('cashier')->name('cashier.')->group(function () {
+Route::prefix('cashier')->name('cashier.')->middleware('role:cashier')->group(function () {
     require __DIR__.'/cashier/dashboard.php';
+    require __DIR__.'/cashier/members.php';
+    require __DIR__.'/cashier/packages.php';
+    require __DIR__.'/cashier/renewals.php';
     require __DIR__.'/cashier/checkins.php';
     require __DIR__.'/cashier/member-payments.php';
     require __DIR__.'/cashier/daily-payments.php';

@@ -96,15 +96,14 @@ class AdminReportsTest extends TestCase
             ],
         ])->get(route('admin.reports'))
             ->assertOk()
-            ->assertSee('Tambah pengeluaran')
-            ->assertSee('Simpan Pengeluaran')
-            ->assertSee('Laporan Member')
-            ->assertSee('Laporan Keuangan')
-            ->assertSee('Laporan Kehadiran')
-            ->assertSee('Rp50.000')
-            ->assertSee('Rp100.000')
-            ->assertSee('Rp15.000')
-            ->assertSee('Rp85.000');
+            ->assertInertia(fn (\Inertia\Testing\AssertableInertia $page) => $page
+                ->component('Admin/Reports')
+                ->where('financialSummary.total_revenue', 100000)
+                ->where('financialSummary.total_expense', 15000)
+                ->where('financialSummary.net_revenue', 85000)
+                ->where('financialSummary.member_revenue', 50000)
+                ->has('reportCatalog', 4)
+            );
 
         $this->withSession([
             'auth' => [
