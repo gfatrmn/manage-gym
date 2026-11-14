@@ -40,7 +40,7 @@ export default function TransactionDetail({ transaction, gymProfile = {} }) {
                     {/* Header */}
                     <div className="flex flex-col justify-between gap-6 border-b border-slate-200 pb-8 sm:flex-row sm:items-start dark:border-slate-800">
                         <div className="flex items-center gap-3">
-                            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-rose-600 to-orange-500 text-white shadow-md">
+                            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-red-600 text-white shadow-md shadow-red-600/20">
                                 <Dumbbell className="h-6 w-6" />
                             </div>
                             <div>
@@ -88,7 +88,7 @@ export default function TransactionDetail({ transaction, gymProfile = {} }) {
                                 Status & Kasir:
                             </p>
                             <div className="mt-1 flex items-center gap-2 sm:justify-end">
-                                <Badge variant={transaction.payment_status === 'verified' ? 'green' : 'amber'}>
+                                <Badge variant={transaction.payment_status === 'verified' ? 'success' : 'warning'}>
                                     {transaction.payment_status === 'verified' ? 'LUNAS / VERIFIED' : transaction.payment_status.toUpperCase()}
                                 </Badge>
                             </div>

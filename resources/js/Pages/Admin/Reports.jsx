@@ -79,7 +79,7 @@ export default function Reports({
                     value={formatRupiah(financialSummary.total_expense)}
                     subtitle={`${financialSummary.expense_count || 0} catatan pengeluaran`}
                     icon={TrendingDown}
-                    accent="amber"
+                    accent="rose"
                 />
                 <StatCard
                     title="Laba Bersih"
@@ -93,29 +93,29 @@ export default function Reports({
             {/* 6-Month Financial History */}
             {financialMonthlyHistory.length > 0 && (
                 <Card className="mb-6">
-                    <h2 className="mb-4 text-base font-bold text-slate-900 dark:text-white">
+                    <h2 className="mb-4 text-base font-bold text-slate-900">
                         Tren Keuangan 6 Bulan Terakhir
                     </h2>
                     <div className="overflow-x-auto">
                         <table className="w-full text-left text-sm">
                             <thead>
-                                <tr className="border-b border-slate-200 text-xs uppercase tracking-wider text-slate-500 dark:border-slate-800 dark:text-slate-400">
+                                <tr className="border-b border-slate-200 text-xs uppercase tracking-wider text-slate-500">
                                     <th className="pb-3 pr-4">Bulan</th>
                                     <th className="pb-3 pr-4">Pemasukan</th>
                                     <th className="pb-3 pr-4">Pengeluaran</th>
                                     <th className="pb-3">Laba Bersih</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                            <tbody className="divide-y divide-slate-100">
                                 {financialMonthlyHistory.map((row, idx) => (
                                     <tr key={idx}>
-                                        <td className="py-3 pr-4 font-semibold text-slate-900 dark:text-white">
+                                        <td className="py-3 pr-4 font-semibold text-slate-900">
                                             {row.month_label}
                                         </td>
-                                        <td className="py-3 pr-4 text-emerald-600 dark:text-emerald-400">
+                                        <td className="py-3 pr-4 text-emerald-600">
                                             {formatRupiah(row.total_revenue)}
                                         </td>
-                                        <td className="py-3 pr-4 text-amber-600 dark:text-amber-400">
+                                        <td className="py-3 pr-4 text-red-600">
                                             {formatRupiah(row.total_expense)}
                                         </td>
                                         <td className="py-3 font-bold text-slate-900 dark:text-white">

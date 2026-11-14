@@ -12,52 +12,22 @@ import {
 import { cn } from '../lib/format';
 
 export function ThemeToggle({ className = '' }) {
-    const [isDark, setIsDark] = useState(() =>
-        typeof document !== 'undefined'
-            ? document.documentElement.classList.contains('dark')
-            : false
-    );
-
-    const toggle = () => {
-        const next = !isDark;
-        setIsDark(next);
-        document.documentElement.classList.toggle('dark', next);
-        try {
-            localStorage.setItem('arena-gym-theme', next ? 'dark' : 'light');
-        } catch {
-            // Ignore storage restrictions
-        }
-    };
-
-    return (
-        <button
-            type="button"
-            onClick={toggle}
-            title={isDark ? 'Ganti ke Mode Terang' : 'Ganti ke Mode Gelap'}
-            aria-label="Toggle theme"
-            className={cn(
-                'inline-flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 transition hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800',
-                className
-            )}
-        >
-            {isDark ? <Sun className="h-4 w-4 text-amber-400" /> : <Moon className="h-4 w-4" />}
-        </button>
-    );
+    return null;
 }
 
 const BUTTON_VARIANTS = {
     primary:
-        'bg-gradient-to-r from-rose-600 to-orange-500 text-white shadow-sm shadow-rose-500/20 hover:from-rose-500 hover:to-orange-400 focus:ring-rose-500',
+        'bg-red-600 text-white shadow-sm shadow-red-600/20 hover:bg-red-700 focus:ring-red-500',
     secondary:
-        'border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700 focus:ring-slate-400',
+        'border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 focus:ring-slate-400',
     success:
         'bg-emerald-600 text-white hover:bg-emerald-500 focus:ring-emerald-500',
     danger:
-        'bg-rose-600 text-white hover:bg-rose-500 focus:ring-rose-500',
+        'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500',
     warning:
-        'bg-amber-500 text-slate-950 hover:bg-amber-400 focus:ring-amber-500',
+        'bg-slate-800 text-white hover:bg-slate-900 focus:ring-slate-500',
     ghost:
-        'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800 focus:ring-slate-400',
+        'text-slate-600 hover:bg-slate-100 focus:ring-slate-400',
 };
 
 const BUTTON_SIZES = {
@@ -94,12 +64,12 @@ export function Button({
 }
 
 const BADGE_VARIANTS = {
-    success: 'bg-emerald-500/15 text-emerald-700 ring-emerald-500/30 dark:text-emerald-300',
-    warning: 'bg-amber-500/15 text-amber-700 ring-amber-500/30 dark:text-amber-300',
-    danger: 'bg-rose-500/15 text-rose-700 ring-rose-500/30 dark:text-rose-300',
-    info: 'bg-sky-500/15 text-sky-700 ring-sky-500/30 dark:text-sky-300',
-    purple: 'bg-violet-500/15 text-violet-700 ring-violet-500/30 dark:text-violet-300',
-    neutral: 'bg-slate-500/10 text-slate-700 ring-slate-500/20 dark:text-slate-300',
+    success: 'bg-emerald-50 text-emerald-700 ring-emerald-500/30',
+    warning: 'bg-red-50 text-red-700 ring-red-500/20',
+    danger: 'bg-red-50 text-red-700 ring-red-500/30',
+    info: 'bg-slate-100 text-slate-700 ring-slate-500/20',
+    purple: 'bg-slate-100 text-slate-700 ring-slate-500/20',
+    neutral: 'bg-slate-100 text-slate-700 ring-slate-500/20',
 };
 
 export function Badge({ variant = 'neutral', className = '', children }) {
@@ -139,11 +109,12 @@ export function StatCard({
     className = '',
 }) {
     const accents = {
-        rose: 'bg-rose-500/10 text-rose-600 dark:text-rose-400',
-        emerald: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
-        amber: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
-        sky: 'bg-sky-500/10 text-sky-600 dark:text-sky-400',
-        violet: 'bg-violet-500/10 text-violet-600 dark:text-violet-400',
+        rose: 'bg-red-50 text-red-600',
+        red: 'bg-red-50 text-red-600',
+        emerald: 'bg-emerald-50 text-emerald-600',
+        amber: 'bg-red-50 text-red-600',
+        sky: 'bg-slate-100 text-slate-700',
+        violet: 'bg-slate-100 text-slate-700',
     };
 
     return (
@@ -182,12 +153,12 @@ export function InputLabel({ htmlFor, required = false, children, className = ''
         <label
             htmlFor={htmlFor}
             className={cn(
-                'mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300',
+                'mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-600',
                 className
             )}
         >
             {children}
-            {required && <span className="ml-1 text-rose-500">*</span>}
+            {required && <span className="ml-1 text-red-600">*</span>}
         </label>
     );
 }
@@ -196,8 +167,8 @@ export function Input({ className = '', error, ...props }) {
     return (
         <input
             className={cn(
-                'w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 transition focus:border-rose-500 focus:outline-none focus:ring-2 focus:ring-rose-500/20 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:placeholder-slate-500',
-                error && 'border-rose-500 focus:border-rose-500 focus:ring-rose-500/30',
+                'w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 transition focus:border-red-600 focus:outline-none focus:ring-2 focus:ring-red-600/20',
+                error && 'border-red-600 focus:border-red-600 focus:ring-red-600/30',
                 className
             )}
             {...props}
@@ -209,8 +180,8 @@ export function Select({ className = '', error, children, ...props }) {
     return (
         <select
             className={cn(
-                'w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 transition focus:border-rose-500 focus:outline-none focus:ring-2 focus:ring-rose-500/20 dark:border-slate-700 dark:bg-slate-950 dark:text-white',
-                error && 'border-rose-500 focus:border-rose-500 focus:ring-rose-500/30',
+                'w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 transition focus:border-red-600 focus:outline-none focus:ring-2 focus:ring-red-600/20',
+                error && 'border-red-600 focus:border-red-600 focus:ring-red-600/30',
                 className
             )}
             {...props}
@@ -224,8 +195,8 @@ export function Textarea({ className = '', error, ...props }) {
     return (
         <textarea
             className={cn(
-                'w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 transition focus:border-rose-500 focus:outline-none focus:ring-2 focus:ring-rose-500/20 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:placeholder-slate-500',
-                error && 'border-rose-500 focus:border-rose-500 focus:ring-rose-500/30',
+                'w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 transition focus:border-red-600 focus:outline-none focus:ring-2 focus:ring-red-600/20',
+                error && 'border-red-600 focus:border-red-600 focus:ring-red-600/30',
                 className
             )}
             {...props}
@@ -235,7 +206,7 @@ export function Textarea({ className = '', error, ...props }) {
 
 export function FieldError({ message }) {
     if (!message) return null;
-    return <p className="mt-1 text-xs font-medium text-rose-500">{message}</p>;
+    return <p className="mt-1 text-xs font-medium text-red-600">{message}</p>;
 }
 
 export function Modal({ open, onClose, title, subtitle, maxWidth = 'max-w-lg', children }) {
@@ -316,9 +287,9 @@ export function FlashBanner() {
             )}
 
             {(flash.error || errorList.length > 0) && (
-                <div className="flex items-start justify-between gap-3 rounded-2xl border border-rose-500/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-800 dark:text-rose-200">
+                <div className="flex items-start justify-between gap-3 rounded-2xl border border-red-500/30 bg-red-50 px-4 py-3 text-sm text-red-800">
                     <div className="flex items-start gap-2.5">
-                        <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-rose-500" />
+                        <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-red-600" />
                         <div className="space-y-1">
                             {flash.error && <p>{flash.error}</p>}
                             {errorList.length === 1 && <p>{errorList[0]}</p>}
@@ -334,7 +305,7 @@ export function FlashBanner() {
                     <button
                         type="button"
                         onClick={() => setDismissedKey(activeKey)}
-                        className="text-rose-600 hover:opacity-75 dark:text-rose-300"
+                        className="text-red-600 hover:opacity-75"
                     >
                         <X className="h-4 w-4" />
                     </button>
@@ -385,8 +356,8 @@ export function Pagination({ paginator }) {
                             className={cn(
                                 'inline-flex h-8 min-w-8 items-center justify-center rounded-lg px-2.5 text-xs font-medium transition',
                                 link.active
-                                    ? 'bg-rose-600 text-white'
-                                    : 'border border-slate-200 bg-white text-slate-700 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700'
+                                    ? 'bg-red-600 text-white'
+                                    : 'border border-slate-200 bg-white text-slate-700 hover:bg-slate-100'
                             )}
                         >
                             {label}

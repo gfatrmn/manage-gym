@@ -47,21 +47,21 @@ export default function Dashboard({
             desc: 'Pesan resmi dari admin & pengelola gym',
             href: '/member/messages',
             icon: Bell,
-            color: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
+            color: 'bg-red-50 text-red-600',
         },
         {
             title: 'Profil & Kritik Saran',
             desc: 'Kelola foto profil, kontak, dan kirim masukan',
             href: '/member/profile',
             icon: User,
-            color: 'bg-slate-500/10 text-slate-600 dark:text-slate-300',
+            color: 'bg-slate-500/10 text-slate-600',
         },
     ];
 
     return (
         <MemberLayout title="Dashboard Member" active="dashboard">
             {/* Hero Profile Banner */}
-            <Card className="mb-6 bg-gradient-to-br from-slate-900 via-slate-900 to-rose-950 text-white dark:border-slate-800">
+            <Card className="mb-6 bg-gradient-to-br from-slate-900 via-slate-900 to-red-950 text-white">
                 <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-center">
                     <div className="flex items-center gap-4">
                         {member?.profile_photo_url ? (
@@ -71,7 +71,7 @@ export default function Dashboard({
                                 className="h-16 w-16 rounded-2xl border-2 border-white/20 object-cover"
                             />
                         ) : (
-                            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-rose-600 to-orange-500 text-xl font-extrabold text-white">
+                            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-red-600 text-xl font-extrabold text-white">
                                 {member?.profile_initials || 'AG'}
                             </div>
                         )}
@@ -91,7 +91,7 @@ export default function Dashboard({
 
                     <Link
                         href="/member/barcode"
-                        className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-rose-600 to-orange-500 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-rose-500/30 transition hover:from-rose-500 hover:to-orange-400"
+                        className="inline-flex items-center justify-center gap-2 rounded-xl bg-red-600 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-red-600/30 transition hover:bg-red-700"
                     >
                         <QrCode className="h-5 w-5" />
                         Buka QR Check-in
@@ -120,7 +120,7 @@ export default function Dashboard({
                     value={remainingDays !== null ? `${remainingDays} Hari` : '-'}
                     subtitle={member?.expires_at ? `Aktif s/d ${formatDate(member.expires_at)}` : 'Status membership'}
                     icon={CreditCard}
-                    accent={remainingDays !== null && remainingDays <= 7 ? 'amber' : 'sky'}
+                    accent={remainingDays !== null && remainingDays <= 7 ? 'rose' : 'sky'}
                 />
             </div>
 

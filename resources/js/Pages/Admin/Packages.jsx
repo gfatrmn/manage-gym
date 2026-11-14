@@ -222,7 +222,7 @@ export default function Packages({ packages, filters = {} }) {
                                     variant="ghost"
                                     size="sm"
                                     onClick={() => handleToggleStatus(pkg)}
-                                    className={pkg.is_active ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'}
+                                    className={pkg.is_active ? 'text-red-600' : 'text-emerald-600'}
                                 >
                                     <Power className="mr-1 h-3.5 w-3.5" />
                                     {pkg.is_active ? 'Nonaktifkan' : 'Aktifkan'}

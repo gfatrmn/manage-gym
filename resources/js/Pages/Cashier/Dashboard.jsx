@@ -16,7 +16,7 @@ import AppLayout from '../../Layouts/AppLayout';
 import { Badge, Button, Card, StatCard } from '../../Components/UI';
 
 const STAT_ICONS = [CreditCard, Ticket, Receipt, DollarSign];
-const STAT_ACCENTS = ['rose', 'sky', 'amber', 'emerald'];
+const STAT_ACCENTS = ['rose', 'sky', 'rose', 'emerald'];
 
 export default function Dashboard({
     cashierShift = {},
@@ -33,10 +33,10 @@ export default function Dashboard({
             active="dashboard"
         >
             {/* Quick POS Action Bar */}
-            <Card className="mb-6 bg-gradient-to-br from-slate-900 via-slate-900 to-rose-950 text-white dark:border-slate-800">
+            <Card className="mb-6 bg-gradient-to-br from-slate-900 via-slate-900 to-red-950 text-white">
                 <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-center">
                     <div>
-                        <p className="text-xs font-bold uppercase tracking-wider text-rose-300">
+                        <p className="text-xs font-bold uppercase tracking-wider text-red-300">
                             Terminal Kasir & Check-in
                         </p>
                         <h2 className="mt-1 text-xl font-extrabold sm:text-2xl">
@@ -46,7 +46,7 @@ export default function Dashboard({
                     <div className="flex flex-wrap gap-2">
                         <Link
                             href="/cashier/checkins"
-                            className="inline-flex items-center gap-1.5 rounded-xl bg-rose-600 px-3.5 py-2 text-xs font-bold text-white hover:bg-rose-500"
+                            className="inline-flex items-center gap-1.5 rounded-xl bg-red-600 px-3.5 py-2 text-xs font-bold text-white hover:bg-red-700"
                         >
                             <QrCode className="h-4 w-4" />
                             Scan Check-in
@@ -101,13 +101,13 @@ export default function Dashboard({
                 {/* Pending Check-in Verification */}
                 <Card>
                     <div className="mb-4 flex items-center justify-between">
-                        <h3 className="flex items-center gap-2 text-base font-bold text-slate-900 dark:text-white">
-                            <Clock className="h-4 w-4 text-amber-500" />
+                        <h3 className="flex items-center gap-2 text-base font-bold text-slate-900">
+                            <Clock className="h-4 w-4 text-red-600" />
                             Antrean Check-in QR
                         </h3>
                         <Link
                             href="/cashier/checkins"
-                            className="text-xs font-semibold text-rose-600 hover:underline dark:text-rose-400"
+                            className="text-xs font-semibold text-red-600 hover:underline"
                         >
                             Kelola
                         </Link>
@@ -234,10 +234,10 @@ export default function Dashboard({
                                         <span className="text-slate-700 dark:text-slate-200">{pm.label}</span>
                                         <span className="text-slate-900 dark:text-white">{pm.value}</span>
                                     </div>
-                                    <div className="h-2.5 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
+                                    <div className="h-2.5 w-full overflow-hidden rounded-full bg-slate-100">
                                         <div
                                             style={{ width: `${pm.progress || 0}%` }}
-                                            className="h-full rounded-full bg-gradient-to-r from-rose-600 to-orange-500"
+                                            className="h-full rounded-full bg-red-600"
                                         />
                                     </div>
                                 </div>

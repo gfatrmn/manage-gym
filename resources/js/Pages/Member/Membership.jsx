@@ -35,21 +35,21 @@ export default function Membership({
                     value={remainingDays !== null ? `${remainingDays} Hari` : '-'}
                     subtitle={`Siklus ${totalDays} hari`}
                     icon={CheckCircle2}
-                    accent={remainingDays !== null && remainingDays <= 7 ? 'amber' : 'emerald'}
+                    accent={remainingDays !== null && remainingDays <= 7 ? 'rose' : 'emerald'}
                 />
             </div>
 
             <Card className="mb-6">
                 <div className="mb-2 flex items-center justify-between text-xs font-semibold">
-                    <span className="text-slate-600 dark:text-slate-300">
+                    <span className="text-slate-600">
                         Progres Siklus Keanggotaan
                     </span>
-                    <span className="text-slate-900 dark:text-white">{progressPercent}% terpakai</span>
+                    <span className="text-slate-900">{progressPercent}% terpakai</span>
                 </div>
-                <div className="h-3 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">
+                <div className="h-3 w-full overflow-hidden rounded-full bg-slate-200">
                     <div
                         style={{ width: `${progressPercent}%` }}
-                        className="h-full rounded-full bg-gradient-to-r from-rose-600 to-orange-500 transition-all"
+                        className="h-full rounded-full bg-red-600 transition-all"
                     />
                 </div>
                 <div className="mt-2 flex justify-between text-xs text-slate-500 dark:text-slate-400">

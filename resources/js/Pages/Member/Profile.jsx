@@ -86,36 +86,36 @@ export default function Profile({
                                 <img
                                     src={member.profile_photo_url}
                                     alt={user?.name}
-                                    className="h-28 w-28 rounded-3xl border-2 border-rose-500/30 object-cover shadow"
+                                    className="h-28 w-28 rounded-3xl border-2 border-red-500/30 object-cover shadow"
                                 />
                             ) : (
-                                <div className="flex h-28 w-28 items-center justify-center rounded-3xl bg-gradient-to-br from-rose-600 to-orange-500 text-3xl font-extrabold text-white shadow-md">
+                                <div className="flex h-28 w-28 items-center justify-center rounded-3xl bg-red-600 text-3xl font-extrabold text-white shadow-md">
                                     {member?.profile_initials || user?.name?.charAt(0) || 'AG'}
                                 </div>
                             )}
 
-                            <p className="mt-3 text-base font-bold text-slate-900 dark:text-white">
+                            <p className="mt-3 text-base font-bold text-slate-900">
                                 {member?.full_name || user?.name}
                             </p>
-                            <p className="font-mono text-xs font-bold text-rose-600 dark:text-rose-400">
+                            <p className="font-mono text-xs font-bold text-red-600">
                                 {member?.checkin_code || 'MEMBER'}
                             </p>
 
                             <div className="mt-2 flex items-center gap-2">
-                                <Badge variant="green">{membershipStatus}</Badge>
-                                <Badge variant="slate">{totalCheckins} Check-in</Badge>
+                                <Badge variant="success">{membershipStatus}</Badge>
+                                <Badge variant="neutral">{totalCheckins} Check-in</Badge>
                             </div>
 
-                            <p className="mt-3 text-xs text-slate-500 dark:text-slate-400">
+                            <p className="mt-3 text-xs text-slate-500">
                                 Sisa kuota ganti foto langsung:{' '}
-                                <strong className="text-slate-900 dark:text-white">
+                                <strong className="text-slate-900">
                                     {photoChangesRemaining}x
                                 </strong>
                             </p>
 
                             {pendingPhotoRequest && (
-                                <div className="mt-3 flex w-full items-center gap-2 rounded-xl border border-amber-500/30 bg-amber-500/10 p-3 text-left text-xs text-amber-800 dark:text-amber-200">
-                                    <Clock className="h-4 w-4 shrink-0 text-amber-500" />
+                                <div className="mt-3 flex w-full items-center gap-2 rounded-xl border border-red-200 bg-red-50 p-3 text-left text-xs text-red-800">
+                                    <Clock className="h-4 w-4 shrink-0 text-red-600" />
                                     <span>
                                         Pengajuan foto tanggal {pendingPhotoRequest.created_at} sedang menunggu persetujuan admin.
                                     </span>
@@ -127,7 +127,7 @@ export default function Profile({
                                     type="file"
                                     accept="image/png,image/jpeg,image/webp"
                                     onChange={(e) => photoForm.setData('profile_photo', e.target.files?.[0] || null)}
-                                    className="block w-full rounded-xl border border-slate-200 p-2 text-xs text-slate-600 file:mr-3 file:rounded-lg file:border-0 file:bg-rose-500/10 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-rose-600 dark:border-slate-700 dark:text-slate-300"
+                                    className="block w-full rounded-xl border border-slate-200 p-2 text-xs text-slate-600 file:mr-3 file:rounded-lg file:border-0 file:bg-red-50 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-red-600"
                                 />
                                 <FieldError message={photoForm.errors.profile_photo} />
                                 <Button

@@ -77,7 +77,7 @@ export default function Transactions({
             case 'verified':
                 return <Badge variant="green">Sukses / Lunas</Badge>;
             case 'pending':
-                return <Badge variant="amber">Menunggu</Badge>;
+                return <Badge variant="warning">Menunggu</Badge>;
             case 'cancelled':
             case 'failed':
                 return <Badge variant="rose">Dibatalkan</Badge>;

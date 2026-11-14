@@ -104,10 +104,10 @@ export default function Packages({ packages = [], member }) {
             )}
 
             {/* Inquire Info Banner */}
-            <div className="mt-8 rounded-2xl bg-gradient-to-br from-rose-50 to-orange-50 p-6 border border-rose-200/60 dark:from-rose-950/20 dark:to-orange-950/20 dark:border-rose-900/40">
+            <div className="mt-8 rounded-2xl bg-red-50 p-6 border border-red-200">
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                     <div className="flex items-center gap-4">
-                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-rose-600 text-white shadow-md">
+                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-red-600 text-white shadow-md">
                             <Zap className="h-6 w-6" />
                         </div>
                         <div>

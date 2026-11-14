@@ -354,7 +354,7 @@ export default function RegisterMember({
                                             <span className="font-mono font-bold text-slate-800 dark:text-slate-200">
                                                 {item.invoice}
                                             </span>
-                                            <Badge variant={item.payment_status === 'verified' ? 'green' : 'amber'}>
+                                            <Badge variant={item.payment_status === 'verified' ? 'success' : 'warning'}>
                                                 {item.payment_status}
                                             </Badge>
                                         </div>

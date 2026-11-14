@@ -21,6 +21,7 @@ import {
     Shield,
     ShoppingBag,
     Ticket,
+    User,
     UserCheck,
     UserCog,
     UserPlus,
@@ -28,7 +29,7 @@ import {
     Wallet,
     X,
 } from 'lucide-react';
-import { Badge, FlashBanner, ThemeToggle } from '../Components/UI';
+import { Badge, FlashBanner } from '../Components/UI';
 import { cn } from '../lib/format';
 
 export default function AppLayout({
@@ -166,14 +167,14 @@ export default function AppLayout({
                     href={panel === 'cashier' ? '/cashier' : '/admin'}
                     className="flex items-center gap-3"
                 >
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-rose-600 to-orange-500 text-white shadow-md shadow-rose-500/20">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-red-600 text-white shadow-md shadow-red-600/20">
                         <Dumbbell className="h-5 w-5" />
                     </div>
                     <div>
-                        <p className="text-sm font-bold tracking-tight text-slate-900 dark:text-white">
+                        <p className="text-sm font-bold tracking-tight text-slate-900">
                             ARENA GYM
                         </p>
-                        <p className="text-[11px] font-medium uppercase tracking-wider text-rose-600 dark:text-rose-400">
+                        <p className="text-[11px] font-medium uppercase tracking-wider text-red-600">
                             {panel === 'cashier' ? 'Cashier POS' : 'Admin Console'}
                         </p>
                     </div>
@@ -207,8 +208,8 @@ export default function AppLayout({
                                         className={cn(
                                             'flex items-center justify-between gap-3 rounded-xl px-3 py-2 text-xs font-semibold transition',
                                             isActive
-                                                ? 'bg-gradient-to-r from-rose-600 to-orange-500 text-white shadow-sm shadow-rose-500/20'
-                                                : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800/80 dark:hover:text-white'
+                                                ? 'bg-red-600 text-white shadow-sm shadow-red-600/20'
+                                                : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
                                         )}
                                     >
                                         <span className="flex items-center gap-2.5 truncate">
@@ -221,7 +222,7 @@ export default function AppLayout({
                                                     'rounded-full px-2 py-0.5 text-[10px] font-bold',
                                                     isActive
                                                         ? 'bg-white/25 text-white'
-                                                        : 'bg-rose-500/15 text-rose-600 dark:text-rose-400'
+                                                        : 'bg-red-50 text-red-600'
                                                 )}
                                             >
                                                 {item.badge}
@@ -235,19 +236,11 @@ export default function AppLayout({
                 </nav>
             </div>
 
-            <div className="shrink-0 border-t border-slate-200 p-4 dark:border-slate-800">
-                <div className="mb-3 rounded-xl bg-slate-100 p-3 dark:bg-slate-800/70">
-                    <p className="truncate text-xs font-bold text-slate-900 dark:text-white">
-                        {auth.name || 'Staff Arena Gym'}
-                    </p>
-                    <p className="truncate text-[11px] text-slate-500 dark:text-slate-400">
-                        Role: {auth.role || panel}
-                    </p>
-                </div>
+            <div className="shrink-0 border-t border-slate-200 p-4">
                 <button
                     type="button"
                     onClick={handleLogout}
-                    className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-rose-600 transition hover:bg-rose-50 dark:border-slate-700 dark:bg-slate-900 dark:text-rose-400 dark:hover:bg-rose-950/30"
+                    className="flex w-full items-center justify-center gap-2 rounded-xl border border-red-200 bg-red-50/60 px-3 py-2 text-xs font-semibold text-red-600 transition hover:bg-red-100"
                 >
                     <LogOut className="h-4 w-4" />
                     Keluar Sistem
@@ -302,18 +295,35 @@ export default function AppLayout({
                             </div>
                         </div>
 
-                        <div className="flex items-center gap-2.5">
+                        <div className="flex items-center gap-3">
                             {auth.role === 'master_admin' && (
                                 <Link
                                     href={panel === 'admin' ? '/cashier' : '/admin'}
                                     className="hidden sm:inline-flex"
                                 >
-                                    <Badge variant="purple">
+                                    <span className="inline-flex items-center rounded-xl border border-red-200 bg-red-50 px-2.5 py-1 text-xs font-semibold text-red-700 hover:bg-red-100 transition">
                                         {panel === 'admin' ? 'Buka Kasir POS' : 'Buka Admin'}
-                                    </Badge>
+                                    </span>
                                 </Link>
                             )}
-                            <ThemeToggle />
+
+                            {/* User Role Card with Icon on Top Right */}
+                            <div className="flex items-center gap-2.5 rounded-xl border border-red-200/90 bg-red-50/70 px-3 py-1.5 shadow-xs">
+                                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-600 text-white shadow-xs">
+                                    <User className="h-4 w-4" />
+                                </div>
+                                <div className="text-left">
+                                    <p className="truncate max-w-[120px] sm:max-w-[200px] text-xs font-bold text-slate-900 leading-tight">
+                                        {auth.name || 'Staff Arena Gym'}
+                                    </p>
+                                    <div className="flex items-center gap-1 mt-0.5">
+                                        <span className="inline-flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wider text-red-700 leading-none">
+                                            <Shield className="h-3 w-3 text-red-600" />
+                                            {auth.role || panel}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </header>

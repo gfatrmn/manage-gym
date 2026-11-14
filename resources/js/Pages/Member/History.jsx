@@ -27,7 +27,7 @@ export default function History({
                     value={`${trainingConsistency}%`}
                     subtitle={`${trainingAssessment} (${activeTrainingDays}/${trackedTrainingDays} hari)`}
                     icon={Flame}
-                    accent="amber"
+                    accent="rose"
                 />
             </div>
 

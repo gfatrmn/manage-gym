@@ -1,7 +1,7 @@
 import React from 'react';
 import { Head, Link } from '@inertiajs/react';
 import { Dumbbell } from 'lucide-react';
-import { FlashBanner, ThemeToggle } from '../Components/UI';
+import { FlashBanner } from '../Components/UI';
 
 export default function GuestLayout({ title, subtitle, children, wide = false }) {
     return (
@@ -10,28 +10,27 @@ export default function GuestLayout({ title, subtitle, children, wide = false })
 
             {/* Decorative ambient gradient */}
             <div className="pointer-events-none fixed inset-0 overflow-hidden">
-                <div className="absolute -left-24 -top-24 h-96 w-96 rounded-full bg-rose-500/15 blur-3xl dark:bg-rose-600/20" />
-                <div className="absolute -bottom-24 -right-24 h-96 w-96 rounded-full bg-orange-500/15 blur-3xl dark:bg-orange-600/15" />
+                <div className="absolute -left-24 -top-24 h-96 w-96 rounded-full bg-red-500/10 blur-3xl" />
+                <div className="absolute -bottom-24 -right-24 h-96 w-96 rounded-full bg-red-500/5 blur-3xl" />
             </div>
 
             <div className="relative z-10 flex min-h-screen flex-col justify-between px-4 py-6 sm:px-6 lg:px-8">
                 <header className="mx-auto flex w-full max-w-6xl items-center justify-between">
                     <Link href="/login" className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-rose-600 to-orange-500 text-white shadow-md shadow-rose-500/25">
+                        <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl bg-red-600 text-white shadow-md shadow-red-600/25">
                             <Dumbbell className="h-5 w-5" />
                         </div>
                         <div>
-                            <p className="text-sm font-bold tracking-tight text-slate-900 dark:text-white">
+                            <p className="text-sm font-bold tracking-tight text-slate-900">
                                 ARENA GYM & FITNESS
                             </p>
-                            <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
+                            <p className="text-[11px] font-medium text-slate-500">
                                 Management & Membership System
                             </p>
                         </div>
                     </Link>
 
                     <div className="flex items-center gap-2">
-                        <ThemeToggle />
                     </div>
                 </header>
 

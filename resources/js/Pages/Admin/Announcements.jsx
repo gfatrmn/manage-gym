@@ -133,8 +133,8 @@ export default function Announcements({
                     </Card>
 
                     <Card>
-                        <h2 className="mb-3 flex items-center gap-2 text-base font-bold text-slate-900 dark:text-white">
-                            <BellRing className="h-4 w-4 text-amber-500" />
+                        <h2 className="mb-3 flex items-center gap-2 text-base font-bold text-slate-900">
+                            <BellRing className="h-4 w-4 text-red-600" />
                             Pengingat Jatuh Tempo (≤7 Hari)
                         </h2>
                         {expiringMembers.length === 0 ? (

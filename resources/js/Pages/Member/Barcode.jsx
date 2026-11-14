@@ -49,8 +49,8 @@ export default function Barcode({ user, member, checkinCode, membershipStatus, s
                         </div>
                     </div>
 
-                    <p className="mt-4 inline-flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
-                        <Sparkles className="h-3.5 w-3.5 text-amber-500" />
+                    <p className="mt-4 inline-flex items-center gap-1.5 text-xs text-slate-500">
+                        <Sparkles className="h-3.5 w-3.5 text-red-600" />
                         Naikkan kecerahan layar agar pemindaian kasir lebih cepat
                     </p>
                 </Card>

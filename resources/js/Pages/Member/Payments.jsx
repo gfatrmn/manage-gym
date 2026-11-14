@@ -89,7 +89,7 @@ export default function Payments({
                                             {formatCurrency(trx.amount)}
                                         </td>
                                         <td className="px-5 py-3.5">
-                                            <Badge variant={trx.payment_status === 'verified' ? 'green' : 'amber'}>
+                                            <Badge variant={trx.payment_status === 'verified' ? 'success' : 'warning'}>
                                                 {trx.payment_status === 'verified' ? 'LUNAS' : trx.payment_status}
                                             </Badge>
                                         </td>
@@ -137,11 +137,11 @@ export default function Payments({
                             {/* Header */}
                             <div className="flex items-start justify-between border-b border-slate-200 pb-5 dark:border-slate-800">
                                 <div className="flex items-center gap-3">
-                                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-rose-600 to-orange-500 text-white shadow-sm">
+                                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-red-600 text-white shadow-sm shadow-red-600/20">
                                         <Dumbbell className="h-5 w-5" />
                                     </div>
                                     <div>
-                                        <p className="text-base font-black text-slate-900 dark:text-white">
+                                        <p className="text-base font-black text-slate-900">
                                             {gymProfile.name || 'ARENA GYM & FITNESS'}
                                         </p>
                                         <p className="text-xs text-slate-500">{gymProfile.address}</p>
@@ -149,7 +149,7 @@ export default function Payments({
                                 </div>
 
                                 <div className="text-right">
-                                    <span className="font-mono text-xs font-bold text-slate-600 dark:text-slate-400">
+                                    <span className="font-mono text-xs font-bold text-slate-600">
                                         {selectedInvoice.invoice}
                                     </span>
                                     <p className="text-[11px] text-slate-400">
@@ -162,25 +162,25 @@ export default function Payments({
                             <div className="my-5 space-y-3 text-xs">
                                 <div className="flex justify-between">
                                     <span className="text-slate-500">Layanan / Paket:</span>
-                                    <span className="font-bold text-slate-900 dark:text-white">
+                                    <span className="font-bold text-slate-900">
                                         {selectedInvoice.package?.name || selectedInvoice.notes || 'Membership'}
                                     </span>
                                 </div>
                                 <div className="flex justify-between">
                                     <span className="text-slate-500">Metode Bayar:</span>
-                                    <span className="font-semibold uppercase text-slate-900 dark:text-white">
+                                    <span className="font-semibold uppercase text-slate-900">
                                         {selectedInvoice.payment_method}
                                     </span>
                                 </div>
                                 <div className="flex justify-between">
                                     <span className="text-slate-500">Status Pembayaran:</span>
-                                    <Badge variant={selectedInvoice.payment_status === 'verified' ? 'green' : 'amber'}>
+                                    <Badge variant={selectedInvoice.payment_status === 'verified' ? 'success' : 'warning'}>
                                         {selectedInvoice.payment_status === 'verified' ? 'LUNAS' : selectedInvoice.payment_status}
                                     </Badge>
                                 </div>
-                                <div className="flex justify-between border-t border-slate-100 pt-3 text-sm font-bold text-slate-900 dark:border-slate-800 dark:text-white">
+                                <div className="flex justify-between border-t border-slate-100 pt-3 text-sm font-bold text-slate-900">
                                     <span>Total Nominal:</span>
-                                    <span className="text-rose-600 dark:text-rose-400">
+                                    <span className="text-red-600">
                                         {formatCurrency(selectedInvoice.amount)}
                                     </span>
                                 </div>

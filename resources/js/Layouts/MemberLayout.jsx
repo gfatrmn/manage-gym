@@ -15,7 +15,7 @@ import {
     User,
     ExternalLink,
 } from 'lucide-react';
-import { Button, FlashBanner, Modal, ThemeToggle } from '../Components/UI';
+import { Button, FlashBanner, Modal } from '../Components/UI';
 import { cn } from '../lib/format';
 
 export default function MemberLayout({ title, active = 'dashboard', children }) {
@@ -56,14 +56,14 @@ export default function MemberLayout({ title, active = 'dashboard', children }) 
             <header className="sticky top-0 z-30 border-b border-slate-200/80 bg-white/90 backdrop-blur-md dark:border-slate-800 dark:bg-slate-900/90">
                 <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
                     <Link href="/member/dashboard" className="flex items-center gap-2.5">
-                        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-rose-600 to-orange-500 text-white shadow-sm">
+                        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-red-600 text-white shadow-sm shadow-red-600/20">
                             <Dumbbell className="h-5 w-5" />
                         </div>
                         <div>
-                            <p className="text-sm font-bold tracking-tight text-slate-900 dark:text-white">
+                            <p className="text-sm font-bold tracking-tight text-slate-900">
                                 ARENA MEMBER
                             </p>
-                            <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                            <p className="text-[11px] font-medium text-slate-500">
                                 Halo, {auth.name || 'Member'}
                             </p>
                         </div>
@@ -80,14 +80,14 @@ export default function MemberLayout({ title, active = 'dashboard', children }) 
                                     className={cn(
                                         'relative flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold transition',
                                         isActive
-                                            ? 'bg-rose-600 text-white shadow-sm shadow-rose-500/20'
-                                            : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800'
+                                            ? 'bg-red-600 text-white shadow-sm shadow-red-600/20'
+                                            : 'text-slate-600 hover:bg-slate-100'
                                     )}
                                 >
                                     <Icon className="h-4 w-4" />
                                     <span>{item.label}</span>
                                     {item.badge > 0 && (
-                                        <span className="ml-0.5 rounded-full bg-amber-400 px-1.5 py-0.2 text-[10px] font-bold text-slate-950">
+                                        <span className="ml-0.5 rounded-full bg-red-600 px-1.5 py-0.2 text-[10px] font-bold text-white">
                                             {item.badge}
                                         </span>
                                     )}
@@ -97,12 +97,11 @@ export default function MemberLayout({ title, active = 'dashboard', children }) 
                     </nav>
 
                     <div className="flex items-center gap-2">
-                        <ThemeToggle />
                         <button
                             type="button"
                             onClick={() => router.post('/member/logout')}
                             title="Keluar"
-                            className="inline-flex h-9 items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 text-xs font-semibold text-rose-600 transition hover:bg-rose-50 dark:border-slate-800 dark:bg-slate-900 dark:text-rose-400 dark:hover:bg-rose-950/40"
+                            className="inline-flex h-9 items-center gap-1.5 rounded-xl border border-red-200 bg-white px-3 text-xs font-semibold text-red-600 transition hover:bg-red-50"
                         >
                             <LogOut className="h-4 w-4" />
                             <span className="hidden sm:inline">Keluar</span>
@@ -113,9 +112,9 @@ export default function MemberLayout({ title, active = 'dashboard', children }) 
 
             <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6">
                 {memberNotifications.isExpiringSoon && (
-                    <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm text-amber-900 dark:text-amber-200">
+                    <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900">
                         <div className="flex items-center gap-2.5">
-                            <AlertTriangle className="h-5 w-5 shrink-0 text-amber-500" />
+                            <AlertTriangle className="h-5 w-5 shrink-0 text-red-600" />
                             <span>
                                 Masa aktif membership Anda tersisa{' '}
                                 <strong>{memberNotifications.remainingDays} hari</strong> (berakhir{' '}
@@ -124,7 +123,7 @@ export default function MemberLayout({ title, active = 'dashboard', children }) 
                         </div>
                         <Link
                             href="/member/membership"
-                            className="rounded-xl bg-amber-500 px-3 py-1.5 text-xs font-bold text-slate-950 hover:bg-amber-400"
+                            className="rounded-xl bg-red-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-red-700"
                         >
                             Lihat Detail
                         </Link>
@@ -147,14 +146,14 @@ export default function MemberLayout({ title, active = 'dashboard', children }) 
                             className={cn(
                                 'relative flex flex-col items-center gap-0.5 rounded-xl px-2.5 py-1 text-[10px] font-semibold',
                                 isActive
-                                    ? 'text-rose-600 dark:text-rose-400'
-                                    : 'text-slate-500 dark:text-slate-400'
+                                    ? 'text-red-600'
+                                    : 'text-slate-500'
                             )}
                         >
                             <Icon className="h-5 w-5" />
                             <span>{item.label}</span>
                             {item.badge > 0 && (
-                                <span className="absolute right-1 top-0.5 h-2 w-2 rounded-full bg-rose-500" />
+                                <span className="absolute right-1 top-0.5 h-2 w-2 rounded-full bg-red-600" />
                             )}
                         </Link>
                     );

@@ -114,7 +114,7 @@ export default function Settings({ settings = {} }) {
                     {/* Konfigurasi Invoice & Sistem */}
                     <Card className="p-6">
                         <div className="flex items-center gap-3 border-b border-slate-100 pb-4 dark:border-slate-800">
-                            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-500/10 text-orange-600 dark:bg-orange-500/20 dark:text-orange-400">
+                            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-red-50 text-red-600">
                                 <FileText className="h-5 w-5" />
                             </div>
                             <div>

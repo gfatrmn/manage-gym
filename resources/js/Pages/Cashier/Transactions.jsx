@@ -71,7 +71,7 @@ export default function Transactions({
             <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 <StatCard title="Ditampilkan" value={paymentSummary.shown_count || 0} subtitle={paymentSummary.shown_total || 'Rp 0'} icon={Receipt} accent="rose" />
                 <StatCard title="Hari Ini" value={paymentSummary.today_count || 0} subtitle={paymentSummary.today_total || 'Rp 0'} icon={Receipt} accent="emerald" />
-                <StatCard title="Pending QRIS" value={paymentSummary.pending_count || 0} icon={Receipt} accent="amber" />
+                <StatCard title="Pending QRIS" value={paymentSummary.pending_count || 0} icon={Receipt} accent="rose" />
                 <StatCard title="Total Semua" value={paymentSummary.all_count || 0} icon={Receipt} accent="sky" />
             </div>
 

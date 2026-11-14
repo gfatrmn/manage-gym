@@ -129,7 +129,7 @@ export default function Members({
             <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 <StatCard title="Total Member" value={totalMembersCount} icon={Users} accent="rose" />
                 <StatCard title="Member Aktif" value={totalActiveCount} icon={Users} accent="emerald" />
-                <StatCard title="Jatuh Tempo (≤7 Hari)" value={expiringSoonCount} icon={Users} accent="amber" />
+                <StatCard title="Jatuh Tempo (≤7 Hari)" value={expiringSoonCount} icon={Users} accent="rose" />
                 <StatCard title="Expired" value={totalExpiredCount} icon={Users} accent="sky" />
             </div>
 

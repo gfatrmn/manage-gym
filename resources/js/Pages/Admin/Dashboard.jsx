@@ -24,7 +24,7 @@ import {
 } from '../../Components/UI';
 
 const STAT_ICONS = [Users, DollarSign, TrendingDown, TrendingUp];
-const STAT_ACCENTS = ['rose', 'emerald', 'amber', 'sky'];
+const STAT_ACCENTS = ['rose', 'emerald', 'rose', 'sky'];
 
 export default function Dashboard({
     stats = [],
@@ -194,16 +194,16 @@ export default function Dashboard({
                     <div className="mb-4 flex items-center justify-between">
                         <div>
                             <h3 className="flex items-center gap-2 text-base font-bold text-slate-900 dark:text-white">
-                                <AlertTriangle className="h-4 w-4 text-amber-500" />
+                                <AlertTriangle className="h-4 w-4 text-red-600" />
                                 Segera Berakhir (≤ 7 Hari)
                             </h3>
-                            <p className="text-xs text-slate-500 dark:text-slate-400">
+                            <p className="text-xs text-slate-500">
                                 Prioritas follow-up perpanjangan membership
                             </p>
                         </div>
                         <Link
                             href="/admin/announcements"
-                            className="text-xs font-semibold text-rose-600 hover:underline dark:text-rose-400"
+                            className="text-xs font-semibold text-red-600 hover:underline"
                         >
                             Kirim Pengingat
                         </Link>
