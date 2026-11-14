@@ -52,6 +52,16 @@ export default function AppLayout({
             ],
         },
         {
+            title: 'Kasir & Front-Office',
+            items: [
+                { key: 'cashier-checkins', label: 'Scan QR Check-in', href: '/cashier/checkins', icon: QrCode },
+                { key: 'pos-products', label: 'POS Jual Produk', href: '/cashier/transactions/products', icon: ShoppingBag },
+                { key: 'register-member', label: 'Pendaftaran Member', href: '/cashier/transactions/register-member', icon: UserPlus },
+                { key: 'member-payments', label: 'Perpanjangan Member', href: '/cashier/member-payments', icon: CreditCard },
+                { key: 'daily-passes', label: 'Tamu Harian (Daily Pass)', href: '/admin/daily-passes', icon: Ticket },
+            ],
+        },
+        {
             title: 'Master Data',
             items: [
                 { key: 'members', label: 'Data Member', href: '/admin/members', icon: Users },
@@ -66,7 +76,6 @@ export default function AppLayout({
                 { key: 'memberships', label: 'Status Membership', href: '/admin/memberships', icon: CreditCard },
                 { key: 'transactions', label: 'Semua Transaksi', href: '/admin/transactions', icon: Receipt },
                 { key: 'checkins', label: 'Absensi & Masuk', href: '/admin/checkins', icon: UserCheck },
-                { key: 'daily-passes', label: 'Tamu Harian', href: '/admin/daily-passes', icon: Ticket },
             ],
         },
         {
@@ -154,7 +163,7 @@ export default function AppLayout({
         },
     ];
 
-    const menuSections = panel === 'cashier' ? cashierSections : adminSections;
+    const menuSections = auth.role === 'cashier' ? cashierSections : adminSections;
 
     const handleLogout = () => {
         router.post('/logout');
@@ -162,9 +171,9 @@ export default function AppLayout({
 
     const SidebarContent = () => (
         <div className="flex h-full min-h-0 flex-col">
-            <div className="flex shrink-0 items-center justify-between border-b border-slate-200 px-5 py-4 dark:border-slate-800">
+            <div className="flex shrink-0 items-center justify-between border-b border-slate-200 px-5 py-4">
                 <Link
-                    href={panel === 'cashier' ? '/cashier' : '/admin'}
+                    href={auth.role === 'cashier' ? '/cashier' : '/admin'}
                     className="flex items-center gap-3"
                 >
                     <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-red-600 text-white shadow-md shadow-red-600/20">
@@ -175,7 +184,7 @@ export default function AppLayout({
                             ARENA GYM
                         </p>
                         <p className="text-[11px] font-medium uppercase tracking-wider text-red-600">
-                            {panel === 'cashier' ? 'Cashier POS' : 'Admin Console'}
+                            {auth.role === 'cashier' ? 'Cashier POS' : 'Admin Console'}
                         </p>
                     </div>
                 </Link>
@@ -273,57 +282,30 @@ export default function AppLayout({
 
             {/* Main area */}
             <div className="flex min-h-screen flex-col lg:pl-68">
-                <header className="sticky top-0 z-30 border-b border-slate-200/80 bg-white/85 px-4 py-3.5 backdrop-blur-md dark:border-slate-800 dark:bg-slate-900/85 sm:px-6 lg:px-8">
+                <header className="sticky top-0 z-30 border-b border-slate-200/80 bg-white/85 px-4 py-3 backdrop-blur-md sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between gap-4">
                         <div className="flex min-w-0 items-center gap-3">
                             <button
                                 type="button"
                                 onClick={() => setSidebarOpen(true)}
-                                className="rounded-xl border border-slate-200 p-2 text-slate-600 hover:bg-slate-100 lg:hidden dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+                                className="rounded-xl border border-slate-200 p-2 text-slate-600 hover:bg-slate-100 lg:hidden"
                             >
                                 <Menu className="h-5 w-5" />
                             </button>
                             <div className="min-w-0">
-                                <h1 className="truncate text-lg font-bold tracking-tight text-slate-900 dark:text-white sm:text-xl">
+                                <h1 className="truncate text-base sm:text-lg font-bold tracking-tight text-slate-900">
                                     {title}
                                 </h1>
-                                {subtitle && (
-                                    <p className="truncate text-xs text-slate-500 dark:text-slate-400">
-                                        {subtitle}
-                                    </p>
-                                )}
                             </div>
                         </div>
 
-                        <div className="flex items-center gap-3">
-                            {auth.role === 'master_admin' && (
-                                <Link
-                                    href={panel === 'admin' ? '/cashier' : '/admin'}
-                                    className="hidden sm:inline-flex"
-                                >
-                                    <span className="inline-flex items-center rounded-xl border border-red-200 bg-red-50 px-2.5 py-1 text-xs font-semibold text-red-700 hover:bg-red-100 transition">
-                                        {panel === 'admin' ? 'Buka Kasir POS' : 'Buka Admin'}
-                                    </span>
-                                </Link>
-                            )}
-
-                            {/* User Role Card with Icon on Top Right */}
-                            <div className="flex items-center gap-2.5 rounded-xl border border-red-200/90 bg-red-50/70 px-3 py-1.5 shadow-xs">
-                                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-600 text-white shadow-xs">
-                                    <User className="h-4 w-4" />
-                                </div>
-                                <div className="text-left">
-                                    <p className="truncate max-w-[120px] sm:max-w-[200px] text-xs font-bold text-slate-900 leading-tight">
-                                        {auth.name || 'Staff Arena Gym'}
-                                    </p>
-                                    <div className="flex items-center gap-1 mt-0.5">
-                                        <span className="inline-flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wider text-red-700 leading-none">
-                                            <Shield className="h-3 w-3 text-red-600" />
-                                            {auth.role || panel}
-                                        </span>
-                                    </div>
-                                </div>
+                        <div className="flex items-center gap-2">
+                            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-red-600 text-white shadow-xs">
+                                <User className="h-4 w-4" />
                             </div>
+                            <span className="text-xs font-bold uppercase tracking-wider text-slate-800">
+                                {auth.role === 'master_admin' ? 'Master Admin' : (auth.role === 'cashier' ? 'Kasir' : 'Admin')}
+                            </span>
                         </div>
                     </div>
                 </header>

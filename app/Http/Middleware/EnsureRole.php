@@ -23,7 +23,7 @@ class EnsureRole
         }
 
         if ($scope === 'cashier') {
-            if (! in_array($role, ['cashier', 'master_admin'], true)) {
+            if (! in_array($role, ['cashier', 'admin', 'master_admin'], true)) {
                 if ($request->expectsJson()) {
                     return response()->json(['message' => 'Unauthorized'], 403);
                 }

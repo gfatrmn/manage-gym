@@ -96,7 +96,15 @@ export default function MemberLayout({ title, active = 'dashboard', children }) 
                         })}
                     </nav>
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-3">
+                        <div className="hidden sm:flex items-center gap-2">
+                            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-red-600 text-white shadow-xs">
+                                <User className="h-4 w-4" />
+                            </div>
+                            <span className="text-xs font-bold uppercase tracking-wider text-slate-800">
+                                MEMBER
+                            </span>
+                        </div>
                         <button
                             type="button"
                             onClick={() => router.post('/member/logout')}

@@ -11,6 +11,7 @@ import {
     ShoppingBag,
     Ticket,
     UserPlus,
+    Zap,
 } from 'lucide-react';
 import AppLayout from '../../Layouts/AppLayout';
 import { Badge, Button, Card, StatCard } from '../../Components/UI';
@@ -33,50 +34,51 @@ export default function Dashboard({
             active="dashboard"
         >
             {/* Quick POS Action Bar */}
-            <Card className="mb-6 bg-gradient-to-br from-slate-900 via-slate-900 to-red-950 text-white">
+            <Card className="mb-6 p-4">
                 <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-center">
                     <div>
-                        <p className="text-xs font-bold uppercase tracking-wider text-red-300">
+                        <h2 className="text-sm font-bold text-slate-900 flex items-center gap-1.5">
+                            <Zap className="h-4 w-4 text-red-600" />
                             Terminal Kasir & Check-in
-                        </p>
-                        <h2 className="mt-1 text-xl font-extrabold sm:text-2xl">
-                            Operasional Cepat Front-Office
                         </h2>
+                        <p className="text-xs text-slate-500">
+                            Shift Aktif: {cashierShift.label || '08:00 - 16:00'} · Akses cepat operasional front-desk
+                        </p>
                     </div>
                     <div className="flex flex-wrap gap-2">
                         <Link
                             href="/cashier/checkins"
-                            className="inline-flex items-center gap-1.5 rounded-xl bg-red-600 px-3.5 py-2 text-xs font-bold text-white hover:bg-red-700"
+                            className="inline-flex items-center gap-1.5 rounded-xl bg-red-600 px-3.5 py-2 text-xs font-bold text-white hover:bg-red-700 shadow-sm shadow-red-600/20"
                         >
                             <QrCode className="h-4 w-4" />
                             Scan Check-in
                         </Link>
                         <Link
                             href="/cashier/transactions/products"
-                            className="inline-flex items-center gap-1.5 rounded-xl bg-white/10 px-3.5 py-2 text-xs font-bold text-white hover:bg-white/20"
+                            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 shadow-xs"
                         >
-                            <ShoppingBag className="h-4 w-4" />
+                            <ShoppingBag className="h-4 w-4 text-red-600" />
                             POS Produk
                         </Link>
                         <Link
                             href="/cashier/member-payments"
-                            className="inline-flex items-center gap-1.5 rounded-xl bg-white/10 px-3.5 py-2 text-xs font-bold text-white hover:bg-white/20"
+                            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 shadow-xs"
                         >
-                            <CreditCard className="h-4 w-4" />
+                            <CreditCard className="h-4 w-4 text-red-600" />
                             Perpanjang Member
                         </Link>
                         <Link
                             href="/cashier/daily-payments"
-                            className="inline-flex items-center gap-1.5 rounded-xl bg-white/10 px-3.5 py-2 text-xs font-bold text-white hover:bg-white/20"
+                            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 shadow-xs"
                         >
-                            <Ticket className="h-4 w-4" />
+                            <Ticket className="h-4 w-4 text-red-600" />
                             Daily Pass
                         </Link>
                         <Link
                             href="/cashier/transactions/register-member"
-                            className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-3.5 py-2 text-xs font-bold text-white hover:bg-emerald-500"
+                            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 shadow-xs"
                         >
-                            <UserPlus className="h-4 w-4" />
+                            <UserPlus className="h-4 w-4 text-emerald-600" />
                             Daftar Member Baru
                         </Link>
                     </div>

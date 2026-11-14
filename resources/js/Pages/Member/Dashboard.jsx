@@ -60,30 +60,30 @@ export default function Dashboard({
 
     return (
         <MemberLayout title="Dashboard Member" active="dashboard">
-            {/* Hero Profile Banner */}
-            <Card className="mb-6 bg-gradient-to-br from-slate-900 via-slate-900 to-red-950 text-white">
-                <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-center">
-                    <div className="flex items-center gap-4">
+            {/* Profile Quick Strip */}
+            <Card className="mb-6 p-4 sm:p-5">
+                <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+                    <div className="flex items-center gap-3.5">
                         {member?.profile_photo_url ? (
                             <img
                                 src={member.profile_photo_url}
                                 alt={user?.name}
-                                className="h-16 w-16 rounded-2xl border-2 border-white/20 object-cover"
+                                className="h-14 w-14 rounded-2xl border-2 border-red-500/20 object-cover shadow-xs"
                             />
                         ) : (
-                            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-red-600 text-xl font-extrabold text-white">
+                            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-red-600 text-lg font-extrabold text-white shadow-xs">
                                 {member?.profile_initials || 'AG'}
                             </div>
                         )}
                         <div>
                             <div className="flex flex-wrap items-center gap-2">
-                                <h1 className="text-xl font-bold sm:text-2xl">
+                                <h1 className="text-lg font-bold sm:text-xl text-slate-900">
                                     {member?.name || user?.name}
                                 </h1>
                                 <Badge variant="success">{membershipStatus}</Badge>
                             </div>
-                            <p className="mt-1 text-xs text-slate-300">
-                                Kode Check-in: <span className="font-mono font-bold text-white">{member?.checkin_code || '-'}</span> · Berakhir{' '}
+                            <p className="mt-0.5 text-xs text-slate-500">
+                                Kode Check-in: <span className="font-mono font-bold text-red-600">{member?.checkin_code || '-'}</span> · Berakhir{' '}
                                 {member?.expires_at ? formatDate(member.expires_at) : '-'}
                             </p>
                         </div>
@@ -91,9 +91,9 @@ export default function Dashboard({
 
                     <Link
                         href="/member/barcode"
-                        className="inline-flex items-center justify-center gap-2 rounded-xl bg-red-600 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-red-600/30 transition hover:bg-red-700"
+                        className="inline-flex items-center justify-center gap-2 rounded-xl bg-red-600 px-4 py-2.5 text-xs sm:text-sm font-bold text-white shadow-sm shadow-red-600/30 transition hover:bg-red-700"
                     >
-                        <QrCode className="h-5 w-5" />
+                        <QrCode className="h-4 w-4" />
                         Buka QR Check-in
                     </Link>
                 </div>

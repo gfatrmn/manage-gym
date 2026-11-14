@@ -4,11 +4,16 @@ import {
     Activity,
     AlertTriangle,
     ArrowUpRight,
+    CreditCard,
     DollarSign,
+    MessageSquare,
+    ShoppingBag,
+    Ticket,
     TrendingDown,
     TrendingUp,
     UserCheck,
     Users,
+    Zap,
 } from 'lucide-react';
 import AppLayout from '../../Layouts/AppLayout';
 import {
@@ -72,74 +77,89 @@ export default function Dashboard({
     return (
         <AppLayout
             title="Dashboard Admin"
-            subtitle="Ringkasan operasional, keuangan harian, dan pemantauan keanggotaan Arena Gym"
             panel="admin"
             active="dashboard"
         >
-            {/* Hero banner */}
-            <Card className="mb-6 bg-gradient-to-br from-slate-900 via-slate-900 to-rose-950 text-white dark:border-slate-800">
-                <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-center">
+            {/* Quick Actions Strip */}
+            <Card className="mb-6 p-4">
+                <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
                     <div>
-                        <Badge variant="danger" className="bg-rose-500/20 text-rose-200 ring-rose-400/30">
-                            Arena Gym Management System
-                        </Badge>
-                        <h2 className="mt-2 text-2xl font-extrabold tracking-tight sm:text-3xl">
-                            Kontrol Operasional & Membership Terpadu
+                        <h2 className="text-sm font-bold text-slate-900 flex items-center gap-1.5">
+                            <Zap className="h-4 w-4 text-red-600" />
+                            Aksi Cepat Front-Office
                         </h2>
-                        <p className="mt-1 max-w-2xl text-xs text-slate-300 sm:text-sm">
-                            Catat kunjungan member & tamu harian, kelola pengingat jatuh tempo, dan pantau laporan keuangan real-time.
+                        <p className="text-xs text-slate-500">
+                            Pencatatan check-in cepat, tamu harian, POS penjualan produk, dan perpanjangan
                         </p>
-                        <div className="mt-4 flex flex-wrap gap-2.5">
-                            <Button onClick={() => setShowCheckinModal(true)} size="sm">
-                                <UserCheck className="h-4 w-4" />
-                                Catat Check-in Member
-                            </Button>
-                            <Button
-                                variant="secondary"
-                                size="sm"
-                                onClick={() => setShowDailyPassModal(true)}
-                            >
-                                + Tamu Harian (Daily Pass)
-                            </Button>
-                            <Link
-                                href="/admin/reports"
-                                className="inline-flex items-center gap-1.5 rounded-xl bg-white/10 px-3.5 py-2 text-xs font-semibold text-white hover:bg-white/20"
-                            >
-                                Buka Laporan Keuangan
-                                <ArrowUpRight className="h-4 w-4" />
-                            </Link>
-                        </div>
                     </div>
-
-                    <div className="grid gap-3 sm:grid-cols-2">
-                        {heroSummary.map((item, idx) => (
-                            <div
-                                key={idx}
-                                className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 backdrop-blur"
-                            >
-                                <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-300">
-                                    {item.label}
-                                </p>
-                                <p className="mt-1 text-lg font-extrabold text-white">{item.value}</p>
-                                <p className="text-[11px] text-slate-400">{item.note}</p>
-                            </div>
-                        ))}
+                    <div className="flex flex-wrap items-center gap-2">
+                        <Button onClick={() => setShowCheckinModal(true)} size="sm">
+                            <UserCheck className="h-4 w-4" />
+                            Check-in Member
+                        </Button>
+                        <Button
+                            variant="secondary"
+                            size="sm"
+                            onClick={() => setShowDailyPassModal(true)}
+                        >
+                            <Ticket className="h-4 w-4" />
+                            + Tamu Harian
+                        </Button>
+                        <Link
+                            href="/cashier/transactions/products"
+                            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition shadow-xs"
+                        >
+                            <ShoppingBag className="h-4 w-4 text-red-600" />
+                            POS Jual Produk
+                        </Link>
+                        <Link
+                            href="/cashier/member-payments"
+                            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition shadow-xs"
+                        >
+                            <CreditCard className="h-4 w-4 text-red-600" />
+                            Perpanjangan Paket
+                        </Link>
+                        <Link
+                            href="/admin/reports"
+                            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition shadow-xs"
+                        >
+                            <ArrowUpRight className="h-4 w-4 text-slate-400" />
+                            Laporan Keuangan
+                        </Link>
                     </div>
                 </div>
             </Card>
 
-            {/* Primary Stats */}
-            <div className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-                {stats.map((stat, idx) => (
-                    <StatCard
-                        key={idx}
-                        title={stat.label}
-                        value={stat.value}
-                        subtitle={stat.note}
-                        icon={STAT_ICONS[idx] || Activity}
-                        accent={STAT_ACCENTS[idx] || 'rose'}
-                    />
-                ))}
+            {/* Primary Stats Grid */}
+            <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <StatCard
+                    title={stats[0]?.label || 'Total Member Aktif'}
+                    value={stats[0]?.value || '0'}
+                    subtitle={stats[0]?.note || 'Status member aktif'}
+                    icon={Users}
+                    accent="rose"
+                />
+                <StatCard
+                    title={stats[1]?.label || 'Pemasukan Hari Ini'}
+                    value={stats[1]?.value || 'Rp 0'}
+                    subtitle={stats[1]?.note || 'Kasir & Daily Pass'}
+                    icon={DollarSign}
+                    accent="emerald"
+                />
+                <StatCard
+                    title="Aktivitas Hari Ini"
+                    value={heroSummary[0]?.value || '0 Kunjungan'}
+                    subtitle={heroSummary[0]?.note || 'Check-in & Tamu Harian'}
+                    icon={Activity}
+                    accent="sky"
+                />
+                <StatCard
+                    title="Jatuh Tempo (≤ 7 Hari)"
+                    value={heroSummary[1]?.value || '0 Jatuh Tempo'}
+                    subtitle="Perlu follow-up perpanjangan"
+                    icon={AlertTriangle}
+                    accent="rose"
+                />
             </div>
 
             {/* Two-column lists */}
@@ -225,9 +245,23 @@ export default function Dashboard({
                                             {m.phone} · Terakhir diingatkan: {m.last_reminder}
                                         </p>
                                     </div>
-                                    <Badge variant={m.days_left <= 2 ? 'danger' : 'warning'}>
-                                        {m.days_left} hari lagi
-                                    </Badge>
+                                    <div className="flex items-center gap-2 shrink-0">
+                                        {m.phone && (
+                                            <a
+                                                href={`https://wa.me/${m.phone.replace(/^0/, '62').replace(/\D/g, '')}?text=${encodeURIComponent(`Halo ${m.full_name}, pengingat membership Arena Gym Anda tersisa ${m.days_left} hari lagi. Silakan perpanjang di meja kasir kami agar latihan tetap lancar. Terima kasih!`)}`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="inline-flex items-center gap-1 rounded-lg border border-emerald-300 bg-emerald-50 px-2 py-1 text-[11px] font-semibold text-emerald-700 hover:bg-emerald-100 transition"
+                                                title="Kirim Pengingat WhatsApp"
+                                            >
+                                                <MessageSquare className="h-3 w-3" />
+                                                Kirim WA
+                                            </a>
+                                        )}
+                                        <Badge variant={m.days_left <= 2 ? 'danger' : 'warning'}>
+                                            {m.days_left} hari lagi
+                                        </Badge>
+                                    </div>
                                 </div>
                             ))}
                         </div>
