@@ -193,8 +193,11 @@ class MemberPaymentController extends Controller
             );
         });
 
-        return redirect()->route('cashier.transactions', ['section' => 'member'])
-            ->with('status', 'Pembayaran member berhasil dicatat.');
+        $redirect = $request->input('return_to') === 'members'
+            ? redirect()->route('cashier.members')
+            : redirect()->route('cashier.transactions', ['section' => 'member']);
+
+        return $redirect->with('status', 'Pembayaran member berhasil dicatat.');
     }
 }
 

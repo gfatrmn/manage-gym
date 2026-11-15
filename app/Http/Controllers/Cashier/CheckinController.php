@@ -64,10 +64,12 @@ class CheckinController extends Controller
 
         $redirectParams = $actor === 'qr_member' ? ['section' => 'qr'] : [];
 
+        $redirectRoute = $request->input('return_to') === 'dashboard' ? 'cashier.dashboard' : 'cashier.checkins';
+
         return RouteHelpers::storeMemberCheckin(
             request: $request,
             actor: $actor,
-            redirectRoute: 'cashier.checkins',
+            redirectRoute: $redirectRoute,
             redirectParams: $redirectParams,
         );
     }
@@ -101,7 +103,9 @@ class CheckinController extends Controller
             );
         });
 
-        return redirect()->route('cashier.checkins')
+        $redirectRoute = request()->input('return_to') === 'dashboard' ? 'cashier.dashboard' : 'cashier.checkins';
+
+        return redirect()->route($redirectRoute)
             ->with('status', "Check-in {$checkin->member?->full_name} berhasil divalidasi kasir.");
     }
 
@@ -117,7 +121,9 @@ class CheckinController extends Controller
             'verified_by' => (string) (session('auth.name') ?? session('auth.login') ?? 'kasir'),
         ]);
 
-        return redirect()->route('cashier.checkins')
+        $redirectRoute = request()->input('return_to') === 'dashboard' ? 'cashier.dashboard' : 'cashier.checkins';
+
+        return redirect()->route($redirectRoute)
             ->with('status', "Pengajuan check-in {$checkin->member?->full_name} ditolak.");
     }
 }

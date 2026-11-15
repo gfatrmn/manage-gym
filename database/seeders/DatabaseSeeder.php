@@ -147,5 +147,11 @@ class DatabaseSeeder extends Seeder
                 ['value' => $val]
             );
         }
+
+        // Seed products and realistic members for front-office & cashier operations
+        $this->call([
+            ProductSeeder::class,
+            MemberSeeder::class,
+        ]);
     }
 }

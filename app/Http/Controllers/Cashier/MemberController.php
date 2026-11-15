@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Cashier;
 use App\Helpers\RouteHelpers;
 use App\Http\Controllers\Controller;
 use App\Models\GymMember;
+use App\Models\MembershipPackage;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -15,6 +16,12 @@ class MemberController extends Controller
     {
         $search = trim((string) $request->query('q', ''));
         $status = $request->query('status', 'all');
+
+        $today = now()->toDateString();
+        $totalMembers = GymMember::query()->where('status', 'member')->count();
+        $activeMembers = GymMember::query()->where('status', 'member')->whereDate('expires_at', '>=', $today)->count();
+        $expiredMembers = GymMember::query()->where('status', 'member')->whereDate('expires_at', '<', $today)->count();
+        $packages = MembershipPackage::query()->where('is_active', true)->get();
 
         $members = GymMember::query()
             ->where('status', 'member')
@@ -53,10 +60,14 @@ class MemberController extends Controller
             ]);
 
         return Inertia::render('Cashier/Members', RouteHelpers::buildCashierViewData([
-            'pageTitle' => 'Data Member - Kasir Arena Gym',
-            'activePage' => 'cashier.members',
-            'members'    => $members,
-            'filters'    => [
+            'pageTitle'      => 'Data & Kelola Member - Kasir Arena Gym',
+            'activePage'     => 'cashier.members',
+            'members'        => $members,
+            'packages'       => $packages,
+            'totalMembers'   => $totalMembers,
+            'activeMembers'  => $activeMembers,
+            'expiredMembers' => $expiredMembers,
+            'filters'        => [
                 'q'      => $search,
                 'status' => $status,
             ],

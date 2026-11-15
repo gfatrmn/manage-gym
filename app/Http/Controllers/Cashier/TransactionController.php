@@ -530,7 +530,11 @@ class TransactionController extends Controller
             ? 'Pendaftaran member berhasil dan transaksi sudah tercatat.'
             : 'Pendaftaran member berhasil. Menunggu verifikasi pembayaran QRIS.';
 
-        return redirect()->route('cashier.transactions.register-member.form')
+        $redirect = $request->input('return_to') === 'members'
+            ? redirect()->route('cashier.members')
+            : redirect()->route('cashier.transactions.register-member.form');
+
+        return $redirect
             ->with('status', $message . ' Username dan password awal sudah siap diberikan ke member.')
             ->with('member_credentials', [
                 'name'     => $validated['full_name'],
